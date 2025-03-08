@@ -1,0 +1,47 @@
+.forms h4{
+    font-size: 16px;
+    font-weight: bold;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+.card{
+    border: 2px solid black;
+    padding: 12px;
+}
+.radio{
+    width: 5%;
+}
+.card .total{
+    display: flex;
+    justify-content: space-between;
+}
+.card .order{
+    background-color: #111;
+    color: white;
+    transition: 1s;
+    border: 1px solid #111;
+}
+.card .order:hover{
+    background-color: #fff;
+    color: #111;
+}
+.checkform, .forms{
+    margin-top: 200px;
+}
+@media(max-width:991px){
+    .checkout-responsive{
+        flex-wrap: wrap-reverse;
+    }
+    .forms{
+        margin-top: 40px;
+    }
+    .checkform{
+        margin-top: 120px;
+    }
+}
+ul li i{
+    background-color: black;
+    color: #fff;
+    cursor: pointer;
+    border-radius: 4px;
+    font-size: 15px;
+}

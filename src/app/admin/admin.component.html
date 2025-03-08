@@ -1,0 +1,78 @@
+<app-navbar></app-navbar>
+<div class="dashboard-container">
+    <!-- Sidebar -->
+    <nav class="sidebar">
+      <div class="brand-logo">Amigo</div>
+      <ul class="menu">
+        <li><a routerLink="/admin">Dashboard</a></li>
+        <li><a routerLink="/adminproduct">Products</a></li>
+        <li><a routerLink="/customerorder">Orders</a></li>
+        <li><a routerLink="/customerconnect">Customers</a></li>
+        <li><a routerLink="" (click)="logout()">LogOut</a></li>
+    </ul>
+    </nav>
+
+    <!-- Main Content Area -->
+    <div class="main-content">
+      <!-- Top Bar -->
+      <header>
+        <div class="top-bar">
+          <div class="logo">Amigo</div>
+          <div class="user-profile">
+            <span>Admin</span>
+            <img src="../../assets/img/delpo.jpg" alt="User Profile">
+          </div>
+        </div>
+      </header>
+      <div class="col-md-9 mt-5 m-auto">
+        <div class="container">
+          <h1 class="text-center text-bg-info text-white">Add Categories</h1>
+          <div class="card d-flex p-3">
+            <label for="" class="mb-2 fs-2 text-success">Category Name</label>
+            <input class="form-control p-3 fs-5" type="text" [(ngModel)]="categoryName" placeholder="ادخل اسم الفئة">
+            <label>Slug الفئة:</label>
+            <input class="form-control p-3 fs-5" type="text" [(ngModel)]="categorySlug" placeholder="ادخل Slug الفئة">
+            <label for="" class="mb-2 fs-2 text-success">Category Image</label>
+            <input type="file" accept="image/*" class="form-control p-3 fs-5" [(ngModel)]="selectedFile" (change)="onFileSelected($event)">
+            <button class="w-100 btn btn-info text-white text-center  mt-4"  (click)="submitCategory()" >Send Data</button>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-9 mt-5 m-auto">
+        <!-- product.component.html -->
+          <div class="card">
+            <div class="card-body">
+              <h1 class="text-center text-bg-info text-white">Add Products</h1>
+              <form (ngSubmit)="submitProduct()">
+          <!-- الحقول الخاصة بالمنتج -->
+          <input class="form-control mb-1 p-2" [(ngModel)]="product.title" name="title" placeholder="اسم المنتج" required />
+          <input class="form-control mb-1 p-2" [(ngModel)]="product.slug" name="slug" placeholder="الرابط" required />
+          <textarea [(ngModel)]="product.description" name="description" placeholder="الوصف" required></textarea>
+          <input class="form-control mb-1 p-2" [(ngModel)]="product.price" name="price" type="number" placeholder="السعر" required />
+          <div class="d-flex mb-2">
+            <input class="form-control me-2" [(ngModel)]="newSize" name="newSize" type="text" placeholder="أدخل الحجم" />
+            <button type="button" class="btn btn-success" (click)="addSize()">إضافة الحجم</button>
+          </div>
+          <input class="form-control mb-1 p-2" [(ngModel)]="product.quantity" name="quantity" type="number" placeholder="الكمية" required />
+          <input class="form-control mb-1 p-2" [(ngModel)]="product.originalQuantity" name="originalQuantity" type="number" placeholder="الكمية الاصلية" required />
+          <input class="form-control mb-1 p-2" [(ngModel)]="product.priceAfterDiscount" name="priceAfterDiscount" type="number" placeholder=" السعر يعد الخصم" required />
+          <select style="background-color: #010103; color: white; font-size: 18px; font-weight: bold; text-align: center;" class="form-control" (change)="onCategoryChange($event)">
+            <option value="">Choose Categories </option>
+            <option *ngFor="let option of allcategory[0]" [value]="option._id">{{option.name}}</option>
+          </select>
+
+  <!-- باقي الحقول -->
+  
+  <label for="imageCover">اختر صورة غلاف المنتج:</label>
+  <input type="file" accept="image/*" id="imageCover" (change)="onImageCoverChange($event)" />
+  
+  <label for="images">اختر صور أخرى:</label>
+  <input type="file" accept="image/*" id="images" (change)="onImagesChange($event)" multiple />
+  
+  <button type="submit" class="btn btn-danger">إضافة المنتج</button>
+        </form>
+            </div>
+          </div>
+      </div>
+    </div>
+  </div>

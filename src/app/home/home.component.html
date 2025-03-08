@@ -1,0 +1,233 @@
+<app-navbar></app-navbar>
+<section class="home ">
+    <!-- <img src="../../assets/img/470973657_18027395270618717_1536976984944287090_n.jpg" alt=""> -->
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-6 m-auto txt">
+                <h2 class="text-white fw-bold">🏡Welcome to the World of Fashion!</h2>
+                <h1 class="text-white fw-bold">Design & High Quailty</h1>
+                <h2 class="text-white fw-bold mb-4 fs-2">👕 Men's Fashion | 🧥 Kids' Wear | 🏷️ Exclusive Deals</h2>
+                <div class="buttons d-flex justify-content-center">
+                <!-- From Uiverse.io by doniaskima --> 
+<button class="btn-53">
+    <div class="original" >Shop Now</div>
+    <div class="letters" routerLink="/cargo">
+      
+      <span>S</span>
+      <span>h</span>
+      <span>o</span>
+      <span>p</span>
+      <span>N</span>
+      <span>o</span>
+      <span>W</span>
+    </div>
+  </button>
+  
+                <!-- From Uiverse.io by doniaskima --> 
+                <!-- From Uiverse.io by adamgiebl --> 
+<button class="cssbuttons-io" routerLink="/cargo">
+    <span>
+        Discover More</span>
+  </button>
+  
+            </div>
+                
+            </div>
+            <div class="col-lg-6">
+                <img src="../../assets/img/EID-2787ec9375e58fc2928d30bff8530b706821e119-Photoroom.png" alt="">
+            </div>
+            </div>
+    </div>
+</section>
+<section class="catgories mt-5">
+    <div class="container">
+        <h3 id="one">Catgories</h3>
+        <div class="row">
+            <div class="col-lg-3" *ngFor="let item of alldata[0];"  (click)="onCategoryChange(item._id)">
+                <a routerLink="/shirt/{{item._id}}">
+                    <div class="cat">
+                    <h3>{{item.name}}</h3>
+                    <img [src]="'http://localhost:8000/uploads/category/'+item.image" alt="">
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+</section>
+<section class="shop">
+    <h1 class="text-center">Shop By Look</h1> <br><br>
+    <h1 class="text-center mb-5">Start From 500EGP!</h1>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-3 mb-5 car-dad">
+                <a href="./wide.html">
+                    <div class="new">
+                        <p>SALE</p>
+                    </div>
+                    <div id="carouselExampleControls" class="carousel carousel-fade slide" data-ride="carousel">
+                        <div class="carousel-inner">
+                            <div class="carousel-item active">
+                                <img src="../../assets/img/wide leg.jpg" class="" alt="...">
+                            </div>
+                            <div class="carousel-item">
+                                <img src="../../assets/img/BOYFRIEND.webp" class="" alt="...">
+                            </div>
+                            <div class="carousel-item">
+                                <img src="../../assets/img/best (2).jpg" class="" alt="...">
+                            </div>
+                        </div>
+                        <div class="car-text">
+                            <h4>WIDE LEG</h4>
+                        </div>
+                        
+                    </div>
+                </a>
+            </div>
+            <div class="col-lg-3 mb-5 car-dad">
+                <a href="./sweat.html">
+                    <div class="new">
+                        <p>SALE</p>
+                    </div>
+                    <div id="carouselExampleControls" class="carousel carousel-fade slide" data-ride="carousel">
+                        <div class="carousel-inner">
+                            <div class="carousel-item active">
+                                <img src="../../assets/img/sweat.webp" class="" alt="...">
+                            </div>
+                            <div class="carousel-item">
+                                <img src="../../assets/img/best (1).jpg" class="" alt="...">
+                            </div>
+                            <div class="carousel-item">
+                                <img src="../../assets/img/sweat.webp" class="" alt="...">
+                            </div>
+                        </div>
+                        <div class="car-text">
+                            <h4>SWEATPANTS</h4>
+                        </div>
+                        
+                    </div>
+                </a>
+            </div>
+            <div class="col-lg-3 mb-5 car-dad">
+                <a href="./slimfit.html">
+                    <div class="new">
+                        <p>SALE</p>
+                    </div>
+                    <div id="carouselExampleControls" class="carousel carousel-fade slide" data-ride="carousel">
+                        <div class="carousel-inner">
+                            <div class="carousel-item active">
+                                <img src="../../assets/img/slim.jpg" class="" alt="...">
+                            </div>
+                            <div class="carousel-item">
+                                <img src="../../assets/img/slim.jpg" class="" alt="...">
+                            </div>
+                            <div class="carousel-item">
+                                <img src="../../assets/img/slim.jpg" class="" alt="...">
+                            </div>
+                        </div>
+                        <div class="car-text">
+                            <h4>SLIMFIT</h4>
+                        </div>
+                        
+                    </div>
+                </a>
+            </div>
+            <div class="col-lg-3 mb-5 car-dad">
+                <a href="./boy.html">
+                    <div class="new">
+                        <p>SALE</p>
+                    </div>
+                    <div id="carouselExampleControls" class="carousel carousel-fade slide" data-ride="carousel">
+                        <div class="carousel-inner">
+                            <div class="carousel-item active">
+                                <img src="../../assets/img/BOYFRIEND.webp" class="" alt="...">
+                            </div>
+                            <div class="carousel-item">
+                                <img src="../../assets/img/BOYFRIEND.webp" class="" alt="...">
+                            </div>
+                            <div class="carousel-item">
+                                <img src="../../assets/img/BOYFRIEND.webp" class="" alt="...">
+                            </div>
+                        </div>
+                        <div class="car-text">
+                            <h4>BOYFRIEND</h4>
+                        </div>
+                        
+                    </div>
+                </a>
+            </div>
+            <div class="col-lg-3 mb-5 car-dad">
+                <a href="./cargo.html">
+                    <div class="new">
+                        <p>SALE</p>
+                    </div>
+                    <div id="carouselExampleControls" class="carousel carousel-fade slide" data-ride="carousel">
+                        <div class="carousel-inner">
+                            <div class="carousel-item active">
+                                <img src="../../assets/img/cargo.webp" class="" alt="...">
+                            </div>
+                            <div class="carousel-item">
+                                <img src="../../assets/img/cargo.webp" class="" alt="...">
+                            </div>
+                            <div class="carousel-item">
+                                <img src="../../assets/img/cargo.webp" class="" alt="...">
+                            </div>
+                        </div>
+                        <div class="car-text">
+                            <h4>CARGO</h4>
+                        </div>
+                        
+                    </div>
+                </a>
+            </div>
+            <div class="col-lg-3 mb-5 car-dad">
+                <a href="./best.html">
+                    <div class="new">
+                        <p>SALE</p>
+                    </div>
+                    <div id="carouselExampleControls" class="carousel carousel-fade slide" data-ride="carousel">
+                        <div class="carousel-inner">
+                            <div class="carousel-item active">
+                                <img src="../../assets/img/best (1).jpg" class="" alt="...">
+                            </div>
+                            <div class="carousel-item">
+                                <img src="../../assets/img/best (1).jpg" class="" alt="...">
+                            </div>
+                            <div class="carousel-item">
+                                <img src="../../assets/img/best (1).jpg" class="" alt="...">
+                            </div>
+                        </div>
+                        <div class="car-text">
+                            <h4>BESTSELLER</h4>
+                        </div>
+                        
+                    </div>
+                </a>
+            </div>
+            <div class="col-lg-3 mb-5 car-dad">
+                <a href="./shirt.html">
+                    <div class="new">
+                        <p>SALE</p>
+                    </div>
+                    <div id="carouselExampleControls" class="carousel carousel-fade slide" data-ride="carousel">
+                        <div class="carousel-inner">
+                            <div class="carousel-item active">
+                                <img src="../../assets/img/t-shirt.jpg" class="" alt="...">
+                            </div>
+                            <div class="carousel-item">
+                                <img src="../../assets/img/t-shirt.jpg" class="" alt="...">
+                            </div>
+                            <div class="carousel-item">
+                                <img src="../../assets/img/t-shirt.jpg" class="" alt="...">
+                            </div>
+                        </div>
+                        <div class="car-text">
+                            <h4>T-SHIRT</h4>
+                        </div>
+                        
+                    </div>
+                </a>
+            </div>
+        </div>
+    </div>
+
+</section>

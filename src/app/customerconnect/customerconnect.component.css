@@ -1,0 +1,128 @@
+.sidebar {
+    width: 250px;
+    background-color: #333;
+    color: white;
+    padding: 20px;
+    height: 100vh;
+    margin-top: 150px;
+  }
+  
+  .sidebar .brand-logo {
+    font-size: 24px;
+    margin-bottom: 20px;
+  }
+  .buttons{
+    display: flex;
+    justify-content: space-between;
+  }
+  .buttons button{
+    width: 45%;
+    margin-right: 5px;
+  }
+  .sidebar .menu {
+    list-style: none;
+  }
+  
+  .sidebar .menu li {
+    margin: 15px 0;
+  }
+  
+  .sidebar .menu li a {
+    color: white;
+    text-decoration: none;
+    font-size: 18px;
+  }
+  
+  .sidebar .menu li a:hover {
+    background-color: #444;
+    padding-left: 10px;
+  }
+  
+  /* Main content area */
+  .main-content {
+    flex-grow: 1;
+    padding: 20px;
+  }
+  
+  .top-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background-color: #fff;
+    padding: 15px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    margin-top: 150px;
+  }
+  .card button{
+    padding: 10px 15px;
+    font-size: 15px;
+    font-weight: bold;
+    border-radius: 10px;
+  }
+  .top-bar .logo {
+    font-size: 24px;
+    color: #333;
+  }
+  .top-bar .user-profile {
+    display: flex;
+    align-items: center;
+  }
+  
+  .top-bar .user-profile img {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    margin-left: 10px;
+  }
+  table{
+    background-color: #007BFF;
+    color: white;
+    border: 1px solid black;
+  }
+  tr{
+    border-bottom: 2px solid #f1f1f1;
+    padding-bottom: 5px;
+    padding: 10px;
+  }
+  td .update{
+    border: 1px solid black;
+    padding: 10px;
+    font-weight: bold;
+    font-size: 15px;
+    border-radius: 8px;
+    width: 100px;
+    background-color: rgb(27, 27, 58);
+    color: white;
+    transition: 1s;
+  }
+  td .update:hover{
+    background-color: rgb(48, 48, 202);
+    border: 1px solid rgb(27, 27, 58);
+  }
+  td .delete{
+    border: 1px solid black;
+    padding: 10px;
+    font-weight: bold;
+    font-size: 15px;
+    border-radius: 8px;
+    width: 100px;
+    background-color: rgb(180, 10, 10);
+    color: white;
+    margin-left: 10px;
+  }
+  td .delete:hover{
+    background-color: rgb(238, 39, 39);
+    border: 1px solid rgb(180, 10, 10);
+  }
+  @media (max-width:991px){
+    .sidebar{
+      margin-top: 90px;
+      height: 300px;
+    }
+    .top-bar{
+      margin-top: 0px;
+    }
+    td,th{
+      font-size: 12px;
+    }
+  }

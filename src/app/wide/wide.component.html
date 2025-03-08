@@ -1,0 +1,36 @@
+<section class="clothes">
+    <h4 class="text-center fw-bold  ">The Most Popular</h4>
+    <h1 class="text-center fw-bold ">Explore Amigo Product</h1>
+    <div class="container">
+        <div class="row">
+            <div class="col-lg-3" *ngFor="let item of alldata">
+                <a href="">
+                    <div class="card ">
+                        <div class="new">
+                            <p>New</p>
+                        </div>
+                        <img src="{{item.image}}" alt="" class="w-100">
+                        <div class="icon ">
+                            <i class="fas fa-shopping-cart" id="cart-btn"></i>
+                            <i class="fas fa-solid fa-star" id="star-btn"></i>
+                        </div>
+                        <p>{{item.title}}</p>
+                        <p>{{item.description}}</p>
+                        <p>{{item.category}}</p>
+                        <span>{{item.price}}EGP</span>                        
+                    </div>
+                </a>
+                <div class="row">
+                    <div class="sizes fw-bold">
+                        <a href="" class="size">30</a>
+                        <a href="" class="size">32</a>
+                        <a href="" class="size">34</a>
+                        <a href="" class="size">36</a>
+                        <a href="" class="size">38</a>
+                    </div>
+                
+                </div>
+            </div>
+        </div>
+    </div>
+</section>

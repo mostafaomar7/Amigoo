@@ -1,0 +1,72 @@
+<app-navbar></app-navbar>
+<div class="row">
+    <div class="col-lg-3">
+        <nav class="sidebar">
+            <div class="brand-logo">Amigo</div>
+            <ul class="menu">
+                <li><a routerLink="/admin">Dashboard</a></li>
+                <li><a routerLink="/adminproduct">Products</a></li>
+                <li><a routerLink="/customerorder">Orders</a></li>
+                <li><a routerLink="/customerconnect">Customers</a></li>
+                <li><a routerLink="" (click)="logout()">LogOut</a></li>
+            </ul>
+        </nav>
+    </div>
+    <div class="col-lg-9" style="margin-top: 30px;">
+        <div class="container">
+            <header>
+                <div class="top-bar">
+                  <div class="logo">Amigo</div>
+                  <div class="user-profile">
+                    <span>Admin</span>
+                    <img src="../../assets/img/delpo.jpg" alt="User Profile">
+                  </div>
+                </div>
+              </header>
+        <div class="row mt-5">
+            <table class="table fw-bold fs-3 table-responsive" style="margin-left: -30px;">
+                <tr style=" font-size: 13px; text-align: center;">
+                    <th class="p-4"></th>
+                    <th>Name</th>
+                    <th>email</th>
+                    <th>phone</th>
+                    <th>Message</th>
+                    <th>Country</th>
+                    <th>streetAddress</th>
+                    <th>state</th>
+                    <th>Order</th>
+                    <th>Action</th>
+                </tr >
+                <tr *ngFor="let res of allresponse[0]; let i =index;" style=" font-size: 13px; text-align: center;">
+                    <td>{{i+1}}</td>
+                    <td>{{res.fullName}}</td>
+                    <td>{{res.email}}</td>
+                    <td>{{res.phone}}</td>
+                    <td>{{res.orderNotes}}</td>
+                    <td>{{res.country}}</td>
+                    <td>{{res.streetAddress}}</td>
+                    <td>{{res.state}}</td>
+                    <td>
+                        <ng-container *ngIf="res.localStorge && res.localStorge.length > 0; else noItems">
+                            <ul *ngFor="let item of res.localStorge">
+                              <li><img style="width: 50px; height: 50px;" [src]="'http://localhost:8000/uploads/products/'+item.imageCover" alt=""></li>
+                              <li >
+                                {{ item.title }}-{{ item.quantity }}pcs-${{ item.price }}-{{item.selectedSize}}
+                              </li>
+                            </ul>
+                          </ng-container>
+                          <ng-template #noItems>
+                            <span>No items</span>
+                          </ng-template>
+                      </td>                    
+                      <td>
+                        <button class="delete" class="delete" (click)="deleteresponse(res.id || res._id)">Delete</button>
+                    </td>
+                    <p *ngIf="res.length === 0" class="alert alert-danger">No Response available.</p>
+                </tr>
+            </table>
+            
+        </div>
+    </div>
+    </div>    
+</div>

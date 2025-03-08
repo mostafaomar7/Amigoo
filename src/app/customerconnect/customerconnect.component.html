@@ -1,0 +1,52 @@
+<app-navbar></app-navbar>
+<div class="row">
+    <div class="col-lg-3">
+        <nav class="sidebar">
+            <div class="brand-logo">Amigo</div>
+            <ul class="menu">
+                <li><a routerLink="/admin">Dashboard</a></li>
+                <li><a routerLink="/adminproduct">Products</a></li>
+                <li><a routerLink="/customerorder">Orders</a></li>
+                <li><a routerLink="/customerconnect">Customers</a></li>
+                <li><a routerLink="" (click)="logout()">LogOut</a></li>
+            </ul>
+        </nav>
+    </div>
+    <div class="col-lg-9" style="margin-top: 30px;">
+        <div class="container">
+            <header>
+                <div class="top-bar">
+                  <div class="logo">Amigo</div>
+                  <div class="user-profile">
+                    <span>Admin</span>
+                    <img src="../../assets/img/delpo.jpg" alt="User Profile">
+                  </div>
+                </div>
+              </header>
+        <div class="row mt-5">
+            <table class="table fw-bold fs-3 table-responsive">
+                <tr >
+                    <th class="p-4"></th>
+                    <th>Customer Name</th>
+                    <th>Customer email</th>
+                    <th>Customer phone</th>
+                    <th>Customer Message</th>
+                    <th>Action</th>
+                </tr >
+                <tr *ngFor="let res of allresponse[0]; let i =index;">
+                    <td>{{i+1}}</td>
+                    <td>{{res.name}}</td>
+                    <td>{{res.email}}</td>
+                    <td>{{res.phone}}</td>
+                    <td>{{res.message}}</td>
+                    <td>
+                        <button class="delete" (click)="deleteresponse(res._id)">Delete</button>
+                    </td>
+                    <p *ngIf="res.length === 0" class="alert alert-danger">No Response available.</p>
+                </tr>
+            </table>
+            
+        </div>
+    </div>
+    </div>    
+</div>

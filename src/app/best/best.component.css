@@ -1,0 +1,17 @@
+.card-best{
+    height: 500px;
+    overflow: hidden;
+    margin-bottom: 10px;
+    font-family: fantasy;
+    font-weight: bold;
+    font-size: 12px;
+}
+.card-best img{
+    width: 100px;
+    height: 200px;
+    margin-bottom: 20px;
+}
+a{
+    color: black;
+    text-align: center;
+}
