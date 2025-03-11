@@ -15,28 +15,28 @@ interface LoginResponse {
 export class ApifunctionService {
   constructor(private http : HttpClient , private router :Router) { }
   getdata(){         // get all product
-    return this.http.get("http://localhost:8000/api/v1/product/")
+    return this.http.get("http://backend:8000/api/v1/product/")
   }
   getcatgory(){
-    return this.http.get("http://localhost:8000/api/v1/categories/")
+    return this.http.get("http://backend:8000/api/v1/categories/")
   }
   getproductybycatgory(id:any){
-    return this.http.get(`http://localhost:8000/api/v1/product/category/${id}`)
+    return this.http.get(`http://backend:8000/api/v1/product/category/${id}`)
   }
   getproductybyid(id:any){
-    return this.http.get('http://localhost:8000/api/v1/categories/' + id)
+    return this.http.get('http://backend:8000/api/v1/categories/' + id)
   }
   getproductybyidd(id:any){
-    return this.http.get('http://localhost:8000/api/v1/product/' + id)
+    return this.http.get('http://backend:8000/api/v1/product/' + id)
   }
   postform(data){
-    return this.http.post("http://localhost:8000/api/v1/submit/",data)
+    return this.http.post("http://backend:8000/api/v1/submit/",data)
   }
   postcategory(object){
-    return this.http.post('http://localhost:8000/api/v1/categories/', object)
+    return this.http.post('http://backend:8000/api/v1/categories/', object)
   }
   
-  private apiUrl = 'http://localhost:8000/api/v1/user';
+  private apiUrl = 'http://backend:8000/api/v1/user';
   login(email: string, password: string): Observable<boolean> {
     return this.http.post<LoginResponse>(`${this.apiUrl}/login`, { email, password }).pipe(
       map(response => {
