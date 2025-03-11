@@ -52,7 +52,7 @@
             <hr>
             <ul *ngFor="let item of cartproduct; let index = index ;" >
                 <ul class="d-flex ">
-                    <li><img style="width: 50px; height: 50px;" [src]="'http://localhost:8000/uploads/products/'+item.imageCover" alt=""></li>
+                    <li><img style="width: 50px; height: 50px;" [src]="'http://backend/uploads/products/'+item.imageCover" alt=""></li>
                     <li class="fw-bold  fs-4 mt-3 mx-2 ">{{item.title}}</li>
                 <!-- <li>
                     <div class="counter d-flex">
