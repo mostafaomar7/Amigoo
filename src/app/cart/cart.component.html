@@ -18,7 +18,7 @@
                 <th>Action</th>
             </tr>
             <tr *ngFor="let item of cartproduct; let index = index ;">
-                <td><img style="width: 50px; height: 50px;" [src]="'http://localhost:8000/uploads/products/'+item.imageCover" alt=""></td>
+                <td><img style="width: 50px; height: 50px;" [src]="'http://backend/uploads/products/'+item.imageCover" alt=""></td>
                 <td>{{item.title}}</td>
                 <td>{{item.price}}</td>
                 <td>
