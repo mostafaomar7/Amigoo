@@ -41,6 +41,9 @@
         border-radius: 8px;
         font-size: 12px;
     }
+  .cat{
+     height: 410px;
+  }
     .cat h3{
       top: 50%;
       left: 60%;
