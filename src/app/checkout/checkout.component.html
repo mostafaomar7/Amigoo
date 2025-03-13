@@ -12,7 +12,7 @@
                 <div *ngIf="user.errors.minlength">Please Your Name Must More Than 1 Char</div>
             </div>
             <label class="fs-4" for="">country/region*</label>
-            <input class="form-control p-2 mb-2 fs-4" type="text" id="name" [(ngModel)]="orderdata.country" placeholder="Your Country" name="country" #country="ngModel" required minlength="3"   />
+            <input class="form-control p-2 mb-2 fs-4" type="text" id="name" [(ngModel)]="orderdata.country" placeholder="Your Region" name="country" #country="ngModel" required minlength="3"   />
             <div class="alert alert-danger" *ngIf="country.touched && country.invalid">
                 <div *ngIf="country.errors.required">Please Enter Your Country</div>
                 <div *ngIf="country.errors.minlength">Please Your Name Must More Than 2 Char</div>
@@ -24,7 +24,7 @@
                 <div *ngIf="street.errors.minlength">Please Your streetAddress Must More Than 2 Char</div>
             </div>
             <label class="fs-4" for="" >State/Country*</label>
-            <input type="text" class="form-control p-2 mb-2 fs-4" required minlength="2" [(ngModel)]="orderdata.state" placeholder="Your State" #state="ngModel" name="state">
+            <input type="text" class="form-control p-2 mb-2 fs-4" required minlength="2" [(ngModel)]="orderdata.state" placeholder="Your Country" #state="ngModel" name="state">
             <div class="alert alert-danger" *ngIf="state.touched && state.invalid">
                 <div *ngIf="state.errors.required">Please Enter Your State</div>
                 <div *ngIf="state.errors.minlength">Please Your State Must More Than 2 Char</div>
