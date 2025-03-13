@@ -1,0 +1,54 @@
+version: '3.8'
+
+services:
+  backend:
+    container_name: backend
+    image: amigo-backend
+    networks:
+      - traefik-public
+    ports:
+      - "8000"
+    labels:
+      traefik.docker.network: "traefik-public"
+      traefik.enable: "true"
+      traefik.http.routers.amigoapi-http.entrypoints: "http"
+      traefik.http.routers.amigoapi-http.middlewares: "https-redirect"
+      traefik.http.routers.amigoapi-http.rule: "Host(`amigoapi.mosalam.com`)"
+      traefik.http.routers.amigoapi-http.service: "amigoapi"
+
+      traefik.http.routers.amigoapi-https.entrypoints: "https"
+      traefik.http.routers.amigoapi-https.rule: "Host(`amigoapi.mosalam.com`)"
+      traefik.http.routers.amigoapi-https.service: "amigoapi"
+      traefik.http.routers.amigoapi-https.tls: "true"
+      traefik.http.routers.amigoapi-https.tls.certresolver: "le"
+
+      traefik.http.services.amigoapi.loadbalancer.server.port: "8000"
+
+  frontend:
+    image: amigo-frontend
+    networks:
+      - traefik-public
+    ports:
+      - "3000"
+    labels:
+      traefik.docker.network: "traefik-public"
+      traefik.enable: "true"
+      traefik.http.routers.amigo-http.entrypoints: "http"
+      traefik.http.routers.amigo-http.middlewares: "https-redirect"
+      traefik.http.routers.amigo-http.rule: "Host(`amigo.mosalam.com`)"
+      traefik.http.routers.amigo-http.service: "amigo"
+
+      traefik.http.routers.amigo-https.entrypoints: "https"
+      traefik.http.routers.amigo-https.rule: "Host(`amigo.mosalam.com`)"
+      traefik.http.routers.amigo-https.service: "amigo"
+      traefik.http.routers.amigo-https.tls: "true"
+      traefik.http.routers.amigo-https.tls.certresolver: "le"
+
+      traefik.http.services.amigo.loadbalancer.server.port: "3000"
+
+networks:
+  traefik-public:
+    name: traefik-public
+    external: true
+    driver_opts:
+      com.docker.network.driver.mtu: 1400
