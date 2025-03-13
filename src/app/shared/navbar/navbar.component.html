@@ -41,7 +41,7 @@
     <div class="cart-item">
       <ul>
         <ul *ngFor="let item of cartproduct; let index = index ;" class="d-flex">
-          <li><img [src]="'http://backend:8000/uploads/products/'+item.imageCover" alt=""></li>
+          <li><img [src]="'https://amigoapi.mosalam.com/uploads/products/'+item.imageCover" alt=""></li>
           <li>{{item.title}}</li>
           <li>
               <div class="counter d-flex">
@@ -62,7 +62,7 @@
     <div class="cart-item star">
       <ul>
         <ul *ngFor="let item of starproduct; let index = index ;" class="d-flex mb-3">
-          <li><img [src]="'http://backend:8000/uploads/products/'+item.imageCover" alt=""></li>
+          <li><img [src]="'https://amigoapi.mosalam.com/uploads/products/'+item.imageCover" alt=""></li>
           <li>{{item.title}}</li>
           <li>
               <div class="counter d-flex">
