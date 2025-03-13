@@ -8,7 +8,7 @@ import { Observable } from 'rxjs';
   providedIn: 'root'
 })
 export class CategoryService {
-  private apiUrl = 'http://backend:8000/api/v1/categories/'; // غيّرها حسب الـ API الحقيقي
+  private apiUrl = 'https://amigoapi.mosalam.com/api/v1/categories/'; // غيّرها حسب الـ API الحقيقي
 
   constructor(private http: HttpClient) {}
 
@@ -30,12 +30,12 @@ export class CategoryService {
     return this.http.get<CategoryResponse>(this.apiUrl);
   }
   deleteCategory(id: string): Observable<void> {
-    return this.http.delete<void>(`http://backend:8000/api/v1/categories/${id}`);
+    return this.http.delete<void>(`https://amigoapi.mosalam.com/api/v1/categories/${id}`);
   }
   updateCategory(id: string, newName: string): Observable<Categoryinfo> {
-    return this.http.put<Categoryinfo>(`http://backend:8000/api/v1/categories/${id}`, { name: newName });
+    return this.http.put<Categoryinfo>(`https://amigoapi.mosalam.com/api/v1/categories/${id}`, { name: newName });
   }
-  apiproducturl='http://backend:8000/api/v1/product/'
+  apiproducturl='https://amigoapi.mosalam.com/api/v1/product/'
   getProducts(): Observable<Productinfo[]> {
     return this.http.get<Productinfo[]>(this.apiproducturl);
   }
@@ -44,34 +44,34 @@ export class CategoryService {
     return this.http.post(this.apiproducturl, formData);
   }
   deleteproduct(id: string): Observable<void> {
-    return this.http.delete<void>(`http://backend:8000/api/v1/product/${id}`);
+    return this.http.delete<void>(`https://amigoapi.mosalam.com/api/v1/product/${id}`);
   }
   updateproduct(id: string, newName: string): Observable<Productinfo> {
-    return this.http.put<Productinfo>(`http://backend:8000/api/v1/product/${id}`, { name: newName });
+    return this.http.put<Productinfo>(`https://amigoapi.mosalam.com/api/v1/product/${id}`, { name: newName });
   }
   // addProduct(product: Productinfo , headers: HttpHeaders): Observable<Productinfo> {
   //   const token = localStorage.getItem('token');
   //   return this.http.post<Productinfo>(this.apiproducturl, product);
   // }
   sendContactForm(contactData: Contact): Observable<any> {
-    return this.http.post<any>('http://backend:8000/api/v1/submit/'
+    return this.http.post<any>('https://amigoapi.mosalam.com/api/v1/submit/'
       , contactData);
   }
   getContactForm(): Observable<any> {
-    return this.http.get<any>('http://backend:8000/api/v1/submit/');
+    return this.http.get<any>('https://amigoapi.mosalam.com/api/v1/submit/');
   }
   deleteresponse(id: string): Observable<void> {
-    return this.http.delete<void>(`http://backend:8000/api/v1/submit/${id}`);
+    return this.http.delete<void>(`https://amigoapi.mosalam.com/api/v1/submit/${id}`);
   }
   sendorderForm(orderData: Order): Observable<any> {
     const headers = new HttpHeaders({ 'Content-Type': 'application/json' });
-    return this.http.post<any>('http://backend:8000/api/v1/order/', JSON.stringify(orderData), { headers });
+    return this.http.post<any>('https://amigoapi.mosalam.com/api/v1/order/', JSON.stringify(orderData), { headers });
   }
   getorderForm(): Observable<any> {
-    return this.http.get<any>('http://backend:8000/api/v1/order/');
+    return this.http.get<any>('https://amigoapi.mosalam.com/api/v1/order/');
   }
   deleteorder(id: string): Observable<void> {
-    return this.http.delete<void>(`http://backend:8000/api/v1/order/${id}`);
+    return this.http.delete<void>(`https://amigoapi.mosalam.com/api/v1/order/${id}`);
   }
 }
   
