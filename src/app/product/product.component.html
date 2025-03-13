@@ -64,8 +64,8 @@
             <div class="col-lg-6" >
                 
                 <div class="view">
-                    <img class="w-100" [src]="'http://backend:8000/uploads/products/'+item.imageCover" alt="">
-                    <img class="w-100 mt-3" [src]="'http://backend:8000/uploads/products/'+item.images[0]" alt="">
+                    <img class="w-100" [src]="'http://localhost:8000/uploads/products/'+item.imageCover" alt="">
+                    <img class="w-100 mt-3" [src]="'http://localhost:8000/uploads/products/'+item.images[0]" alt="">
                 </div>
             </div>
             <div class="col-lg-6" >
@@ -110,7 +110,7 @@
                         </div>
                         <div class="buy">
                             <p class="line">or</p>
-                            <button class="btn btn-danger w-100 buy-now" (click)="addToCart(item ,amount)" routerLink="/checkout"><i class="fas fa-shopping-cart"
+                            <button class="btn btn-danger w-100 buy-now" (click)="buy(item ,amount)" ><i class="fas fa-shopping-cart"
                                 id="cart-btn"></i>BUY NOW</button>
                         </div>
                         <!-- <hr class="text-danger"> -->
