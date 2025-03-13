@@ -13,7 +13,7 @@ const submitForm = require('./routes/contactFormRoutes');
 const OrderForm = require('./routes/orderRoutes');
 
 const corsOptions = {
-  origin: "http://localhost:4200", // اسم الدومين الخاص بالفرونت
+  origin: "https://amigo.mosalam.com", // اسم الدومين الخاص بالفرونت
   methods: ["GET", "POST", "PUT", "DELETE"], // الطرق المسموح بها
   credentials: true, // السماح بإرسال الكوكيز أو الـ Authorization headers
 };
