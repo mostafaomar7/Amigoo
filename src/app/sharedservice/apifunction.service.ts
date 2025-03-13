@@ -64,7 +64,7 @@ export class ApifunctionService {
   //   return this.http.get("https://fakestoreapi.com/products/category/"+keyword)
   // }
   // // postdata(object){
-  // //   return this.http.post("http://localhost:3000/type" , object )
+  // //   return this.http.post("https://amigoapi.mosalam.com/type" , object )
   // // }
   // getproductybyid(id:any){
   //   return this.http.get('https://fakestoreapi.com/products/' + id)
