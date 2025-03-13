@@ -82,6 +82,33 @@ export class ProductComponent implements OnInit {
     }
     
   }
+  buy(product: any , amount :Number ) {
+    if (!this.selectedSizes[product._id]) {  
+      alert('يرجى اختيار المقاس أولاً!');
+      return;
+    }
+    if("cart" in localStorage){
+      this.cardproduct = JSON.parse(localStorage.getItem("cart")!)
+      let exist = this.cardproduct.find(itemm => itemm._id == product._id)
+      if (exist) {
+        alert("Your Product is Already in Cart");
+        window.location.href='/checkout'
+      } else {
+        this.cardproduct.push({ ...product, selectedSize: this.selectedSizes[product._id] });
+        localStorage.setItem("cart", JSON.stringify(this.cardproduct));
+        window.location.href='/checkout'
+      }
+    } else {
+      this.cardproduct.push({ ...product, selectedSize: this.selectedSizes[product._id] });
+      localStorage.setItem("cart", JSON.stringify(this.cardproduct));
+      
+    }
+    if (!this.selectedSizes[product._id]) {  
+      alert('يرجى اختيار المقاس أولاً!');
+      return;
+    }
+    
+  }
   ngOnInit(): void {
     // الحصول على الـ ID من الـ URL
     // this.productId = this.route.snapshot.paramMap.get('_id') || '';  // الحصول على الـ ID من الرابط
