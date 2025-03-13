@@ -6,7 +6,7 @@
             <h4>Billing Details</h4>
             <hr>
             <label class="fs-4" for="">Full Name*</label>
-            <input class="form-control p-2 mb-2 fs-4" type="text" id="name" [(ngModel)]="orderdata.fullName" placeholder="Your Name" name="name"   minlength="2" #user="ngModel"  required />
+            <input class="form-control p-2 mb-2 fs-4" type="text" id="name" [(ngModel)]="orderdata.fullName" palceholder="Your Name" name="name"   minlength="2" #user="ngModel"  required />
             <div class="alert alert-danger" *ngIf="user.touched && user.invalid">
                 <div *ngIf="user.errors.required">Please Enter Your Name</div>
                 <div *ngIf="user.errors.minlength">Please Your Name Must More Than 1 Char</div>
