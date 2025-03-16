@@ -1,3 +1,22 @@
+.what img{
+    width: 30px;
+}
+.what{
+    background-color: #f1f1f1;
+    width: 110px;
+    position: fixed;
+    top: 85%;
+    right: 2%;
+    display: flex;
+    justify-content: space-between;
+    border-radius: 10px;
+    z-index: 10000;
+    padding: 4px;
+}
+.what span{
+    margin-top: 8px;
+    font-size: 11px;
+}
 select{
     color: white;
     font-size: 16px;
