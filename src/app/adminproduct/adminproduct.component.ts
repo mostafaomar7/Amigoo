@@ -34,13 +34,52 @@ export class AdminproductComponent implements OnInit {
       });
     }
   }
+  // editCategory(category: Categoryinfo) {
+  //   const newName = prompt('Enter new category name:', category.name);
+  //   if (newName && newName !== category.name) {
+  //     this.catserv.updateCategory(category._id, newName  ).subscribe(() => {
+  //       category.name = newName; // تحديث مباشر بدون إعادة جلب البيانات
+  //     });
+  //   }
+  // }
   editCategory(category: Categoryinfo) {
     const newName = prompt('Enter new category name:', category.name);
-    if (newName && newName !== category.name) {
-      this.catserv.updateCategory(category._id, newName  ).subscribe(() => {
-        category.name = newName; // تحديث مباشر بدون إعادة جلب البيانات
-      });
-    }
+    if (!newName) return;
+  
+    const fileInput = document.createElement('input');
+    fileInput.type = 'file';
+    fileInput.accept = 'image/*';
+  
+    fileInput.onchange = (event: any) => {
+      const file = event.target.files[0];
+  
+      if (file) {
+        const formData = new FormData();
+        formData.append('name', newName);
+        formData.append('image', file);
+  
+        // ✅ إضافة console.log لعرض البيانات قبل الإرسال
+        console.log('🔹 FormData Content:');
+        formData.forEach((value, key) => {
+          console.log(`${key}:`, value);
+        });
+        
+  
+        this.catserv.updateCategory(category._id, formData).subscribe({
+          next: (updatedCategory) => {
+            category.name = updatedCategory.name;
+            category.image = updatedCategory.image;
+            alert('تم التعديل بنجاح')
+            window.location.reload();
+          },
+          error: (err) => {
+            console.error('❌ Upload failed:', err);
+          }
+        });
+      }
+    };
+  
+    fileInput.click();
   }
   deleteproduct(id: string) {
     if (confirm('Are you sure you want to delete this product?')) {
