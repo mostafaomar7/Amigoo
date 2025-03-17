@@ -33,7 +33,7 @@
                 </tr>
                 <tr *ngFor="let cat of allcategory[0]; let i = index;">
                   <td>{{ i + 1 }}</td>
-                  <td><img style="width: 50px; height: 50px;" [src]="'http://localhost:8000/uploads/category/' + cat.image" alt="Category Image"></td>
+                  <td><img style="width: 50px; height: 50px;" [src]="'https://amigoapi.mosalam.com/uploads/category/' + cat.image" alt="Category Image"></td>
                   <td>{{ cat.name }}</td>
                   <td>
                     <button class="update" (click)="editCategory(cat)">Update</button>
