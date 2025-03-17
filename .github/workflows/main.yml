@@ -20,4 +20,4 @@ jobs:
 
     - name: Run the script on server via SSH
       run: |
-        ssh -o StrictHostKeyChecking=no root@49.12.59.133 "bash -s" < /home/dockerUser/deployAmgio.sh
+        ssh -o StrictHostKeyChecking=no root@49.12.59.133 "bash -s /home/dockerUser/deployAmgio.sh"
