@@ -78,32 +78,52 @@ exports.CreatCategories = asyncHandler(async(req, res) => {
     
 });
 
-
 exports.updateCategory = asyncHandler(async (req, res) => {
   const { id } = req.params;
-  const { name, image } = req.body;
+  const { name } = req.body;
+  const image = req.body.image || (req.file ? req.file.filename : null);
 
-  // التحقق من أن `name` موجود وصالح
   if (!name || typeof name !== 'string' || name.trim() === '') {
     return res.status(400).json({ msg: 'Category name is required and must be a valid string.' });
   }
 
-  const category = await Category.findOneAndUpdate(
-    { _id: id },
-    { 
-      name, 
-      slug: slugify(name, { lower: true }), // تأكد أن الاسم يستخدم في slugify بعد التحقق
-      image // تحديث الصورة أيضًا
-    },
-    { new: true }
-  );
+  const updateData = { name, slug: slugify(name, { lower: true }) };
+  if (image) updateData.image = image;
+
+  const category = await Category.findOneAndUpdate({ _id: id }, updateData, { new: true });
 
   if (!category) {
-    return res.status(404).json({ msg: `No category for this id ${id}` });
+    return res.status(404).json({ msg: `No category found for this ID: ${id}` });
   }
 
   res.status(200).json({ data: category });
 });
+
+// exports.updateCategory = asyncHandler(async (req, res) => {
+//   const { id } = req.params;
+//   const { name, image } = req.body;
+
+//   // التحقق من أن `name` موجود وصالح
+//   if (!name || typeof name !== 'string' || name.trim() === '') {
+//     return res.status(400).json({ msg: 'Category name is required and must be a valid string.' });
+//   }
+
+//   const category = await Category.findOneAndUpdate(
+//     { _id: id },
+//     { 
+//       name, 
+//       slug: slugify(name, { lower: true }), // تأكد أن الاسم يستخدم في slugify بعد التحقق
+//       image // تحديث الصورة أيضًا
+//     },
+//     { new: true }
+//   );
+
+//   if (!category) {
+//     return res.status(404).json({ msg: `No category for this id ${id}` });
+//   }
+
+//   res.status(200).json({ data: category });
+// });
 
 
 exports.deleteCategory = asyncHandler(async (req, res) => {
