@@ -32,8 +32,8 @@ export class CategoryService {
   deleteCategory(id: string): Observable<void> {
     return this.http.delete<void>(`https://amigoapi.mosalam.com/api/v1/categories/${id}`);
   }
-  updateCategory(id: string, newName: string): Observable<Categoryinfo> {
-    return this.http.put<Categoryinfo>(`https://amigoapi.mosalam.com/api/v1/categories/${id}`, { name: newName });
+  updateCategory(id: string, formData: FormData): Observable<Categoryinfo> {
+    return this.http.put<Categoryinfo>(`http://localhost:8000/api/v1/categories/${id}`, formData);
   }
   apiproducturl='https://amigoapi.mosalam.com/api/v1/product/'
   getProducts(): Observable<Productinfo[]> {
