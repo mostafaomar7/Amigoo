@@ -1,5 +1,5 @@
 import { Categoryinfo, Productinfo } from './../models/category';
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { ApifunctionService } from '../sharedservice/apifunction.service';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { CategoryService } from '../sharedservice/category.service';
@@ -34,53 +34,46 @@ export class AdminproductComponent implements OnInit {
       });
     }
   }
-  // editCategory(category: Categoryinfo) {
-  //   const newName = prompt('Enter new category name:', category.name);
-  //   if (newName && newName !== category.name) {
-  //     this.catserv.updateCategory(category._id, newName  ).subscribe(() => {
-  //       category.name = newName; // تحديث مباشر بدون إعادة جلب البيانات
-  //     });
-  //   }
-  // }
-  editCategory(category: Categoryinfo) {
-    const newName = prompt('Enter new category name:', category.name);
-    if (!newName) return;
+  @ViewChild('fileInput') fileInput!: ElementRef;
+selectedCategory!: Categoryinfo;
+selectedCategoryName!: string;
+
+editCategory(category: Categoryinfo) {
+  const newName = prompt('Enter new category name:', category.name);
+  if (!newName) return;
+
+  this.selectedCategory = category; // حفظ الفئة المختارة
+  this.selectedCategoryName = newName;
   
-    const fileInput = document.createElement('input');
-    fileInput.type = 'file';
-    fileInput.accept = 'image/*';
-  
-    fileInput.onchange = (event: any) => {
-      const file = event.target.files[0];
-  
-      if (file) {
-        const formData = new FormData();
-        formData.append('name', newName);
-        formData.append('image', file);
-  
-        // ✅ إضافة console.log لعرض البيانات قبل الإرسال
-        console.log('🔹 FormData Content:');
-        formData.forEach((value, key) => {
-          console.log(`${key}:`, value);
-        });
-        
-  
-        this.catserv.updateCategory(category._id, formData).subscribe({
-          next: (updatedCategory) => {
-            category.name = updatedCategory.name;
-            category.image = updatedCategory.image;
-            alert('تم التعديل بنجاح')
-            window.location.reload();
-          },
-          error: (err) => {
-            console.error('❌ Upload failed:', err);
-          }
-        });
-      }
-    };
-  
-    fileInput.click();
+  this.fileInput.nativeElement.click(); // فتح نافذة اختيار الملف
+}
+
+onFileSelected(event: any) {
+  const file = event.target.files[0];
+
+  if (file) {
+    const formData = new FormData();
+    formData.append('name', this.selectedCategoryName);
+    formData.append('image', file);
+
+    // ✅ Console log للتحقق من البيانات قبل الإرسال
+    console.log('🔹 FormData Content:');
+    formData.forEach((value, key) => console.log(`${key}:`, value));
+
+    this.catserv.updateCategory(this.selectedCategory._id, formData).subscribe({
+      next: (updatedCategory) => {
+        this.selectedCategory.name = updatedCategory.name;
+        this.selectedCategory.image = updatedCategory.image;
+        alert('تم التعديل بنجاح');
+        window.location.reload();
+      },
+      error: (err) => console.error('❌ Upload failed:', err)
+    });
   }
+}
+
+  
+
   deleteproduct(id: string) {
     if (confirm('Are you sure you want to delete this product?')) {
       this.catserv.deleteproduct(id).subscribe(() => {
