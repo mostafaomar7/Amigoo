@@ -1,40 +1,47 @@
 const slugify = require('slugify')
 const asyncHandler = require('express-async-handler')
 const Category = require('../models/categoryModel');
+const cloudinary = require('../config/config/cloudinary');
+const multer = require('multer');
+
+
 ///// image
-const multer  = require('multer')
-const { v4: uuidv4 } = require('uuid');
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
 
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, 'uploads/category')
+// إعداد التخزين لمولتر (رفع الصور إلى Cloudinary)
+const categoryStorage = new CloudinaryStorage({
+  cloudinary,
+  params: {
+    folder: 'categories', // اسم المجلد في Cloudinary
+    allowed_formats: ['jpeg', 'png', 'jpg'], // أو يمكن استخدام "png"
+    public_id: (req, file) => `category-${Date.now()}-${file.originalname}` // اسم الصورة
   },
-  filename: function (req, file, cb) {
-    const ext = file.mimetype.split("/")[1];
-    const filename =`category-${uuidv4()}-${Date.now()}-.${ext}`
-    cb(null,filename  )
-    console.log(req.file);
-    
-    req.body.image=filename
+});
 
-  }
+// إعداد رفع الملفات باستخدام Multer
+const categoryUpload = multer({ storage: categoryStorage });
 
-})
+// ميدل وير لرفع الصورة
+exports.uploadCategoryImage = async (req, res, next) => {
+  categoryUpload.single('image')(req, res, async function (err) {
+    if (err) {
+      return res.status(400).json({ error: err.message });
+    }
 
-const multerFilter = function  (req, file, cb) {
-  if(file.mimetype.startsWith("image")){
- // To accept the file pass `true`, like so:
- cb(null, true)
-  }else{
-      // You can always pass an error if something goes wrong:
-       cb(new Error('I don\'t have image!, shoud to be image'))
+    if (!req.file) {
+      return res.status(400).json({ error: 'لم يتم رفع صورة!' });
+    }
 
-  }
-}
-
-const upload = multer({ storage: storage,fileFilter:multerFilter })
-exports.uploadimage = upload.single('image');
-////
+    // رفع الصورة إلى Cloudinary والحصول على الرابط الصحيح
+    try {
+      const result = await cloudinary.uploader.upload(req.file.path);
+      req.body.image = result.secure_url; // حفظ الرابط النهائي في الطلب
+      next();
+    } catch (uploadError) {
+      return res.status(500).json({ error: 'فشل رفع الصورة إلى Cloudinary', details: uploadError.message });
+    }
+  });
+};
 
 //get all categore
 exports.getCategories = asyncHandler(async(req, res) => {
