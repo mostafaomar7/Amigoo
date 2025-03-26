@@ -5,52 +5,44 @@ const { v4: uuidv4 } = require('uuid');
 const sharp = require('sharp');
 const { uploadMixOfImages } = require('../middlewares/uploadImageMiddleware');
 const product = require('../models/productModel');
+const cloudinary = require('../config/config/cloudinary');
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
+
+// Multer storage for Cloudinary (Products)
+const storage = new CloudinaryStorage({
+  cloudinary,
+  params: {
+    folder: 'products',
+    allowed_formats: ['jpeg', 'png', 'jpg'], // السماح بأنواع الصور
+    public_id: (req, file) => `product-${uuidv4()}-${Date.now()}`, // اسم فريد للصورة
+  },
+});
 
 
-exports.uploadProductImages = uploadMixOfImages([
-  {
-    name: 'imageCover',
-    maxCount: 1,
-  },
-  {
-    name: 'images',
-    maxCount: 5,
-  },
+const upload = multer({ storage });
+
+exports.uploadProductImages = upload.fields([
+  { name: 'imageCover', maxCount: 1 },
+  { name: 'images', maxCount: 5 },
 ]);
 
 exports.resizeProductImages = asyncHandler(async (req, res, next) => {
   if (req.files.imageCover) {
-    const imageCoverFileName = `product-${uuidv4()}-${Date.now()}-cover.jpeg`;
-
-    await sharp(req.files.imageCover[0].buffer)
-      .resize({ width: 2000 }) // تعديل للحفاظ على نسبة الأبعاد الأصلية
-      .toFormat('jpeg')
-      .jpeg({ quality: 100 })
-      .toFile(`uploads/products/${imageCoverFileName}`);
-
-    req.body.imageCover = imageCoverFileName;
+    const result = await cloudinary.uploader.upload(req.files.imageCover[0].path);
+    req.body.imageCover = result.secure_url; // حفظ الرابط في قاعدة البيانات
   }
 
   if (req.files.images) {
     req.body.images = [];
     await Promise.all(
-      req.files.images.map(async (img, index) => {
-        const imageName = `product-${uuidv4()}-${Date.now()}-${index + 1}.jpeg`;
-
-        await sharp(img.buffer)
-          .resize({ width: 2000 }) // تعديل للحفاظ على نسبة الأبعاد الأصلية
-          .toFormat('jpeg')
-          .jpeg({ quality: 95 })
-          .toFile(`uploads/products/${imageName}`);
-
-        req.body.images.push(imageName);
+      req.files.images.map(async (img) => {
+        const result = await cloudinary.uploader.upload(img.path);
+        req.body.images.push(result.secure_url);
       })
     );
   }
-
   next();
 });
-
 
 //get all product
 exports.getProducts = asyncHandler(async(req, res) => {
