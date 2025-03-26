@@ -1,21 +1,26 @@
 const multer = require('multer');
-const multerOptions = () => {
+const { CloudinaryStorage } = require('multer-storage-cloudinary');
+const cloudinary = require('../config/config/cloudinary');
 
-  const multerStorage = multer.memoryStorage();
+// إعدادات التخزين في Cloudinary
+const storage = new CloudinaryStorage({
+  cloudinary,
+  params: {
+    folder: 'uploads', // يمكن تغييره حسب نوع الصور
+    format: async () => 'jpeg' },
+});
 
-  const multerFilter = function (req, file, cb) {
-    if (file.mimetype.startsWith('image')) {
-      cb(null, true);
-    } else {
-      cb(new Error('Only Images allowed', 400), false);
-    }
-  };
-
-  const upload = multer({ storage: multerStorage, fileFilter: multerFilter });
-
-  return upload;
+// مرشح الملفات للسماح فقط بالصور
+const fileFilter = (req, file, cb) => {
+  if (file.mimetype.startsWith('image')) {
+    cb(null, true);
+  } else {
+    cb(new Error('Only Images allowed', 400), false);
+  }
 };
 
-exports.uploadSingleImage = (fieldName) => multerOptions().single(fieldName);
+const upload = multer({ storage, fileFilter });
 
-exports.uploadMixOfImages = (arrayOfFields) => multerOptions().fields(arrayOfFields);
+exports.uploadSingleImage = (fieldName) => upload.single(fieldName);
+
+exports.uploadMixOfImages = (arrayOfFields) => upload.fields(arrayOfFields);
