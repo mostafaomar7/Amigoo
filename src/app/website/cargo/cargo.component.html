@@ -1,0 +1,44 @@
+<div class="container cargo" *ngIf="!selectedCategory">
+    <section class="clothes">
+        <div class="title">
+            <h4 class="text-center fw-bold  ">The Most Popular</h4>
+            <h1 class="text-center fw-bold ">Explore Amigo Product</h1>
+        </div>
+        <div class="row">
+                    <div class="col-lg-4 mb-3" *ngFor="let item of alldata[0]">
+                            <div class="card-shirt card  border-2">
+                                <div class="icon">
+                                    <i (click)="addToCart(item ,amount);"  class="fas fa-shopping-cart" id="cart-btn"></i>
+                                    <i (click)="addTostar(item ,amount);" class="fas fa-solid fa-star" id="star-btn"></i>
+                                </div>
+                                <a>
+                                    <div style="cursor:pointer;" routerLink="/product/{{item._id}}" class="pointer">
+                                        <img  [src]="'https://amigoapi.mosalam.com/uploads/products/'+item.imageCover" alt="" class="w-100">
+                                        <p class="fs-4 fw-bold">{{item.title}}</p>
+                                        <p class="fs-4 fw-bold">{{item.description}}</p>
+                                        <span class="fs-4 fw-bold">{{item.price}}EGP</span>
+                                    </div>
+
+
+
+                                    <div class="row justify-content-center mb-3">
+                                        <label *ngFor="let s of item.size" class="size-box mx-1">
+                                          <input type="radio" [name]="'size_' + item._id" [(ngModel)]="selectedSizes[item._id]" [value]="s" />
+                                          <span>{{ s }}</span>
+                                        </label>
+                                      </div>
+
+                                </a>
+                                <div class="flex text-center">
+                                    <button class="btn btn-dark text-white w-100 fs-4" *ngIf="!addtocart"  (click)="addToCart(item ,amount)">Add To Cart</button>
+                                </div>
+                            </div>
+
+                    </div>
+    </div>
+    </section>
+</div>
+<div>
+<app-navbar  (categorySelected)="selectedCategory = $event" ></app-navbar>  <!-- ربط الـ category من الـ Navbar -->
+<app-boy-friend [selectedCategory]="selectedCategory" (item)="addtocartt($event)"></app-boy-friend>  <!-- تمرير الـ category للـ Item -->
+</div>

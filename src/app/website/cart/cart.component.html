@@ -1,0 +1,42 @@
+<div class="container cart">
+    <div class="col-lg-12 text">
+        <h1 class="text-danger">Shopping Cart</h1>
+        <div class="d-flex justify-content-between">
+            <p class="fs-3">you have <span class="text-danger">{{cartproduct.length}}</span> item in cart</p>
+            <button class="btn btn-outline-danger fs-5" (click)="ClearAllProducts()">Clear All Products</button>
+        </div>
+        <div class="col-lg-9 m-auto">
+            <table class="table ">
+            <tr>
+                <th></th>
+                <th>Name</th>
+                <th>Price</th>
+                <th>Quantity</th>
+                <th>Size</th>
+                <th>Total</th>
+                <th>Action</th>
+            </tr>
+            <tr *ngFor="let item of cartproduct; let index = index ;">
+                <td><img style="width: 50px; height: 50px;" [src]="'https://amigoapi.mosalam.com/uploads/products/'+item.imageCover" alt=""></td>
+                <td>{{item.title}}</td>
+                <td>{{item.price}}</td>
+                <td>
+                        <li>
+                            <div class="counter d-flex">
+                            <button id="decrease" class="counter-btn bg-black text-white w-25 mx-2" (click)="decrease(index)"  >-</button>
+                            <input  class="form-control w-75"  (change)="detectedchange()" type="number" id="quantity" value="1" min="1" [(ngModel)]="item.quantity"  >
+                            <button id="increase" class="counter-btn bg-black text-white w-25 mx-2" (click)="increase(index)"  >+</button>
+                            </div>
+                        </li></td>
+                <td>{{item.selectedSize}}</td>
+                        <td>total : {{item.price * item.quantity}} </td>
+                <td><button class="btn btn-danger" (click)="delete(index)">Delete</button></td>
+            </tr>
+        </table>
+        </div>
+        <div class="mt-4 right">
+            <p class="mx-5 fs-3 mt-1">total : <span>{{total}} EGP</span></p>
+            <button routerLink="/checkout" class="btn btn-success mb-4">Order Now</button>
+        </div>
+    </div>
+</div>

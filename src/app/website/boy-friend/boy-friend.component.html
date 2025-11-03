@@ -1,0 +1,41 @@
+<div class="title" *ngIf="selectedCategory">
+    <h4 class="text-center fw-bold  ">The Most Popular</h4>
+    <h1 class="text-center fw-bold ">Explore Amigo Product</h1>
+</div>
+<div class="container" *ngIf="selectedCategory">
+    <section class="clothes" >
+        <div class="title">
+            <h4 class="text-center fw-bold  ">The Most Popular</h4>
+            <h1 class="text-center fw-bold ">Explore Amigo Product</h1>
+        </div>
+        <div class="row">
+                    <div class="col-lg-4" *ngFor="let item of alldata[1]" >
+                            <div class="card-shirt card border-2 mb-2">
+                                <a>
+                                    <div style="cursor:pointer;" routerLink="/product/{{item._id}}" class="pointer">
+                                        <img  [src]="env.getImageUrl('products/' + item.imageCover)" alt="" class="w-100">
+                                        <p class="fs-4 fw-bold">{{item.title}}</p>
+                                        <p class="fs-4 fw-bold">{{item.description}}</p>
+                                        <span class="fs-4 fw-bold">{{item.price}}EGP</span>
+                                    </div>
+                                <div class="icon ">
+                                    <i (click)="addToCart(item ,amount)" class="fas fa-shopping-cart" id="cart-btn"></i>
+                                    <i class="fas fa-solid fa-star" id="star-btn"></i>
+                                </div>
+                                <div class="row justify-content-center">
+                                    <label *ngFor="let s of item.size" class="size-box ">
+                                    <input type="radio" [name]="'size_' + item._id" [(ngModel)]="selectedSizes[item._id]" [value]="s" />
+                                    <span>{{ s }}</span>
+                                    </label>
+                                </div>
+                                </a>
+                                <div class="flex text-center">
+                                    <button class="btn btn-dark text-white w-100 fs-4" *ngIf="!addtocart"  (click)="addToCart(item ,amount)">Add To Cart</button>
+                                </div>
+                            </div>
+
+                    </div>
+    </div>
+    </section>
+
+</div>

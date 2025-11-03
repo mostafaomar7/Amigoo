@@ -1,0 +1,361 @@
+<!-- Master Sizes Management Page -->
+<div class="container-fluid py-4">
+  <!-- Header -->
+  <div class="mb-4">
+    <h1 class="h2 mb-1 text-white">Sizes Management</h1>
+    <p class="text-white mb-0">Manage size names (e.g., S, M, L, XL)</p>
+  </div>
+
+  <!-- Search and Add Button -->
+  <div
+    class="d-flex flex-column flex-md-row gap-2 align-items-start align-items-md-center mb-4"
+  >
+    <div class="input-group" style="max-width: 400px; flex: 1">
+      <span class="input-group-text">
+        <i class="fas fa-search text-dark"></i>
+      </span>
+      <input
+        type="text"
+        id="searchInput"
+        class="form-control"
+        [(ngModel)]="searchTerm"
+        (input)="onSearchInput()"
+        placeholder="Search by size name..."
+      />
+    </div>
+    <button
+      type="button"
+      class="btn btn-primary"
+      (click)="showAddSizeModal()"
+    >
+      <i class="fas fa-plus me-2"></i>Add Size
+    </button>
+  </div>
+
+  <!-- Sizes Table -->
+  <div class="card">
+    <div class="card-body">
+      <!-- Loading State -->
+      <div *ngIf="isLoading" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+      </div>
+
+      <!-- Sizes List -->
+      <div *ngIf="!isLoading" class="table-responsive">
+        <table class="table table-hover align-middle master-sizes-table">
+          <thead class="table-light">
+            <tr>
+              <th scope="col">Size Name</th>
+              <th scope="col">Status</th>
+              <th scope="col">Created At</th>
+              <th scope="col" class="text-end">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let size of filteredSizes" [class.inactive-row]="!size.isActive">
+              <td>
+                <strong [class.text-muted]="!size.isActive" [class.text-dark]="size.isActive">{{ size.sizeName }}</strong>
+              </td>
+              <td>
+                <div class="form-check">
+                  <label class="form-check-label ms-2" [for]="'toggle-' + size._id" style="padding-left: 0 !important;">
+                    <span
+                      class="badge"
+                      [class.bg-success]="size.isActive"
+                      [class.bg-danger]="!size.isActive"
+                      style="color: #ffffff !important;"
+                    >
+                      {{ size.isActive ? 'Active' : 'Inactive' }}
+                    </span>
+                  </label>
+                </div>
+              </td>
+              <td>
+                <small class="text-muted">{{ size.createdAt | date : "dd-MM-yyyy h:mm a" }}</small>
+              </td>
+              <td class="text-end">
+                <div class="btn-group" role="group">
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-action btn-edit"
+                    (click)="showEditSizeModal(size)"
+                    title="Edit Size"
+                  >
+                    <i class="fas fa-pencil-alt"></i>
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-action btn-delete"
+                    (click)="showDeleteSizeModal(size)"
+                    title="Delete Size"
+                  >
+                    <i class="fas fa-trash-alt"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Empty State -->
+      <div
+        *ngIf="!isLoading && filteredSizes.length === 0"
+        class="text-center py-5"
+      >
+        <i class="fas fa-ruler fa-3x text-muted mb-3"></i>
+        <h5 class="text-muted">No sizes found</h5>
+        <p class="text-muted">Get started by adding a new size.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pagination -->
+  <div *ngIf="!isLoading && totalItems > 0 && totalPages > 0" class="mt-4">
+    <nav aria-label="Master Sizes pagination">
+      <ul class="pagination justify-content-center mb-3">
+        <li class="page-item" [class.disabled]="currentPage === 1">
+          <a
+            class="page-link"
+            href="#"
+            (click)="goToPage(currentPage - 1); $event.preventDefault()"
+            [attr.aria-disabled]="currentPage === 1"
+            [class.disabled]="currentPage === 1"
+          >
+            <i class="fas fa-chevron-left" style="color: #2563eb !important;"></i>
+            <span class="visually-hidden">Previous</span>
+          </a>
+        </li>
+        <li
+          *ngFor="let page of pageNumbers"
+          class="page-item"
+          [class.active]="page === currentPage"
+        >
+          <a
+            class="page-link"
+            href="#"
+            (click)="goToPage(page); $event.preventDefault()"
+          >
+            {{ page }}
+          </a>
+        </li>
+        <li class="page-item" [class.disabled]="currentPage === totalPages">
+          <a
+            class="page-link"
+            href="#"
+            (click)="goToPage(currentPage + 1); $event.preventDefault()"
+            [attr.aria-disabled]="currentPage === totalPages"
+            [class.disabled]="currentPage === totalPages"
+          >
+            <i class="fas fa-chevron-right" style="color: #2563eb !important;"></i>
+            <span class="visually-hidden">Next</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+    <div class="text-center text-muted">
+      <small>
+        Showing <strong>{{ (currentPage - 1) * itemsPerPage + 1 }}</strong> to
+        <strong>{{ Math.min(currentPage * itemsPerPage, totalItems) }}</strong> of
+        <strong>{{ totalItems }}</strong>
+        {{ totalItems === 1 ? 'result' : 'results' }}
+        <span *ngIf="totalPages > 1"> | Page <strong>{{ currentPage }}</strong> of <strong>{{ totalPages }}</strong></span>
+      </small>
+    </div>
+  </div>
+</div>
+
+<!-- Add Size Modal -->
+<div
+  class="modal fade"
+  [class.show]="showAddModal"
+  [style.display]="showAddModal ? 'block' : 'none'"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="addSizeModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <form [formGroup]="sizeForm" (ngSubmit)="addSize()">
+        <div class="modal-header">
+          <h5 class="modal-title" id="addSizeModalLabel">
+            <i class="fas fa-plus-circle me-2"></i>Add New Size
+          </h5>
+          <button
+            type="button"
+            class="btn-close"
+            (click)="closeModals()"
+            aria-label="Close"
+          ></button>
+        </div>
+        <div class="modal-body">
+          <!-- Size Name -->
+          <div class="mb-3">
+            <label for="sizeName" class="form-label">
+              Size Name <span class="text-danger">*</span>
+            </label>
+            <input
+              type="text"
+              id="sizeName"
+              class="form-control text-lowercase"
+              [class.is-invalid]="hasFieldError(sizeForm, 'sizeName')"
+              formControlName="sizeName"
+              placeholder="Enter size name (e.g., s, m, l, xl)"
+              style="text-transform: lowercase;"
+              maxlength="10"
+            />
+            <div
+              *ngIf="hasFieldError(sizeForm, 'sizeName')"
+              class="invalid-feedback"
+            >
+              {{ getFieldError(sizeForm, "sizeName") }}
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            (click)="closeModals()"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            class="btn btn-primary"
+            [disabled]="!sizeForm.valid"
+          >
+            <i class="fas fa-save me-2"></i>Add Size
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Size Modal -->
+<div
+  class="modal fade"
+  [class.show]="showEditModal"
+  [style.display]="showEditModal ? 'block' : 'none'"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="editSizeModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <form [formGroup]="editSizeForm" (ngSubmit)="updateSize()">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editSizeModalLabel">
+            <i class="fas fa-edit me-2"></i>Edit Size
+          </h5>
+          <button
+            type="button"
+            class="btn-close"
+            (click)="closeModals()"
+            aria-label="Close"
+          ></button>
+        </div>
+        <div class="modal-body">
+          <!-- Size Name -->
+          <div class="mb-3">
+            <label for="editSizeName" class="form-label">
+              Size Name <span class="text-danger">*</span>
+            </label>
+            <input
+              type="text"
+              id="editSizeName"
+              class="form-control text-lowercase"
+              [class.is-invalid]="hasFieldError(editSizeForm, 'sizeName')"
+              formControlName="sizeName"
+              placeholder="Enter size name"
+              style="text-transform: lowercase;"
+              maxlength="10"
+            />
+
+            <div
+              *ngIf="hasFieldError(editSizeForm, 'sizeName')"
+              class="invalid-feedback"
+            >
+              {{ getFieldError(editSizeForm, "sizeName") }}
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            (click)="closeModals()"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            class="btn btn-primary"
+            [disabled]="!editSizeForm.valid"
+          >
+            <i class="fas fa-save me-2"></i>Update Size
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div
+  class="modal fade"
+  [class.show]="showDeleteModal"
+  [style.display]="showDeleteModal ? 'block' : 'none'"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="deleteSizeModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header border-0">
+        <h5 class="modal-title" id="deleteSizeModalLabel">
+          <i class="fas fa-exclamation-triangle me-2"></i>Delete Size
+        </h5>
+        <button
+          type="button"
+          class="btn-close"
+          (click)="closeModals()"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <div class="text-center mb-4">
+          <i class="fas fa-exclamation-circle fa-3x text-danger mb-3"></i>
+          <h5 class="text-muted" >Are you sure?</h5>
+
+          <div *ngIf="selectedSize" class="mt-3">
+            <div class="p-3 bg-light rounded">
+              <p class="mb-1"><strong>Size Name:</strong> {{ selectedSize.sizeName }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer border-0">
+        <button type="button" class="btn btn-secondary" (click)="closeModals()">
+          Cancel
+        </button>
+        <button type="button" class="btn btn-danger" (click)="deleteSize()">
+          <i class="fas fa-trash me-2"></i>Delete Size
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Backdrop -->
+<div
+  *ngIf="showAddModal || showEditModal || showDeleteModal"
+  class="modal-backdrop fade show"
+  (click)="closeModals()"
+></div>

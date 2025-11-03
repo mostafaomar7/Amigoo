@@ -1,0 +1,121 @@
+<!-- Modern Collapsible Sidebar -->
+<aside class="dashboard-sidebar" [class.collapsed]="sidebarCollapsed">
+  <div class="sidebar-header">
+    <div class="sidebar-brand">
+      <img src="assets/img/logo/bg_white.png" alt="Amigoo Logo" class="brand-logo">
+    </div>
+    <button
+      class="btn btn-link sidebar-toggle d-lg-none"
+      (click)="onToggleSidebar()"
+      type="button"
+      aria-label="Toggle sidebar">
+      <i class="fas fa-times"></i>
+    </button>
+  </div>
+
+  <nav class="sidebar-nav">
+    <ul class="nav flex-column">
+      <!-- Dashboard -->
+      <li class="nav-item">
+        <a
+          class="nav-link"
+          [class.active]="isActiveRoute('/admin') && !isActiveRoute('/admin/products') && !isActiveRoute('/admin/categories') && !isActiveRoute('/admin/master-sizes') && !isActiveRoute('/admin/orders') && !isActiveRoute('/admin/contact-forms') && !isActiveRoute('/admin/settings')"
+          routerLink="/admin"
+          routerLinkActive="active"
+          [routerLinkActiveOptions]="{exact: true}"
+          (click)="onNavLinkClick()">
+          <i class="fas fa-tachometer-alt"></i>
+          <span class="nav-label">Dashboard</span>
+        </a>
+      </li>
+
+      <!-- Categories -->
+      <li class="nav-item">
+        <a
+          class="nav-link"
+          routerLink="/admin/categories"
+          routerLinkActive="active"
+          (click)="onNavLinkClick()">
+          <i class="fas fa-tags"></i>
+          <span class="nav-label">Categories</span>
+        </a>
+      </li>
+
+      <!-- Products -->
+      <li class="nav-item">
+        <a
+          class="nav-link"
+          routerLink="/admin/products"
+          routerLinkActive="active"
+          (click)="onNavLinkClick()">
+          <i class="fas fa-box"></i>
+          <span class="nav-label">Products</span>
+        </a>
+      </li>
+
+      <!-- Master Sizes -->
+      <li class="nav-item">
+        <a
+          class="nav-link"
+          routerLink="/admin/master-sizes"
+          routerLinkActive="active"
+          (click)="onNavLinkClick()">
+          <i class="fas fa-list-alt"></i>
+          <span class="nav-label">Sizes</span>
+        </a>
+      </li>
+
+      <!-- Orders -->
+      <li class="nav-item">
+        <a
+          class="nav-link"
+          routerLink="/admin/orders"
+          routerLinkActive="active"
+          (click)="onNavLinkClick()">
+          <i class="fas fa-shopping-cart"></i>
+          <span class="nav-label">Orders</span>
+          <span class="badge bg-danger ms-auto" *ngIf="pendingOrders > 0 && !sidebarCollapsed">
+            {{ pendingOrders }}
+          </span>
+        </a>
+      </li>
+
+      <!-- Contact -->
+      <li class="nav-item">
+        <a
+          class="nav-link"
+          routerLink="/admin/contact-forms"
+          routerLinkActive="active"
+          (click)="onNavLinkClick()">
+          <i class="fas fa-envelope"></i>
+          <span class="nav-label">Contact</span>
+          <span class="badge bg-primary ms-auto" *ngIf="unreadMessages > 0 && !sidebarCollapsed">
+            {{ unreadMessages }}
+          </span>
+        </a>
+      </li>
+
+      <!-- Settings -->
+      <li class="nav-item">
+        <a
+          class="nav-link"
+          routerLink="/admin/settings"
+          routerLinkActive="active"
+          (click)="onNavLinkClick()">
+          <i class="fas fa-cog"></i>
+          <span class="nav-label">Settings</span>
+        </a>
+      </li>
+    </ul>
+  </nav>
+
+  <div class="sidebar-footer">
+    <button
+      class="btn btn-outline-danger w-100"
+      (click)="onLogout()"
+      type="button">
+      <i class="fas fa-sign-out-alt"></i>
+      <span class="nav-label" *ngIf="!sidebarCollapsed">Logout</span>
+    </button>
+  </div>
+</aside>

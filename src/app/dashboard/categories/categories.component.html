@@ -1,0 +1,423 @@
+<!-- Categories Management Page -->
+<div class="container-fluid py-4">
+  <!-- Header -->
+  <div class="mb-4">
+    <h1 class="h2 mb-1 text-white">Categories Management</h1>
+    <p class="text-white mb-0">Manage your product categories</p>
+  </div>
+
+  <!-- Search and Add Button -->
+  <div
+    class="d-flex flex-column flex-md-row gap-2 align-items-start align-items-md-center mb-4"
+  >
+    <div class="input-group" style="max-width: 400px; flex: 1">
+      <span class="input-group-text">
+        <i class="fas fa-search text-dark"></i>
+      </span>
+      <input
+        type="text"
+        id="searchInput"
+        class="form-control"
+        [(ngModel)]="searchTerm"
+        (input)="onSearchInput()"
+        placeholder="Search categories by name..."
+      />
+    </div>
+    <button
+      type="button"
+      class="btn btn-primary"
+      (click)="showAddCategoryModal()"
+    >
+      <i class="fas fa-plus me-2"></i>Add Category
+    </button>
+  </div>
+
+  <!-- Categories Table -->
+  <div class="card">
+    <div class="card-body">
+      <!-- Loading State -->
+      <div *ngIf="isLoading" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+      </div>
+
+      <!-- Categories List -->
+      <div *ngIf="!isLoading" class="table-responsive">
+        <table class="table table-hover align-middle categories-table">
+          <thead class="table-light">
+            <tr>
+              <th scope="col">Image</th>
+              <th scope="col">Name</th>
+              <th scope="col">Created At</th>
+              <th scope="col" class="text-end">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let category of filteredCategories">
+              <td>
+                <img
+                  [src]="getImageUrl(category.image)"
+                  [alt]="category.name"
+                  class="rounded"
+                  style="width: 60px; height: 60px; object-fit: cover"
+                />
+              </td>
+              <td>
+                <strong class="text-dark">{{ category.name }}</strong>
+              </td>
+              <td>
+                <small class="text-muted">{{ category.createdAt | date : "dd-MM-yyyy h:mm a" }}</small>
+              </td>
+              <td class="text-end">
+                <div class="btn-group" role="group">
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-action btn-edit"
+                    (click)="showEditCategoryModal(category)"
+                    title="Edit Category"
+                  >
+                    <i class="fas fa-pencil-alt"></i>
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-action btn-delete"
+                    (click)="showDeleteCategoryModal(category)"
+                    title="Delete Category"
+                  >
+                    <i class="fas fa-trash-alt"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Empty State -->
+      <div
+        *ngIf="!isLoading && filteredCategories.length === 0"
+        class="text-center py-5"
+      >
+        <i class="fas fa-folder-open fa-3x text-muted mb-3"></i>
+        <h5 class="text-muted">No categories found</h5>
+        <p class="text-muted">Get started by adding a new category.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pagination -->
+  <div *ngIf="!isLoading && totalItems > 0 && totalPages > 0" class="mt-4">
+    <nav aria-label="Categories pagination">
+      <ul class="pagination justify-content-center mb-3">
+        <li class="page-item" [class.disabled]="currentPage === 1">
+          <a
+            class="page-link"
+            href="#"
+            (click)="goToPage(currentPage - 1); $event.preventDefault()"
+            [attr.aria-disabled]="currentPage === 1"
+            [class.disabled]="currentPage === 1"
+          >
+            <i class="fas fa-chevron-left" style="color: #2563eb !important;"></i>
+            <span class="visually-hidden">Previous</span>
+          </a>
+        </li>
+        <li
+          *ngFor="let page of pageNumbers"
+          class="page-item"
+          [class.active]="page === currentPage"
+        >
+          <a
+            class="page-link"
+            href="#"
+            (click)="goToPage(page); $event.preventDefault()"
+          >
+            {{ page }}
+          </a>
+        </li>
+        <li class="page-item" [class.disabled]="currentPage === totalPages">
+          <a
+            class="page-link"
+            href="#"
+            (click)="goToPage(currentPage + 1); $event.preventDefault()"
+            [attr.aria-disabled]="currentPage === totalPages"
+            [class.disabled]="currentPage === totalPages"
+          >
+            <i class="fas fa-chevron-right" style="color: #2563eb !important;"></i>
+            <span class="visually-hidden">Next</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+    <div class="text-center text-muted">
+      <small>
+        Showing <strong>{{ (currentPage - 1) * itemsPerPage + 1 }}</strong> to
+        <strong>{{ Math.min(currentPage * itemsPerPage, totalItems) }}</strong> of
+        <strong>{{ totalItems }}</strong>
+        {{ totalItems === 1 ? 'result' : 'results' }}
+        <span *ngIf="totalPages > 1"> | Page <strong>{{ currentPage }}</strong> of <strong>{{ totalPages }}</strong></span>
+      </small>
+    </div>
+  </div>
+</div>
+
+<!-- Add Category Modal -->
+<div
+  class="modal fade"
+  [class.show]="showAddModal"
+  [style.display]="showAddModal ? 'block' : 'none'"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="addCategoryModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <form [formGroup]="categoryForm" (ngSubmit)="addCategory()">
+        <div class="modal-header">
+          <h5 class="modal-title" id="addCategoryModalLabel">
+            <i class="fas fa-plus-circle me-2"></i>Add New Category
+          </h5>
+          <button
+            type="button"
+            class="btn-close"
+            (click)="closeModals()"
+            aria-label="Close"
+          ></button>
+        </div>
+        <div class="modal-body">
+          <!-- Category Name -->
+          <div class="mb-3">
+            <label for="categoryName" class="form-label">
+              Category Name <span class="text-danger">*</span>
+            </label>
+            <input
+              type="text"
+              id="categoryName"
+              class="form-control"
+              [class.is-invalid]="hasFieldError(categoryForm, 'name')"
+              formControlName="name"
+              placeholder="Enter category name"
+            />
+            <div
+              *ngIf="hasFieldError(categoryForm, 'name')"
+              class="invalid-feedback"
+            >
+              {{ getFieldError(categoryForm, "name") }}
+            </div>
+          </div>
+
+          <!-- Image Upload -->
+          <div class="mb-3">
+            <label for="categoryImage" class="form-label">
+              Category Image <span class="text-danger">*</span>
+            </label>
+            <input
+              type="file"
+              id="categoryImage"
+              class="form-control"
+              accept="image/*"
+              (change)="onImageSelected($event, false)"
+              required
+            />
+            <div class="form-text">
+              <i class="fas fa-info-circle me-1"></i>
+              Please select an image file (JPG, PNG, etc.)
+            </div>
+            <div *ngIf="selectedImage" class="mt-2">
+              <img
+                [src]="getImagePreview(selectedImage)"
+                alt="Preview"
+                class="img-thumbnail"
+                style="max-width: 200px; max-height: 200px"
+              />
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            (click)="closeModals()"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            class="btn btn-primary"
+            [disabled]="!categoryForm.valid || !selectedImage"
+          >
+            <i class="fas fa-save me-2"></i>Add Category
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Category Modal -->
+<div
+  class="modal fade"
+  [class.show]="showEditModal"
+  [style.display]="showEditModal ? 'block' : 'none'"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="editCategoryModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <form [formGroup]="editCategoryForm" (ngSubmit)="updateCategory()">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editCategoryModalLabel">
+            <i class="fas fa-edit me-2"></i>Edit Category
+          </h5>
+          <button
+            type="button"
+            class="btn-close"
+            (click)="closeModals()"
+            aria-label="Close"
+          ></button>
+        </div>
+        <div class="modal-body">
+          <!-- Current Image Display -->
+          <div *ngIf="selectedCategory" class="mb-3">
+            <label class="form-label">Current Image</label>
+            <div>
+              <img
+                [src]="getImageUrl(selectedCategory.image)"
+                [alt]="selectedCategory.name"
+                class="img-thumbnail"
+                style="max-width: 200px; max-height: 200px"
+              />
+            </div>
+          </div>
+
+          <!-- Category Name -->
+          <div class="mb-3">
+            <label for="editCategoryName" class="form-label">
+              Category Name <span class="text-danger">*</span>
+            </label>
+            <input
+              type="text"
+              id="editCategoryName"
+              class="form-control"
+              [class.is-invalid]="hasFieldError(editCategoryForm, 'name')"
+              formControlName="name"
+              placeholder="Enter category name"
+            />
+            <div
+              *ngIf="hasFieldError(editCategoryForm, 'name')"
+              class="invalid-feedback"
+            >
+              {{ getFieldError(editCategoryForm, "name") }}
+            </div>
+          </div>
+
+          <!-- Image Upload -->
+          <div class="mb-3">
+            <label for="editCategoryImage" class="form-label">
+              Update Image <small class="text-muted">(Optional)</small>
+            </label>
+            <input
+              type="file"
+              id="editCategoryImage"
+              class="form-control"
+              accept="image/*"
+              (change)="onImageSelected($event, true)"
+            />
+            <div class="form-text">
+              <i class="fas fa-info-circle me-1"></i>
+              Leave empty to keep the current image
+            </div>
+            <div *ngIf="selectedEditImage" class="mt-2">
+              <img
+                [src]="getImagePreview(selectedEditImage)"
+                alt="Preview"
+                class="img-thumbnail"
+                style="max-width: 200px; max-height: 200px"
+              />
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            (click)="closeModals()"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            class="btn btn-primary"
+            [disabled]="!editCategoryForm.valid"
+          >
+            <i class="fas fa-save me-2"></i>Update Category
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div
+  class="modal fade"
+  [class.show]="showDeleteModal"
+  [style.display]="showDeleteModal ? 'block' : 'none'"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="deleteCategoryModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header border-0">
+        <h5 class="modal-title text-danger" id="deleteCategoryModalLabel">
+          <i class="fas fa-exclamation-triangle me-2"></i>Delete Category
+        </h5>
+        <button
+          type="button"
+          class="btn-close"
+          (click)="closeModals()"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <div class="text-center mb-4">
+          <i class="fas fa-exclamation-circle fa-3x text-danger mb-3"></i>
+          <h5>Are you sure?</h5>
+          <p class="text-muted">
+            You are about to delete the category
+            <strong>"{{ selectedCategory?.name }}"</strong>. This action cannot
+            be undone.
+          </p>
+          <div *ngIf="selectedCategory" class="mt-3">
+            <img
+              [src]="getImageUrl(selectedCategory.image)"
+              [alt]="selectedCategory.name"
+              class="img-thumbnail"
+              style="max-width: 150px; max-height: 150px"
+            />
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer border-0">
+        <button type="button" class="btn btn-secondary" (click)="closeModals()">
+          Cancel
+        </button>
+        <button type="button" class="btn btn-danger" (click)="deleteCategory()">
+          <i class="fas fa-trash me-2"></i>Delete Category
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Backdrop -->
+<div
+  *ngIf="showAddModal || showEditModal || showDeleteModal"
+  class="modal-backdrop fade show"
+  (click)="closeModals()"
+></div>

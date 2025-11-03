@@ -1,0 +1,1206 @@
+<!-- Products Management Page -->
+<div class="container-fluid py-4">
+  <!-- Header -->
+  <div class="mb-4">
+    <h1 class="h2 mb-1 text-white">Products Management</h1>
+    <p class="text-white mb-0">Manage your products</p>
+  </div>
+
+  <!-- Search and Add Button -->
+  <div
+    class="d-flex flex-column flex-md-row gap-2 align-items-start align-items-md-center mb-4"
+  >
+    <div class="input-group" style="max-width: 400px; flex: 1">
+      <span class="input-group-text">
+        <i class="fas fa-search text-dark"></i>
+      </span>
+      <input
+        type="text"
+        id="searchInput"
+        class="form-control"
+        [(ngModel)]="searchTerm"
+        (input)="onSearchInput()"
+        placeholder="Search products..."
+      />
+    </div>
+    <button
+      type="button"
+      class="btn btn-primary"
+      (click)="showAddProductModal()"
+    >
+      <i class="fas fa-plus me-2"></i>Add Product
+    </button>
+  </div>
+
+  <!-- Products Table -->
+  <div class="card">
+    <div class="card-body">
+      <!-- Loading State -->
+      <div *ngIf="isLoading" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+      </div>
+
+      <!-- Products List -->
+      <div *ngIf="!isLoading" class="table-responsive">
+        <table class="table table-hover align-middle products-table">
+          <thead class="table-light">
+            <tr>
+              <th scope="col">Image</th>
+              <th scope="col">Title</th>
+              <th scope="col">Price</th>
+              <th scope="col">Category</th>
+              <th scope="col">Created At</th>
+              <th scope="col" class="text-end">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let product of filteredProducts">
+              <td>
+                <img
+                  [src]="getImageUrl(product.imageCover)"
+                  [alt]="product.title"
+                  class="rounded"
+                  style="width: 60px; height: 60px; object-fit: cover"
+                />
+              </td>
+              <td>
+                <strong class="text-dark">{{ product.title }}</strong>
+              </td>
+              <td>
+                <span class="text-dark">{{ product.price }} EGP</span>
+                <span *ngIf="product.priceAfterDiscount" class="text-muted ms-2 text-decoration-line-through">
+                  {{ product.priceAfterDiscount }} EGP
+                </span>
+              </td>
+              <td>
+                <span class="text-muted">{{ product.category.name }}</span>
+              </td>
+              <td>
+                <small class="text-muted">{{ product.createdAt | date : "dd-MM-yyyy h:mm a" }}</small>
+              </td>
+              <td class="text-end">
+                <div class="btn-group" role="group">
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-action btn-info"
+                    (click)="showDetailsProductModal(product)"
+                    title="View Details"
+                  >
+                    <i class="fas fa-eye"></i>
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-action btn-edit"
+                    (click)="showEditProductModal(product)"
+                    title="Edit Product"
+                  >
+                    <i class="fas fa-pencil-alt"></i>
+                  </button>
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-action btn-delete"
+                    (click)="showDeleteProductModal(product)"
+                    title="Delete Product"
+                  >
+                    <i class="fas fa-trash-alt"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Empty State -->
+      <div
+        *ngIf="!isLoading && filteredProducts.length === 0"
+        class="text-center py-5"
+      >
+        <i class="fas fa-box-open fa-3x text-muted mb-3"></i>
+        <h5 class="text-muted">No products found</h5>
+        <p class="text-muted">Get started by adding a new product.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pagination -->
+  <div *ngIf="!isLoading && totalItems > 0 && totalPages > 0" class="mt-4">
+    <nav aria-label="Products pagination">
+      <ul class="pagination justify-content-center mb-3">
+        <li class="page-item" [class.disabled]="currentPage === 1">
+          <a
+            class="page-link"
+            href="#"
+            (click)="goToPage(currentPage - 1); $event.preventDefault()"
+            [attr.aria-disabled]="currentPage === 1"
+            [class.disabled]="currentPage === 1"
+          >
+            <i class="fas fa-chevron-left" style="color: #212529 !important;"></i>
+            <span class="visually-hidden">Previous</span>
+          </a>
+        </li>
+        <li
+          *ngFor="let page of pageNumbers"
+          class="page-item"
+          [class.active]="page === currentPage"
+        >
+          <a
+            class="page-link"
+            href="#"
+            (click)="goToPage(page); $event.preventDefault()"
+          >
+            {{ page }}
+          </a>
+        </li>
+        <li class="page-item" [class.disabled]="currentPage === totalPages">
+          <a
+            class="page-link"
+            href="#"
+            (click)="goToPage(currentPage + 1); $event.preventDefault()"
+            [attr.aria-disabled]="currentPage === totalPages"
+            [class.disabled]="currentPage === totalPages"
+          >
+            <i class="fas fa-chevron-right" style="color: #212529 !important;"></i>
+            <span class="visually-hidden">Next</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+    <div class="text-center text-muted">
+      <small>
+        Showing <strong>{{ (currentPage - 1) * itemsPerPage + 1 }}</strong> to
+        <strong>{{ Math.min(currentPage * itemsPerPage, totalItems) }}</strong> of
+        <strong>{{ totalItems }}</strong>
+        {{ totalItems === 1 ? 'result' : 'results' }}
+        <span *ngIf="totalPages > 1"> | Page <strong>{{ currentPage }}</strong> of <strong>{{ totalPages }}</strong></span>
+      </small>
+    </div>
+  </div>
+</div>
+
+<!-- Add Product Modal -->
+<div
+  class="modal fade"
+  [class.show]="showAddModal"
+  [style.display]="showAddModal ? 'block' : 'none'"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="addProductModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+    <div class="modal-content">
+      <form [formGroup]="productForm" (ngSubmit)="addProduct()">
+        <div class="modal-header">
+          <h5 class="modal-title" id="addProductModalLabel">
+            <i class="fas fa-plus-circle me-2"></i>Add New Product
+          </h5>
+          <button
+            type="button"
+            class="btn-close"
+            (click)="closeModals()"
+            aria-label="Close"
+          ></button>
+        </div>
+        <div class="modal-body">
+          <!-- Basic Information -->
+          <div class="mb-4">
+            <h6 class="text-muted mb-3 border-bottom pb-2 fw-semibold">Basic Information</h6>
+            <div class="mb-3">
+              <label for="productTitle" class="form-label fw-medium">
+                Title <span class="text-danger">*</span>
+              </label>
+              <input
+                type="text"
+                id="productTitle"
+                class="form-control"
+                [class.is-invalid]="hasFieldError(productForm, 'title')"
+                formControlName="title"
+                placeholder="Enter product title"
+              />
+              <div
+                *ngIf="hasFieldError(productForm, 'title')"
+                class="invalid-feedback d-block"
+              >
+                {{ getFieldError(productForm, "title") }}
+              </div>
+            </div>
+            <div class="mb-0">
+              <label for="productDescription" class="form-label fw-medium">
+                Description <span class="text-danger">*</span>
+              </label>
+              <textarea
+                id="productDescription"
+                class="form-control"
+                [class.is-invalid]="hasFieldError(productForm, 'description')"
+                formControlName="description"
+                rows="3"
+                placeholder="Enter product description"
+              ></textarea>
+              <div
+                *ngIf="hasFieldError(productForm, 'description')"
+                class="invalid-feedback d-block"
+              >
+                {{ getFieldError(productForm, "description") }}
+              </div>
+            </div>
+          </div>
+
+          <!-- Pricing -->
+          <div class="mb-4">
+            <h6 class="text-muted mb-3 border-bottom pb-2 fw-semibold">Pricing</h6>
+            <div class="row g-3">
+              <div class="col-12 col-md-6">
+                <label for="productPrice" class="form-label fw-medium">
+                  Price <span class="text-danger">*</span>
+                </label>
+                <input
+                  type="number"
+                  id="productPrice"
+                  class="form-control"
+                  [class.is-invalid]="hasFieldError(productForm, 'price')"
+                  formControlName="price"
+                  placeholder="0.00"
+                  min="0"
+                  step="0.01"
+                />
+                <div
+                  *ngIf="hasFieldError(productForm, 'price')"
+                  class="invalid-feedback d-block"
+                >
+                  {{ getFieldError(productForm, "price") }}
+                </div>
+              </div>
+              <div class="col-12 col-md-6">
+                <label for="productDiscount" class="form-label fw-medium">
+                  Price After Discount <small class="text-muted">(Optional)</small>
+                </label>
+                <input
+                  type="number"
+                  id="productDiscount"
+                  class="form-control"
+                  [class.is-invalid]="hasFieldError(productForm, 'priceAfterDiscount')"
+                  formControlName="priceAfterDiscount"
+                  placeholder="0.00"
+                  min="0"
+                  step="0.01"
+                />
+                <div
+                  *ngIf="hasFieldError(productForm, 'priceAfterDiscount')"
+                  class="invalid-feedback d-block"
+                >
+                  {{ getFieldError(productForm, "priceAfterDiscount") }}
+                </div>
+                <div class="form-text mt-1">
+                  <i class="fas fa-info-circle me-1"></i>
+                  Must be less than the regular price
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Category -->
+          <div class="mb-4">
+            <h6 class="text-muted mb-3 border-bottom pb-2 fw-semibold">Category</h6>
+            <div class="mb-0">
+              <label for="productCategory" class="form-label fw-medium">
+                <i class="fas fa-folder me-1"></i>Category <span class="text-danger">*</span>
+              </label>
+              <div class="position-relative category-select-wrapper">
+                <select
+                  id="productCategory"
+                  class="form-select"
+                  [class.is-invalid]="hasFieldError(productForm, 'category')"
+                  formControlName="category"
+                >
+                  <option [value]="null" disabled>Select a category</option>
+                  <option *ngFor="let category of categories" [value]="category._id">
+                    {{ category.name }}
+                  </option>
+                </select>
+              </div>
+              <div
+                *ngIf="hasFieldError(productForm, 'category')"
+                class="invalid-feedback d-block"
+              >
+                <i class="fas fa-exclamation-circle me-1"></i>{{ getFieldError(productForm, "category") }}
+              </div>
+              <div *ngIf="!hasFieldError(productForm, 'category') && productForm.get('category')?.value" class="form-text mt-2">
+                <i class="fas fa-check-circle text-success me-1"></i>
+                <span class="text-muted">Selected: <strong>{{ getSelectedCategoryName(productForm.get('category')?.value) }}</strong></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Colors -->
+          <div class="mb-4">
+            <h6 class="text-muted mb-3 border-bottom pb-2 fw-semibold">Colors</h6>
+            <div class="mb-0">
+              <label class="form-label fw-medium">Product Colors</label>
+              <div class="input-group">
+                <input
+                  type="text"
+                  class="form-control"
+                  [(ngModel)]="newColor"
+                  [ngModelOptions]="{standalone: true}"
+                  placeholder="Enter color name"
+                  (keyup.enter)="addColor(false)"
+                />
+                <button
+                  type="button"
+                  class="btn btn-outline-secondary"
+                  (click)="addColor(false)"
+                >
+                  <i class="fas fa-plus me-1"></i>Add
+                </button>
+              </div>
+              <div *ngIf="productColors.length > 0" class="d-flex flex-wrap gap-2 mt-2">
+                <span
+                  *ngFor="let color of productColors"
+                  class="badge bg-primary fs-6 py-2 px-3"
+                >
+                  {{ color }}
+                  <button
+                    type="button"
+                    class="btn-close btn-close-white ms-2"
+                    (click)="removeColor(color, false)"
+                    aria-label="Remove"
+                  ></button>
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Images -->
+          <div class="mb-4">
+            <h6 class="text-muted mb-3 border-bottom pb-2 fw-semibold">Images</h6>
+            <div class="mb-4">
+              <label for="productCoverImage" class="form-label fw-medium">
+                Cover Image <span class="text-danger">*</span>
+              </label>
+              <div class="input-group">
+                <input
+                  type="file"
+                  id="productCoverImage"
+                  class="form-control"
+                  accept="image/*"
+                  (change)="onCoverImageSelected($event, false)"
+                  required
+                />
+              </div>
+              <div class="form-text mt-1">
+                <i class="fas fa-info-circle me-1"></i>
+                This will be the main product image
+              </div>
+              <div *ngIf="selectedCoverImage" class="mt-3">
+                <img
+                  [src]="getImagePreview(selectedCoverImage)"
+                  alt="Cover Preview"
+                  class="img-thumbnail"
+                />
+              </div>
+            </div>
+            <div class="mb-0">
+              <label for="productImages" class="form-label fw-medium">
+                Additional Images
+              </label>
+              <div class="input-group">
+                <input
+                  type="file"
+                  id="productImages"
+                  class="form-control"
+                  accept="image/*"
+                  multiple
+                  (change)="onImagesSelected($event, false)"
+                  #additionalImagesInput
+                />
+              </div>
+              <div class="form-text mt-1 mb-3">
+                <i class="fas fa-info-circle me-1"></i>
+                You can select multiple images (max 5)
+              </div>
+              <div *ngIf="selectedImages.length > 0" class="mt-3">
+                <div class="d-flex flex-wrap gap-3">
+                  <div *ngFor="let image of selectedImages; let i = index" class="position-relative">
+                    <img
+                      [src]="getImagePreview(image)"
+                      alt="Preview {{ i + 1 }}"
+                      class="img-thumbnail"
+                    />
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-danger position-absolute top-0 end-0 rounded-circle"
+                      (click)="removeImage(i, false)"
+                      title="Remove image"
+                    >
+                      <i class="fas fa-times"></i>
+                    </button>
+                  </div>
+                </div>
+                <small class="text-muted d-block mt-2">
+                  <i class="fas fa-check-circle text-success me-1"></i>
+                  {{ selectedImages.length }} image(s) selected
+                </small>
+              </div>
+            </div>
+          </div>
+
+          <!-- Sizes & Quantity -->
+          <div class="mb-4">
+            <h6 class="text-muted mb-3 border-bottom pb-2 fw-semibold">
+              Sizes & Quantity <span class="text-danger">*</span>
+            </h6>
+            <div class="mb-3">
+              <label class="form-label fw-medium">Add Size and Quantity <span class="text-danger">*</span></label>
+              <div class="input-group">
+                <select
+                  class="form-select"
+                  [(ngModel)]="selectedSizeToAdd"
+                  [ngModelOptions]="{standalone: true}"
+                >
+                  <option value="">Select a size to add</option>
+                  <option *ngFor="let size of getAvailableSizesForQuantity(false)" [value]="size._id">
+                    {{ size.sizeName.toUpperCase() }}
+                  </option>
+                </select>
+                <button
+                  type="button"
+                  class="btn btn-outline-primary"
+                  (click)="addSizeToQuantity(selectedSizeToAdd, false); selectedSizeToAdd = ''"
+                  [disabled]="!selectedSizeToAdd || getAvailableSizesForQuantity(false).length === 0"
+                >
+                  <i class="fas fa-plus me-1"></i>Add Size
+                </button>
+              </div>
+            </div>
+            <div *ngIf="productQuantity.length > 0" class="border rounded p-3 bg-light mb-3">
+              <div class="table-responsive">
+                <table class="table table-sm table-bordered mb-0">
+                  <thead class="table-light">
+                    <tr>
+                      <th>Size</th>
+                      <th>Quantity</th>
+                      <th class="text-center">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let qty of productQuantity; let i = index">
+                      <td class="align-middle">
+                        <strong>{{ qty.size.toUpperCase() }}</strong>
+                      </td>
+                      <td class="align-middle">
+                        <input
+                          type="number"
+                          class="form-control form-control-sm"
+                          [value]="qty.no"
+                          min="0"
+                          (input)="updateQuantityValue(i, +$any($event.target).value, false)"
+                        />
+                      </td>
+                      <td class="text-center align-middle">
+                        <button
+                          type="button"
+                          class="btn btn-sm btn-danger"
+                          (click)="removeSizeFromQuantity(i, false)"
+                          title="Remove size"
+                        >
+                          <i class="fas fa-trash"></i>
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer border-top pt-3">
+          <div class="d-grid d-md-flex gap-2 justify-content-md-end w-100">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              (click)="closeModals()"
+            >
+              <i class="fas fa-times me-1"></i>Cancel
+            </button>
+            <button
+              type="submit"
+              class="btn btn-primary"
+              [disabled]="!productForm.valid || !selectedCoverImage || productQuantity.length === 0"
+            >
+              <i class="fas fa-save me-2"></i>Add Product
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Product Modal -->
+<div
+  class="modal fade"
+  [class.show]="showEditModal"
+  [style.display]="showEditModal ? 'block' : 'none'"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="editProductModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+    <div class="modal-content">
+      <form [formGroup]="editProductForm" (ngSubmit)="updateProduct()">
+        <div class="modal-header">
+          <h5 class="modal-title" id="editProductModalLabel">
+            <i class="fas fa-edit me-2"></i>Edit Product
+          </h5>
+          <button
+            type="button"
+            class="btn-close"
+            (click)="closeModals()"
+            aria-label="Close"
+          ></button>
+        </div>
+        <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
+          <!-- Basic Information -->
+          <div class="mb-4">
+            <h6 class="text-muted mb-3 border-bottom pb-2 fw-semibold">Basic Information</h6>
+            <div class="mb-3">
+              <label for="editProductTitle" class="form-label fw-medium">
+                Title <span class="text-danger">*</span>
+              </label>
+              <input
+                type="text"
+                id="editProductTitle"
+                class="form-control"
+                [class.is-invalid]="hasFieldError(editProductForm, 'title')"
+                formControlName="title"
+                placeholder="Enter product title"
+              />
+              <div
+                *ngIf="hasFieldError(editProductForm, 'title')"
+                class="invalid-feedback d-block"
+              >
+                {{ getFieldError(editProductForm, "title") }}
+              </div>
+            </div>
+            <div class="mb-0">
+              <label for="editProductDescription" class="form-label fw-medium">
+                Description <span class="text-danger">*</span>
+              </label>
+              <textarea
+                id="editProductDescription"
+                class="form-control"
+                [class.is-invalid]="hasFieldError(editProductForm, 'description')"
+                formControlName="description"
+                rows="3"
+                placeholder="Enter product description"
+              ></textarea>
+              <div
+                *ngIf="hasFieldError(editProductForm, 'description')"
+                class="invalid-feedback d-block"
+              >
+                {{ getFieldError(editProductForm, "description") }}
+              </div>
+            </div>
+          </div>
+
+          <!-- Pricing -->
+          <div class="mb-4">
+            <h6 class="text-muted mb-3 border-bottom pb-2 fw-semibold">Pricing</h6>
+            <div class="row g-3">
+              <div class="col-12 col-md-6">
+                <label for="editProductPrice" class="form-label fw-medium">
+                  Price <span class="text-danger">*</span>
+                </label>
+                <input
+                  type="number"
+                  id="editProductPrice"
+                  class="form-control"
+                  [class.is-invalid]="hasFieldError(editProductForm, 'price')"
+                  formControlName="price"
+                  placeholder="0.00"
+                  min="0"
+                  step="0.01"
+                />
+                <div
+                  *ngIf="hasFieldError(editProductForm, 'price')"
+                  class="invalid-feedback d-block"
+                >
+                  {{ getFieldError(editProductForm, "price") }}
+                </div>
+              </div>
+              <div class="col-12 col-md-6">
+                <label for="editProductDiscount" class="form-label fw-medium">
+                  Price After Discount <small class="text-muted">(Optional)</small>
+                </label>
+                <input
+                  type="number"
+                  id="editProductDiscount"
+                  class="form-control"
+                  [class.is-invalid]="hasFieldError(editProductForm, 'priceAfterDiscount')"
+                  formControlName="priceAfterDiscount"
+                  placeholder="0.00"
+                  min="0"
+                  step="0.01"
+                />
+                <div
+                  *ngIf="hasFieldError(editProductForm, 'priceAfterDiscount')"
+                  class="invalid-feedback d-block"
+                >
+                  {{ getFieldError(editProductForm, "priceAfterDiscount") }}
+                </div>
+                <div class="form-text mt-1">
+                  <i class="fas fa-info-circle me-1"></i>
+                  Must be less than the regular price
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Category -->
+          <div class="mb-4">
+            <h6 class="text-muted mb-3 border-bottom pb-2 fw-semibold">Category</h6>
+            <div class="mb-0">
+              <label for="editProductCategory" class="form-label fw-medium">
+                <i class="fas fa-folder me-1"></i>Category <span class="text-danger">*</span>
+              </label>
+              <div class="position-relative category-select-wrapper">
+                <select
+                  id="editProductCategory"
+                  class="form-select"
+                  [class.is-invalid]="hasFieldError(editProductForm, 'category')"
+                  formControlName="category"
+                >
+                  <option [value]="null" disabled>Select a category</option>
+                  <option *ngFor="let category of categories" [value]="category._id">
+                    {{ category.name }}
+                  </option>
+                </select>
+              </div>
+              <div
+                *ngIf="hasFieldError(editProductForm, 'category')"
+                class="invalid-feedback d-block"
+              >
+                <i class="fas fa-exclamation-circle me-1"></i>{{ getFieldError(editProductForm, "category") }}
+              </div>
+              <div *ngIf="!hasFieldError(editProductForm, 'category') && editProductForm.get('category')?.value" class="form-text mt-2">
+                <i class="fas fa-check-circle text-success me-1"></i>
+                <span class="text-muted">Selected: <strong>{{ getSelectedCategoryName(editProductForm.get('category')?.value) || (selectedProduct?.category?.name || '') }}</strong></span>
+              </div>
+              <div *ngIf="!hasFieldError(editProductForm, 'category') && !editProductForm.get('category')?.value && selectedProduct?.category?.name" class="form-text mt-2">
+                <i class="fas fa-info-circle text-info me-1"></i>
+                <span class="text-muted">Current category: <strong>{{ selectedProduct.category.name }}</strong></span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Colors -->
+          <div class="mb-4">
+            <h6 class="text-muted mb-3 border-bottom pb-2 fw-semibold">Colors</h6>
+            <div class="mb-0">
+              <label class="form-label fw-medium">Product Colors</label>
+              <div class="input-group">
+                <input
+                  type="text"
+                  class="form-control"
+                  [(ngModel)]="editNewColor"
+                  [ngModelOptions]="{standalone: true}"
+                  placeholder="Enter color name"
+                  (keyup.enter)="addColor(true)"
+                />
+                <button
+                  type="button"
+                  class="btn btn-outline-secondary"
+                  (click)="addColor(true)"
+                >
+                  <i class="fas fa-plus me-1"></i>Add
+                </button>
+              </div>
+              <div *ngIf="editProductColors.length > 0" class="d-flex flex-wrap gap-2 mt-2">
+                <span
+                  *ngFor="let color of editProductColors"
+                  class="badge bg-primary fs-6 py-2 px-3"
+                >
+                  {{ color }}
+                  <button
+                    type="button"
+                    class="btn-close btn-close-white ms-2"
+                    (click)="removeColor(color, true)"
+                    aria-label="Remove"
+                  ></button>
+                </span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Images -->
+          <div class="mb-4">
+            <h6 class="text-muted mb-3 border-bottom pb-2 fw-semibold">Images</h6>
+            <div class="mb-4">
+              <label class="form-label fw-medium">Current Cover Image</label>
+              <div *ngIf="selectedProduct" class="mb-2">
+                <img
+                  [src]="getImageUrl(selectedProduct.imageCover)"
+                  [alt]="selectedProduct.title"
+                  class="img-thumbnail"
+                  style="max-width: 200px; max-height: 200px"
+                />
+              </div>
+              <label for="editProductCoverImage" class="form-label fw-medium">
+                Update Cover Image <small class="text-muted">(Optional)</small>
+              </label>
+              <div class="input-group">
+                <input
+                  type="file"
+                  id="editProductCoverImage"
+                  class="form-control"
+                  accept="image/*"
+                  (change)="onCoverImageSelected($event, true)"
+                />
+              </div>
+              <div class="form-text mt-1">
+                <i class="fas fa-info-circle me-1"></i>
+                Leave empty to keep current cover image
+              </div>
+              <div *ngIf="selectedEditCoverImage" class="mt-3">
+                <img
+                  [src]="getImagePreview(selectedEditCoverImage)"
+                  alt="Cover Preview"
+                  class="img-thumbnail"
+                />
+              </div>
+            </div>
+            <div class="mb-0">
+              <label class="form-label fw-medium">Current Additional Images</label>
+              <div *ngIf="selectedProduct && selectedProduct.images && selectedProduct.images.length > 0" class="mb-3">
+                <div class="d-flex flex-wrap gap-3">
+                  <div *ngFor="let image of selectedProduct.images; let i = index" class="position-relative">
+                    <img
+                      [src]="getImageUrl(image)"
+                      [alt]="'Existing image ' + (i + 1)"
+                      class="img-thumbnail"
+                    />
+                    <small class="badge bg-info position-absolute top-0 start-0 m-1">Existing</small>
+                  </div>
+                </div>
+                <small class="text-muted d-block mt-2">
+                  <i class="fas fa-info-circle me-1"></i>
+                  {{ selectedProduct.images.length }} existing image(s) - New images will be added to these
+                </small>
+              </div>
+              <div *ngIf="!selectedProduct || !selectedProduct.images || selectedProduct.images.length === 0" class="mb-3">
+                <small class="text-muted">
+                  <i class="fas fa-info-circle me-1"></i>
+                  No additional images currently
+                </small>
+              </div>
+              <label for="editProductImages" class="form-label fw-medium">
+                Add More Images <small class="text-muted">(Optional)</small>
+              </label>
+              <div class="input-group">
+                <input
+                  type="file"
+                  id="editProductImages"
+                  class="form-control"
+                  accept="image/*"
+                  multiple
+                  (change)="onImagesSelected($event, true)"
+                  #editAdditionalImagesInput
+                />
+              </div>
+              <div class="form-text mt-1 mb-3">
+                <i class="fas fa-info-circle me-1"></i>
+                You can select multiple images (max 5)
+              </div>
+              <div *ngIf="selectedEditImages.length > 0" class="mt-3">
+                <div class="d-flex flex-wrap gap-3">
+                  <div *ngFor="let image of selectedEditImages; let i = index" class="position-relative">
+                    <img
+                      [src]="getImagePreview(image)"
+                      alt="Preview {{ i + 1 }}"
+                      class="img-thumbnail"
+                    />
+                    <button
+                      type="button"
+                      class="btn btn-sm btn-danger position-absolute top-0 end-0 rounded-circle"
+                      (click)="removeImage(i, true)"
+                      title="Remove image"
+                    >
+                      <i class="fas fa-times"></i>
+                    </button>
+                  </div>
+                </div>
+                <small class="text-muted d-block mt-2">
+                  <i class="fas fa-check-circle text-success me-1"></i>
+                  {{ selectedEditImages.length }} new image(s) selected
+                </small>
+              </div>
+            </div>
+          </div>
+
+          <!-- Sizes & Quantity -->
+          <div class="mb-4">
+            <h6 class="text-muted mb-3 border-bottom pb-2 fw-semibold">
+              Sizes & Quantity <span class="text-danger">*</span>
+            </h6>
+            <div class="mb-3">
+              <label class="form-label fw-medium">Add Size and Quantity <span class="text-danger">*</span></label>
+              <div class="input-group">
+                <select
+                  class="form-select"
+                  [(ngModel)]="selectedEditSizeToAdd"
+                  [ngModelOptions]="{standalone: true}"
+                >
+                  <option value="">Select a size to add</option>
+                  <option *ngFor="let size of getAvailableSizesForQuantity(true)" [value]="size._id">
+                    {{ size.sizeName.toUpperCase() }}
+                  </option>
+                </select>
+                <button
+                  type="button"
+                  class="btn btn-outline-primary"
+                  (click)="addSizeToQuantity(selectedEditSizeToAdd, true); selectedEditSizeToAdd = ''"
+                  [disabled]="!selectedEditSizeToAdd || getAvailableSizesForQuantity(true).length === 0"
+                >
+                  <i class="fas fa-plus me-1"></i>Add Size
+                </button>
+              </div>
+            </div>
+            <div *ngIf="editProductQuantity.length > 0" class="border rounded p-3 bg-light mb-3">
+              <div class="table-responsive">
+                <table class="table table-sm table-bordered mb-0">
+                  <thead class="table-light">
+                    <tr>
+                      <th>Size</th>
+                      <th>Quantity</th>
+                      <th class="text-center">Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    <tr *ngFor="let qty of editProductQuantity; let i = index">
+                      <td class="align-middle">
+                        <strong>{{ qty.size.toUpperCase() }}</strong>
+                      </td>
+                      <td class="align-middle">
+                        <input
+                          type="number"
+                          class="form-control form-control-sm"
+                          [value]="qty.no"
+                          min="0"
+                          (input)="updateQuantityValue(i, +$any($event.target).value, true)"
+                        />
+                      </td>
+                      <td class="text-center align-middle">
+                        <button
+                          type="button"
+                          class="btn btn-sm btn-danger"
+                          (click)="removeSizeFromQuantity(i, true)"
+                          title="Remove size"
+                        >
+                          <i class="fas fa-trash"></i>
+                        </button>
+                      </td>
+                    </tr>
+                  </tbody>
+                </table>
+              </div>
+            </div>
+            <div *ngIf="editProductQuantity.length === 0" class="alert alert-danger mb-0">
+              <i class="fas fa-exclamation-circle me-2"></i>
+              <small>At least one size with quantity is required.</small>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer border-top pt-3">
+          <div class="d-grid d-md-flex gap-2 justify-content-md-end w-100">
+            <button
+              type="button"
+              class="btn btn-secondary"
+              (click)="closeModals()"
+            >
+              <i class="fas fa-times me-1"></i>Cancel
+            </button>
+            <button
+              type="submit"
+              class="btn btn-primary"
+              [disabled]="!editProductForm.valid || editProductQuantity.length === 0"
+            >
+              <i class="fas fa-save me-2"></i>Update Product
+            </button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Product Details Modal -->
+<div
+  class="modal fade"
+  [class.show]="showDetailsModal"
+  [style.display]="showDetailsModal ? 'block' : 'none'"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="productDetailsModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-centered modal-xl" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="productDetailsModalLabel">
+          <i class="fas fa-info-circle me-2"></i>Product Details
+        </h5>
+        <button
+          type="button"
+          class="btn-close"
+          (click)="closeModals()"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body" *ngIf="selectedProduct">
+        <div class="row">
+          <!-- Images Carousel -->
+          <div class="col-md-6 mb-4">
+            <div class="position-relative">
+              <div style="height: 400px; width: 100%; object-fit: cover;">
+              <img
+                [src]="getCurrentImage()"
+                [alt]="selectedProduct.title"
+                class="img-fluid rounded"
+                style=" height: 100%; width: 100%; object-fit: cover;"
+              />
+              </div>
+              <button
+                *ngIf="selectedProduct.images && selectedProduct.images.length > 0"
+                class="btn btn-light position-absolute top-50 start-0 translate-middle-y"
+                style="left: 10px; z-index: 10; "
+                (click)="prevImage()"
+                title="Previous"
+              >
+                <i class="fas fa-chevron-left" style="color: #212529 !important;"></i>
+              </button>
+              <button
+                *ngIf="selectedProduct.images && selectedProduct.images.length > 0"
+                class="btn btn-light position-absolute top-50 end-0 translate-middle-y"
+                style="right: 10px; z-index: 10; "
+                (click)="nextImage()"
+                title="Next"
+              >
+                <i class="fas fa-chevron-right" style="color: #212529 !important;"></i>
+              </button>
+            </div>
+            <div *ngIf="selectedProduct.images && selectedProduct.images.length > 0" class="mt-2 text-center">
+              <small class="text-muted">
+                Image {{ currentImageIndex === 0 ? 1 : currentImageIndex }} of {{ (selectedProduct.images.length || 0) + 1 }}
+              </small>
+            </div>
+          </div>
+
+          <!-- Product Info -->
+          <div class="col-md-6">
+            <h3 class="mb-3">{{ selectedProduct.title }}</h3>
+            <div class="mb-3">
+              <h4 class="text-primary mb-1">{{ selectedProduct.price }} EGP</h4>
+              <span *ngIf="selectedProduct.priceAfterDiscount" class="text-muted text-decoration-line-through">
+                {{ selectedProduct.priceAfterDiscount }} EGP
+              </span>
+            </div>
+            <div class="mb-3">
+              <strong>Category:</strong> {{ selectedProduct.category.name }}
+            </div>
+            <div class="mb-3">
+              <strong>Description:</strong>
+              <p class="mt-2">{{ selectedProduct.description }}</p>
+            </div>
+            <div class="mb-3" *ngIf="selectedProduct.colors && selectedProduct.colors.length > 0">
+              <strong>Colors:</strong>
+              <div class="d-flex flex-wrap gap-2 mt-2">
+                <span *ngFor="let color of selectedProduct.colors" class="badge bg-primary">
+                  {{ color }}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Sizes Table -->
+        <div class="mt-4">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h5>Sizes & Stock</h5>
+          </div>
+          <div class="table-responsive">
+            <table class="table table-bordered table-hover">
+              <thead class="table-light">
+                <tr>
+                  <th>Size</th>
+                  <th>Quantity</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let qty of (selectedProduct.quantity || [])">
+                  <td>
+                    <strong>{{ qty.size.toUpperCase() }}</strong>
+                  </td>
+                  <td>{{ qty.no }}</td>
+                  <td>
+                    <span class="badge" [ngClass]="getSizeStatusClass(qty.no)">
+                      {{ getSizeStatus(qty.no) }}
+                    </span>
+                  </td>
+                </tr>
+                <tr *ngIf="!selectedProduct.quantity || selectedProduct.quantity.length === 0">
+                  <td colspan="3" class="text-center text-muted">
+                    No sizes configured for this product
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button
+          type="button"
+          class="btn btn-secondary"
+          (click)="closeModals()"
+        >
+          Close
+        </button>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div
+  class="modal fade"
+  [class.show]="showDeleteModal"
+  [style.display]="showDeleteModal ? 'block' : 'none'"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="deleteProductModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header border-0">
+        <h5 class="modal-title text-danger" id="deleteProductModalLabel">
+          <i class="fas fa-exclamation-triangle me-2"></i>Delete Product
+        </h5>
+        <button
+          type="button"
+          class="btn-close"
+          (click)="closeModals()"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body">
+        <div class="text-center mb-4">
+          <i class="fas fa-exclamation-circle fa-3x text-danger mb-3"></i>
+          <h5>Are you sure?</h5>
+          <p class="text-muted">
+            You are about to delete the product
+            <strong>"{{ selectedProduct?.title }}"</strong>. This action cannot
+            be undone.
+          </p>
+          <div *ngIf="selectedProduct" class="mt-3">
+            <img
+              [src]="getImageUrl(selectedProduct.imageCover)"
+              [alt]="selectedProduct.title"
+              class="img-thumbnail"
+              style="max-width: 150px; max-height: 150px"
+            />
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer border-0">
+        <button type="button" class="btn btn-secondary" (click)="closeModals()">
+          Cancel
+        </button>
+        <button type="button" class="btn btn-danger" (click)="deleteProduct()">
+          <i class="fas fa-trash me-2"></i>Delete Product
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Add Size Modal (from Details) -->
+<div
+  class="modal fade"
+  [class.show]="showAddSizeModal"
+  [style.display]="showAddSizeModal ? 'block' : 'none'"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="addSizeModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <form [formGroup]="sizeForm" (ngSubmit)="addSize()">
+        <div class="modal-header">
+          <h5 class="modal-title" id="addSizeModalLabel">
+            <i class="fas fa-plus-circle me-2"></i>Add New Master Size
+          </h5>
+          <button
+            type="button"
+            class="btn-close"
+            (click)="closeModals()"
+            aria-label="Close"
+          ></button>
+        </div>
+        <div class="modal-body">
+          <div class="mb-3">
+            <label for="sizeName" class="form-label">
+              Size Name <span class="text-danger">*</span>
+            </label>
+            <input
+              type="text"
+              id="sizeName"
+              class="form-control text-lowercase"
+              [class.is-invalid]="hasFieldError(sizeForm, 'sizeName')"
+              formControlName="sizeName"
+              placeholder="Enter size name (e.g., s, m, l, xl)"
+              style="text-transform: lowercase;"
+              maxlength="10"
+            />
+            <div
+              *ngIf="hasFieldError(sizeForm, 'sizeName')"
+              class="invalid-feedback"
+            >
+              {{ getFieldError(sizeForm, "sizeName") }}
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            (click)="closeModals()"
+          >
+            Cancel
+          </button>
+          <button
+            type="submit"
+            class="btn btn-primary"
+            [disabled]="!sizeForm.valid"
+          >
+            <i class="fas fa-save me-2"></i>Add Size
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Backdrop -->
+<div
+  *ngIf="showAddModal || showEditModal || showDeleteModal || showDetailsModal || showAddSizeModal"
+  class="modal-backdrop fade show"
+  (click)="closeModals()"
+></div>

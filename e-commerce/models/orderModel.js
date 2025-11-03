@@ -2,6 +2,21 @@ const mongoose = require("mongoose");
 
 const orderSchema = new mongoose.Schema(
   {
+    userId: {
+      type: mongoose.Schema.ObjectId,
+      ref: 'User',
+      required: [true, 'Order must belong to a user'],
+    },
+    orderNumber: {
+      type: String,
+      unique: true,
+      required: true,
+    },
+    status: {
+      type: String,
+      enum: ['pending', 'completed', 'cancelled'],
+      default: 'pending',
+    },
     fullName: {
       type: String,
       required: [true, "Full Name is required"],
@@ -41,26 +56,44 @@ const orderSchema = new mongoose.Schema(
       type: String,
       trim: true,
     },
-    localStorge: [
+    items: [
       {
-        category: { type: Object, required: true },
-        colors: { type: Array, default: [] },
-        createdAt: { type: Date, default: Date.now },
-        description: { type: String, required: true },
-        imageCover: { type: String, required: true },
-        images: { type: [String], required: true },
-        originalQuantity: { type: Number, required: true },
-        price: { type: Number, required: true },
-        priceAfterDiscount: { type: Number, required: true },
-        quantity: { type: Number, required: true },
-        size: { type: [String], default: [] },
-        slug: { type: String, required: true },
-        sold: { type: Number, default: 0 },
-        title: { type: String, required: true },
-        updatedAt: { type: Date, default: Date.now },
-        selectedSize : { type: String, required: true },
+        productId: {
+          type: mongoose.Schema.ObjectId,
+          ref: 'Product',
+          required: true,
+        },
+        sizeName: {
+          type: String,
+          required: true,
+        },
+        quantity: {
+          type: Number,
+          required: true,
+          min: 1,
+        },
+        price: {
+          type: Number,
+          required: true,
+        },
+        totalPrice: {
+          type: Number,
+          required: true,
+        },
       },
     ],
+    totalAmount: {
+      type: Number,
+      required: true,
+    },
+    shippingCost: {
+      type: Number,
+      default: 0,
+    },
+    finalAmount: {
+      type: Number,
+      required: true,
+    },
   },
   { timestamps: true }
 );

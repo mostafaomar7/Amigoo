@@ -18,8 +18,50 @@ exports.submitForm = async (req, res) => {
 
 exports.getAllForms = async (req, res) => {
   try {
-    const forms = await ContactForm.find();
-    res.status(200).json({ data: forms });
+    const { page: pageQuery, limit: limitQuery, keyword: keywordQuery, isReplied } = req.query;
+    const page = pageQuery * 1 || 1;
+    const limit = limitQuery * 1 || 10;
+    const skip = (page - 1) * limit;
+    const keyword = keywordQuery || '';
+
+    const searchQuery = keyword
+      ? {
+          $or: [
+            { name: { $regex: keyword, $options: 'i' } }, // Search in name
+            { email: { $regex: keyword, $options: 'i' } }, // Search in email
+            { phone: { $regex: keyword, $options: 'i' } }, // Search in phone
+            { message: { $regex: keyword, $options: 'i' } }, // Search in message
+          ],
+        }
+      : {};
+
+    const filter = {
+      ...searchQuery,
+      isDeleted: false,
+      ...(isReplied !== undefined && { isReplied: isReplied === 'true' }),
+    };
+
+    const forms = await ContactForm.find(filter)
+      .skip(skip)
+      .limit(limit)
+      .sort({ createdAt: -1 });
+
+    const totalItems = await ContactForm.countDocuments(filter);
+    const totalPages = Math.ceil(totalItems / limit);
+
+    res.status(200).json({
+      success: true,
+      message: 'Contact forms retrieved successfully',
+      data: forms,
+      pagination: {
+        currentPage: page,
+        itemsPerPage: limit,
+        totalItems: totalItems,
+        totalPages: totalPages,
+        hasNextPage: page < totalPages,
+        hasPrevPage: page > 1,
+      }
+    });
   } catch (error) {
     res.status(500).json({ message: 'Error fetching forms', error: error.message });
   }
@@ -27,7 +69,7 @@ exports.getAllForms = async (req, res) => {
 
 exports.getFormById = async (req, res) => {
   try {
-    const form = await ContactForm.findById(req.params.id);
+    const form = await ContactForm.findOne({ _id: req.params.id, isDeleted: false });
     if (!form) {
       return res.status(404).json({ message: 'Form not found' });
     }
@@ -39,10 +81,14 @@ exports.getFormById = async (req, res) => {
 
 exports.updateForm = async (req, res) => {
   try {
-    const updatedForm = await ContactForm.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-      runValidators: true,
-    });
+    const updatedForm = await ContactForm.findOneAndUpdate(
+      { _id: req.params.id, isDeleted: false },
+      req.body,
+      {
+        new: true,
+        runValidators: true,
+      }
+    );
     if (!updatedForm) {
       return res.status(404).json({ message: 'Form not found' });
     }
@@ -54,7 +100,11 @@ exports.updateForm = async (req, res) => {
 
 exports.deleteForm = async (req, res) => {
   try {
-    const deletedForm = await ContactForm.findByIdAndDelete(req.params.id);
+    const deletedForm = await ContactForm.findOneAndUpdate(
+      { _id: req.params.id, isDeleted: false },
+      { isDeleted: true },
+      { new: true }
+    );
     if (!deletedForm) {
       return res.status(404).json({ message: 'Form not found' });
     }
@@ -64,3 +114,34 @@ exports.deleteForm = async (req, res) => {
   }
 };
 
+// Admin reply to contact form
+exports.replyToForm = async (req, res) => {
+  try {
+    const { adminReply } = req.body;
+
+    if (!adminReply || adminReply.trim() === '') {
+      return res.status(400).json({ message: 'Admin reply is required' });
+    }
+
+    const updatedForm = await ContactForm.findOneAndUpdate(
+      { _id: req.params.id, isDeleted: false },
+      {
+        adminReply: adminReply.trim(),
+        isReplied: true
+      },
+      { new: true, runValidators: true }
+    );
+
+    if (!updatedForm) {
+      return res.status(404).json({ message: 'Form not found' });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'Reply sent successfully',
+      data: updatedForm
+    });
+  } catch (error) {
+    res.status(500).json({ message: 'Error replying to form', error: error.message });
+  }
+};

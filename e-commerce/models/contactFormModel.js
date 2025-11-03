@@ -28,6 +28,18 @@ const contactFormSchema = new mongoose.Schema({
     type: Boolean,
     required: [true, 'You must accept the terms and conditions'],
   },
-});
+  isDeleted: {
+    type: Boolean,
+    default: false,
+  },
+  isReplied: {
+    type: Boolean,
+    default: false,
+  },
+  adminReply: {
+    type: String,
+    trim: true,
+  },
+}, { timestamps: true });
 
 module.exports = mongoose.model('ContactForm', contactFormSchema);

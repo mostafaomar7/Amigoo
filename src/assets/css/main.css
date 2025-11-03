@@ -44,7 +44,7 @@ body{
     text-align: center;
     color:#fff;
     text-transform: uppercase;
-    font-size: 2rem;
+    font-size: 1.8rem;
     display: flex;
     align-items: center;
 }
@@ -281,6 +281,10 @@ i{
         padding:1rem;
     }
 
+    .heading{
+        font-size: 1.5rem;
+    }
+
     section{
         padding:1rem;
     }
@@ -308,8 +312,8 @@ i{
             z-index: 2000;
             margin-left: 13px;
     }
-    
-    
+
+
     .header .navbar.active{
         right:0;
     }
@@ -334,6 +338,18 @@ i{
         font-size: 50%;
     }
 
+    .heading{
+        font-size: 1.3rem;
+    }
+
+    .move h1{
+        font-size: 1.1rem;
+    }
+
+    .move h1 span{
+        font-size: 1.1rem;
+    }
+
 }
 .move h1{
     color: white;
@@ -342,7 +358,10 @@ i{
     font-style: normal;
     font-variation-settings:
       "slnt" 0;
-    font-size: 2rem;
+    font-size: 1.4rem;
+}
+.move h1 span{
+    font-size: 1.4rem;
 }
 .slide-in {
     animation: slideInFromLeft 5s forwards;
@@ -767,7 +786,7 @@ i{
     margin-right: 10px;
     padding: 5px;
     opacity:0;
-    transition: .5s;    
+    transition: .5s;
 }
 .clothes .icon i:hover{
     background-color: #666;

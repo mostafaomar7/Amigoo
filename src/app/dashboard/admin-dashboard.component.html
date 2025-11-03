@@ -1,0 +1,56 @@
+<!-- Modern Admin Dashboard -->
+<div class="dashboard-wrapper">
+
+  <div class="dashboard-container">
+    <!-- Mobile/Tablet Overlay -->
+    <div
+      class="sidebar-overlay"
+      (click)="toggleSidebar()"
+      [class.visible]="!sidebarCollapsed">
+    </div>
+
+    <!-- Sidebar Component -->
+    <app-dashboard-sidebar
+      [sidebarCollapsed]="sidebarCollapsed"
+      [pendingOrders]="stats.pendingOrders"
+      [unreadMessages]="stats.unreadMessages"
+      (toggleSidebar)="toggleSidebar()">
+    </app-dashboard-sidebar>
+
+    <!-- Main Content Area -->
+    <main class="main-content" [class.sidebar-expanded]="!sidebarCollapsed" [class.sidebar-collapsed]="sidebarCollapsed">
+      <!-- Header Component (Desktop) -->
+      <app-dashboard-header
+        [pendingOrders]="stats.pendingOrders"
+        [unreadMessages]="stats.unreadMessages"
+        (toggleSidebar)="toggleSidebar()">
+      </app-dashboard-header>
+
+      <!-- Dashboard Content -->
+      <div class="content-area thin-scrollbar" style="position: relative;">
+        <!-- Overview Component -->
+        <app-dashboard-overview
+          *ngIf="showDashboard"
+          [stats]="stats"
+          [recentActivity]="recentActivity"
+          [isLoading]="isLoading"
+          (addProduct)="addProduct()"
+          (viewOrders)="viewOrders()"
+          (manageCategories)="manageCategories()"
+          (viewMessages)="viewMessages()">
+        </app-dashboard-overview>
+
+        <!-- Order Statistics Component -->
+        <div *ngIf="showDashboard && orderStats" class="container-fluid py-4">
+          <app-order-statistics [orderStats]="orderStats" [isLoading]="isLoading"></app-order-statistics>
+        </div>
+
+        <!-- Router Outlet for Child Components -->
+        <router-outlet></router-outlet>
+      </div>
+    </main>
+  </div>
+
+  <!-- Notification Toast -->
+  <app-dashboard-notification-toast></app-dashboard-notification-toast>
+</div>

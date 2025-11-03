@@ -1,0 +1,380 @@
+<!-- Orders Management Page -->
+<div class="container-fluid py-4">
+  <!-- Header -->
+  <div class="mb-4">
+    <h1 class="h2 mb-1 text-white">Orders Management</h1>
+    <p class="text-white mb-0">Manage your customer orders</p>
+  </div>
+
+  <!-- Search and Filter -->
+  <div
+    class="d-flex flex-column flex-md-row gap-2 align-items-start align-items-md-center mb-4"
+  >
+    <div class="input-group" style="max-width: 400px; flex: 1">
+      <span class="input-group-text">
+        <i class="fas fa-search text-dark"></i>
+      </span>
+      <input
+        type="text"
+        id="searchInput"
+        class="form-control"
+        [(ngModel)]="searchTerm"
+        (input)="onSearchInput()"
+        placeholder="Search orders by number, customer, email..."
+        [ngModelOptions]="{standalone: true}"
+      />
+    </div>
+    <div class="input-group" style="max-width: 250px">
+      <span class="input-group-text">
+        <i class="fas fa-filter text-dark"></i>
+      </span>
+      <select
+        class="form-select"
+        [(ngModel)]="statusFilter"
+        (change)="onStatusFilter()"
+        [ngModelOptions]="{standalone: true}"
+      >
+        <option value="">All Status</option>
+        <option value="pending">Pending</option>
+        <option value="completed">Completed</option>
+        <option value="cancelled">Cancelled</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Orders Table -->
+  <div class="card">
+    <div class="card-body">
+      <!-- Loading State -->
+      <div *ngIf="isLoading" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+      </div>
+
+      <!-- Orders List -->
+      <div *ngIf="!isLoading" class="table-responsive">
+        <table class="table table-hover align-middle orders-table">
+          <thead class="table-light">
+            <tr>
+              <th scope="col">Order Number</th>
+              <th scope="col">Customer</th>
+              <th scope="col">Total</th>
+              <th scope="col">Status</th>
+              <th scope="col">Date</th>
+              <th scope="col" class="text-end">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let order of filteredOrders">
+              <td>
+                <strong class="text-dark">#{{ order.orderNumber }}</strong>
+              </td>
+              <td>
+                <div>
+                  <strong class="text-dark">{{ order.fullName }}</strong>
+                  <br />
+                  <small class="text-muted">{{ order.email }}</small>
+                </div>
+              </td>
+              <td>
+                <strong class="text-dark">{{ order.finalAmount }} EGP</strong>
+              </td>
+              <td>
+                <!-- Dropdown for pending status -->
+                <div *ngIf="order.status === 'pending'" class="status-dropdown-wrapper">
+                  <select
+                    class="form-select form-select-sm status-dropdown"
+                    [value]="order.status"
+                    (change)="updateOrderStatusDirectly(order, $any($event.target).value)"
+                  >
+                    <option value="pending">Pending</option>
+                    <option value="completed">Completed</option>
+                    <option value="cancelled">Cancelled</option>
+                  </select>
+                  <i class="fas fa-chevron-down status-dropdown-icon"></i>
+                </div>
+                <!-- Badge for completed/cancelled -->
+                <span
+                  *ngIf="order.status !== 'pending'"
+                  class="badge"
+                  [ngClass]="getStatusClass(order.status)"
+                >
+                  {{ getStatusLabel(order.status) }}
+                </span>
+              </td>
+              <td>
+                <small class="text-muted">{{ order.createdAt | date : "dd-MM-yyyy h:mm a" }}</small>
+              </td>
+              <td class="text-end">
+                <div class="btn-group" role="group">
+                  <button
+                    type="button"
+                    class="btn btn-sm btn-action btn-info"
+                    (click)="showOrderDetailsModal(order)"
+                    title="View Details"
+                  >
+                    <i class="fas fa-eye"></i>
+                  </button>
+
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Empty State -->
+      <div
+        *ngIf="!isLoading && filteredOrders.length === 0"
+        class="text-center py-5"
+      >
+        <i class="fas fa-shopping-cart fa-3x text-muted mb-3"></i>
+        <h5 class="text-muted">No orders found</h5>
+        <p class="text-muted" *ngIf="statusFilter">
+          No orders with status "{{ getStatusLabel(statusFilter) }}" found.
+        </p>
+        <p class="text-muted" *ngIf="!statusFilter">
+          No orders have been placed yet.
+        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pagination -->
+  <div *ngIf="!isLoading && totalItems > 0 && totalPages > 0" class="mt-4">
+    <nav aria-label="Orders pagination">
+      <ul class="pagination justify-content-center mb-3">
+        <li class="page-item" [class.disabled]="currentPage === 1">
+          <a
+            class="page-link"
+            href="#"
+            (click)="goToPage(currentPage - 1); $event.preventDefault()"
+            [attr.aria-disabled]="currentPage === 1"
+            [class.disabled]="currentPage === 1"
+          >
+            <i class="fas fa-chevron-left" style="color: #2563eb !important;"></i>
+            <span class="visually-hidden">Previous</span>
+          </a>
+        </li>
+        <li
+          *ngFor="let page of pageNumbers"
+          class="page-item"
+          [class.active]="page === currentPage"
+        >
+          <a
+            class="page-link"
+            href="#"
+            (click)="goToPage(page); $event.preventDefault()"
+          >
+            {{ page }}
+          </a>
+        </li>
+        <li class="page-item" [class.disabled]="currentPage === totalPages">
+          <a
+            class="page-link"
+            href="#"
+            (click)="goToPage(currentPage + 1); $event.preventDefault()"
+            [attr.aria-disabled]="currentPage === totalPages"
+            [class.disabled]="currentPage === totalPages"
+          >
+            <i class="fas fa-chevron-right" style="color: #2563eb !important;"></i>
+            <span class="visually-hidden">Next</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+    <div class="text-center text-muted">
+      <small>
+        Showing <strong>{{ (currentPage - 1) * itemsPerPage + 1 }}</strong> to
+        <strong>{{ Math.min(currentPage * itemsPerPage, totalItems) }}</strong> of
+        <strong>{{ totalItems }}</strong>
+        {{ totalItems === 1 ? 'order' : 'orders' }}
+        <span *ngIf="totalPages > 1"> | Page <strong>{{ currentPage }}</strong> of <strong>{{ totalPages }}</strong></span>
+      </small>
+    </div>
+  </div>
+</div>
+
+<!-- Order Details Modal -->
+<div
+  class="modal fade"
+  [class.show]="showDetailsModal"
+  [style.display]="showDetailsModal ? 'block' : 'none'"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="orderDetailsModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="orderDetailsModalLabel">
+          <i class="fas fa-info-circle me-2"></i>Order Details #{{ selectedOrder?.orderNumber }}
+        </h5>
+        <button
+          type="button"
+          class="btn-close"
+          (click)="closeModals()"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body" *ngIf="selectedOrder">
+        <!-- Order Info -->
+        <div class="row mb-4">
+          <div class="col-md-6">
+            <h6 class="text-muted mb-3 border-bottom pb-2 fw-semibold">Order Information</h6>
+            <div class="mb-2">
+              <strong>Order Number:</strong> #{{ selectedOrder.orderNumber }}
+            </div>
+            <div class="mb-2">
+              <strong>Status:</strong>
+              <span class="badge ms-2" [ngClass]="getStatusClass(selectedOrder.status)">
+                {{ getStatusLabel(selectedOrder.status) }}
+              </span>
+            </div>
+            <div class="mb-2">
+              <strong>Date:</strong>
+              {{ selectedOrder.createdAt | date : "dd-MM-yyyy h:mm a" }}
+            </div>
+            <div class="mb-2" *ngIf="selectedOrder.orderNotes">
+              <strong>Order Notes:</strong>
+              <div class="mt-1 p-2 bg-light rounded">
+                <em>{{ selectedOrder.orderNotes }}</em>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <h6 class="text-muted mb-3 border-bottom pb-2 fw-semibold">Customer Information</h6>
+            <div class="mb-2" *ngIf="selectedOrder.userId">
+              <strong>User Account:</strong>
+              <div class="ms-2">
+                <small class="d-block">{{ selectedOrder.userId.name }}</small>
+                <small class="text-muted">{{ selectedOrder.userId.email }}</small>
+              </div>
+            </div>
+            <div class="mb-2">
+              <strong>Name:</strong> {{ selectedOrder.fullName }}
+            </div>
+            <div class="mb-2">
+              <strong>Email:</strong> {{ selectedOrder.email }}
+            </div>
+            <div class="mb-2">
+              <strong>Phone:</strong> {{ selectedOrder.phone }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Shipping Address -->
+        <div class="mb-4">
+          <h6 class="text-muted mb-3 border-bottom pb-2 fw-semibold">Shipping Address</h6>
+          <div class="mb-2">
+            <strong>Street:</strong> {{ selectedOrder.streetAddress }}
+          </div>
+          <div class="mb-2">
+            <strong>State:</strong> {{ selectedOrder.state }}
+          </div>
+          <div class="mb-2">
+            <strong>Country:</strong> {{ selectedOrder.country }}
+          </div>
+
+        </div>
+
+        <!-- Order Items -->
+        <div class="mb-4">
+          <h6 class="text-muted mb-3 border-bottom pb-2 fw-semibold">Order Items</h6>
+          <div class="table-responsive">
+            <table class="table table-bordered table-hover">
+              <thead class="table-light">
+                <tr>
+                  <th style="width: 50px;">Image</th>
+                  <th>Product</th>
+                  <th>Category</th>
+                  <th>Size</th>
+                  <th>Quantity</th>
+                  <th>Price</th>
+                  <th>Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr *ngFor="let item of selectedOrder.items">
+                  <td class="align-middle">
+                    <img
+                      *ngIf="item.productId?.imageCover"
+                      [src]="getImageUrl(item.productId.imageCover)"
+                      [alt]="item.productId.title"
+                      class="rounded"
+                      style="width: 50px; height: 50px; object-fit: cover"
+                      onerror="this.style.display='none'"
+                    />
+                    <div *ngIf="!item.productId?.imageCover" class="text-center text-muted">
+                      <i class="fas fa-image"></i>
+                    </div>
+                  </td>
+                  <td class="align-middle">
+                    <strong>{{ item.productId?.title || 'Unknown Product' }}</strong>
+                  </td>
+                  <td class="align-middle">
+                    <small class="text-muted">{{ item.productId?.category?.name || 'N/A' }}</small>
+                  </td>
+                  <td class="align-middle">
+                    <span class="badge bg-secondary">{{ item.sizeName.toUpperCase() }}</span>
+                  </td>
+                  <td class="align-middle">{{ item.quantity }}</td>
+                  <td class="align-middle">{{ item.price }} EGP</td>
+                  <td class="align-middle"><strong>{{ item.totalPrice }} EGP</strong></td>
+                </tr>
+                <tr *ngIf="!selectedOrder.items || selectedOrder.items.length === 0">
+                  <td colspan="7" class="text-center text-muted">
+                    No items found in this order
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Order Summary -->
+        <div class="border-top pt-3">
+          <div class="row">
+            <div class="col-md-6 offset-md-6">
+              <table class="table table-sm mb-0">
+                <tbody>
+                  <tr>
+                    <td><strong>Subtotal:</strong></td>
+                    <td class="text-end">{{ selectedOrder.totalAmount }} EGP</td>
+                  </tr>
+                  <tr>
+                    <td><strong>Shipping:</strong></td>
+                    <td class="text-end">{{ selectedOrder.shippingCost }} EGP</td>
+                  </tr>
+                  <tr class="table-light">
+                    <td><strong>Total:</strong></td>
+                    <td class="text-end"><strong>{{ selectedOrder.finalAmount }} EGP</strong></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button
+          type="button"
+          class="btn btn-secondary"
+          (click)="closeModals()"
+        >
+          Close
+        </button>
+
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Backdrop -->
+<div
+  *ngIf="showDetailsModal || showStatusModal"
+  class="modal-backdrop fade show"
+  (click)="closeModals()"
+></div>

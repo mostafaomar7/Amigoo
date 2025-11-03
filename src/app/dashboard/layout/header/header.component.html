@@ -1,0 +1,86 @@
+<!-- Modern Collapsible Header -->
+<header class="dashboard-header navbar navbar-expand-lg navbar-light bg-white border-bottom">
+  <div class="container-fluid px-3 px-lg-5">
+    <!-- Left Section: Menu Toggle & Logo/Title -->
+    <div class="d-flex align-items-center">
+      <button
+        class="btn btn-link d-lg-none me-2 p-2"
+        type="button"
+        (click)="onToggleSidebar()"
+        aria-label="Toggle sidebar">
+        <i class="fas fa-bars" style="color: #495057;"></i>
+      </button>
+
+      <div class="d-flex align-items-center">
+        <h5 class="mb-0 d-none d-md-block me-3">Dashboard</h5>
+        <span class="text-muted small d-none d-md-block">
+          Welcome back, {{ currentUser?.name || 'Admin' }}
+        </span>
+      </div>
+    </div>
+
+    <!-- Right Section: Search & Actions -->
+    <div class="d-flex align-items-center gap-3">
+      <!-- Collapsible Search -->
+
+      <!-- Notifications -->
+      <button
+        class="btn btn-link position-relative p-2"
+        type="button"
+        aria-label="Notifications">
+        <i class="fas fa-bell"></i>
+        <span
+          class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+          *ngIf="getTotalNotifications() > 0">
+          {{ getTotalNotifications() }}
+        </span>
+      </button>
+
+      <!-- Profile Dropdown -->
+      <div class="dropdown profile-section" [class.show]="showProfileMenu">
+        <button
+          class="btn btn-link d-flex align-items-center p-0"
+          type="button"
+          (click)="toggleProfileMenu()"
+          [attr.aria-expanded]="showProfileMenu"
+          aria-label="User menu"
+          aria-haspopup="true">
+          <img
+            src="assets/img/logo/logo.png"
+            alt="Profile"
+            class="rounded-circle"
+            style="width: 36px; height: 36px; object-fit: cover;">
+        </button>
+
+        <ul
+          class="dropdown-menu dropdown-menu-end shadow"
+          [class.show]="showProfileMenu"
+          style="min-width: 220px;">
+          <li class="px-3 py-2 border-bottom">
+            <div class="fw-bold">{{ currentUser?.name || 'Admin' }}</div>
+            <small class="text-muted d-block">{{ currentUser?.email || '' }}</small>
+          </li>
+          <li>
+            <a class="dropdown-item" routerLink="/admin/settings" (click)="showProfileMenu = false">
+              <i class="fas fa-cog me-2"></i> Settings
+            </a>
+          </li>
+          <li>
+            <a class="dropdown-item" routerLink="/admin/profile" (click)="showProfileMenu = false">
+              <i class="fas fa-user me-2"></i> Profile
+            </a>
+          </li>
+          <li><hr class="dropdown-divider"></li>
+          <li>
+            <button
+              class="dropdown-item text-danger"
+              type="button"
+              (click)="onLogout()">
+              <i class="fas fa-sign-out-alt me-2"></i> Logout
+            </button>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</header>

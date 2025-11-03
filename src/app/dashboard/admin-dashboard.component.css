@@ -1,0 +1,125 @@
+/* ============================================
+   Dashboard Main Layout Styles
+   Only container and layout styles
+   Component styles are in their respective folders
+   ============================================ */
+
+.dashboard-wrapper {
+  min-height: 100vh;
+  background: var(--color-bg-secondary);
+  position: relative;
+}
+
+.dashboard-container {
+  display: flex;
+  min-height: calc(100vh - 64px);
+}
+
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  margin-left: 0;
+  transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.content-area {
+  flex: 1;
+  padding: var(--spacing-6);
+  overflow-y: auto;
+  background: var(--color-bg-secondary);
+}
+
+/* Responsive */
+@media (min-width: 768px) {
+  .dashboard-container {
+    min-height: 100vh;
+  }
+
+  .main-content {
+    margin-left: 0;
+  }
+
+  .content-area {
+    padding: var(--spacing-6) var(--spacing-8);
+  }
+}
+
+/* Sidebar Overlay for Mobile/Tablet */
+.sidebar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 999;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 0.3s ease, visibility 0.3s ease;
+}
+
+.sidebar-overlay.visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+@media (min-width: 992px) {
+  .sidebar-overlay {
+    display: none !important;
+  }
+}
+
+/* Sidebar spacing for large screens */
+@media (min-width: 992px) {
+  .main-content.sidebar-expanded {
+    margin-left: 260px;
+  }
+
+  .main-content.sidebar-collapsed {
+    margin-left: 80px;
+  }
+}
+
+/* Mobile/Tablet - No margin for main content */
+@media (max-width: 991.98px) {
+  .main-content {
+    margin-left: 0 !important;
+    width: 100%;
+  }
+
+  .content-area {
+    padding: 1rem;
+  }
+}
+
+/* Tablet specific optimizations */
+@media (min-width: 768px) and (max-width: 991.98px) {
+  .content-area {
+    padding: 1.5rem;
+  }
+}
+
+@media (min-width: 1024px) {
+  .content-area {
+    padding: var(--spacing-8);
+  }
+}
+
+@media (min-width: 1280px) {
+  .content-area {
+    padding: var(--spacing-8) var(--spacing-12);
+  }
+}
+
+/* Print Styles */
+@media print {
+  .dashboard-container {
+    display: block;
+  }
+
+  .content-area {
+    padding: 0;
+  }
+}

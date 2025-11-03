@@ -1,0 +1,87 @@
+<div class="container">
+    <form action="" (ngSubmit)="submitForm()">
+    <div class="row checkout-responsive">
+        <div class="col-lg-7 forms"  >
+            <h4>Billing Details</h4>
+            <hr>
+            <label class="fs-4" for="">Full Name*</label>
+            <input class="form-control p-2 mb-2 fs-4" type="text" id="name" [(ngModel)]="orderdata.fullName" palceholder="Your Name" name="name"   minlength="2" #user="ngModel"  required />
+            <div class="alert alert-danger" *ngIf="user.touched && user.invalid">
+                <div *ngIf="user.errors.required">Please Enter Your Name</div>
+                <div *ngIf="user.errors.minlength">Please Your Name Must More Than 1 Char</div>
+            </div>
+            <label class="fs-4" for="">country/region*</label>
+            <input class="form-control p-2 mb-2 fs-4" type="text" id="name" [(ngModel)]="orderdata.country" placeholder="Your Region" name="country" #country="ngModel" required minlength="3"   />
+            <div class="alert alert-danger" *ngIf="country.touched && country.invalid">
+                <div *ngIf="country.errors.required">Please Enter Your Country</div>
+                <div *ngIf="country.errors.minlength">Please Your Name Must More Than 2 Char</div>
+            </div>
+            <label class="fs-4" for="">Street Address*</label>
+            <input type="text" class="form-control p-2 mb-2 fs-4" [(ngModel)]="orderdata.streetAddress" placeholder="Your Street" name="street" #street="ngModel" required minlength="3">
+            <div class="alert alert-danger" *ngIf="street.touched && street.invalid">
+                <div *ngIf="street.errors.required">Please Enter Your streetAddress</div>
+                <div *ngIf="street.errors.minlength">Please Your streetAddress Must More Than 2 Char</div>
+            </div>
+            <label class="fs-4" for="" >State/Country*</label>
+            <input type="text" class="form-control p-2 mb-2 fs-4" required minlength="2" [(ngModel)]="orderdata.state" placeholder="Your Country" #state="ngModel" name="state">
+            <div class="alert alert-danger" *ngIf="state.touched && state.invalid">
+                <div *ngIf="state.errors.required">Please Enter Your State</div>
+                <div *ngIf="state.errors.minlength">Please Your State Must More Than 2 Char</div>
+            </div>
+            <label class="fs-4" for="">Phone*</label>
+            <input type="text" class="form-control p-2 mb-2 fs-4" [(ngModel)]="orderdata.phone" placeholder="Your Phone" #phone="ngModel" required minlength="10" name="phone">
+            <div class="alert alert-danger" *ngIf="phone.touched && phone.invalid">
+                <div *ngIf="phone.errors.required">Please Enter Your Phone</div>
+                <div *ngIf="phone.errors.minlength">Please Your Phone Must More Than 10 Char</div>
+            </div>
+            <label class="fs-4" for="">Email Address*</label>
+            <input type="text" class="form-control mt-2 p-2 mb-2 fs-4" [(ngModel)]="orderdata.email" placeholder="Your Email" #email="ngModel" required minlength="4" name="email">
+            <div class="alert alert-danger" *ngIf="email.touched && email.invalid">
+                <div *ngIf="email.errors.required">Please Enter Your Valid Mail</div>
+                <div *ngIf="email.errors.minlength">Please Your Email Must has format mail</div>
+            </div>
+            <h4>Shipping Details</h4>
+            <hr>
+            <label class="fs-4">Order Notes</label>
+            <textarea type="text" class="form-control p-2 mb-2 fs-4"[(ngModel)]="orderdata.orderNotes" required minlength="1"></textarea>
+        </div>
+        <div class="col-lg-5 checkform" >
+            <div class="card">
+                <h4>Shipping Details</h4>
+            <hr>
+            <ul *ngFor="let item of cartproduct; let index = index ;" >
+                <ul class="d-flex ">
+                    <li><img style="width: 50px; height: 50px;" [src]="'https://amigoapi.mosalam.com/uploads/products/'+item.imageCover" alt=""></li>
+                    <li class="fw-bold  fs-4 mt-3 mx-2 ">{{item.title}}</li>
+                <!-- <li>
+                    <div class="counter d-flex">
+                    <i id="decrease" class="counter-btn btn-success mx-2 p-3" (click)="decrease(index)"  >-</i>
+                    <input  class="form-control w-75"  (change)="detectedchange()" type="number" id="quantity" value="1" min="1" [(ngModel)]="item.quantity"  >
+                    <i id="increase" class="counter-btn btn-success mx-2 p-3" (click)="increase(index)"  >+</i>
+                    </div></li> -->
+                    <li class="mt-3 mx-2 fw-bold  fs-4">Quantity : {{item.quantity}} </li>
+                <li class="mt-3 mx-2 fw-bold  fs-4">Size : {{item.selectedSize}} </li>
+                <li class="mt-3 mx-2 fw-bold  fs-6">Subtotal : {{item.price * item.quantity}} </li>
+                <li><button class="mt-3 mx-2 fas fa-trash  fs-2 mt-3"  (click)="delete(index)"></button></li>
+
+                </ul>
+
+            </ul>
+
+            <hr>
+            <div class="total">
+                <p class="fw-bold fs-3">Total Price : </p>
+                <p class="fw-bold fs-3">{{total}}</p>
+            </div>
+            <div class="d-flex">
+                <input name="radio" type="radio" class="mx-1">
+            <label for="radio" class="fw-bold fs-4">Cash On delivery</label>
+            </div>
+            <button class="btn order fs-4 mt-5 fw-bold" type="submit">Palce Order</button>
+            <p *ngIf="successMessage" style="color: green;" class="alert alert-success fs-3">{{ successMessage }}</p>
+                    <p *ngIf="errorMessage" style="color: red;" class="alert alert-danger fs-3">{{ errorMessage }}</p>
+            </div>
+        </div>
+    </div>
+</form>
+</div>

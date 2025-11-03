@@ -1,0 +1,1 @@
+{"ast":null,"code":"export class Addcategory {}\n;\nexport class Clientinfo {\n  constructor(_id, name) {\n    this._id = _id;\n    this.name = name;\n  }\n}\nexport class Clientlogin {}","map":null,"metadata":{},"sourceType":"module","externalDependencies":[]}

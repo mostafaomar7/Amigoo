@@ -1,0 +1,268 @@
+<!-- Contact Messages Inbox Page -->
+<div class="container-fluid py-4">
+  <!-- Header -->
+  <div class="mb-4">
+    <h1 class="h2 mb-1 text-white">Contact Messages Inbox</h1>
+    <p class="text-white mb-0">Manage and reply to contact messages</p>
+  </div>
+
+  <!-- Search and Filter -->
+  <div
+    class="d-flex flex-column flex-md-row gap-2 align-items-start align-items-md-center mb-4"
+  >
+    <div class="input-group" style="max-width: 400px; flex: 1">
+      <span class="input-group-text">
+        <i class="fas fa-search text-dark"></i>
+      </span>
+      <input
+        type="text"
+        id="searchInput"
+        class="form-control"
+        [(ngModel)]="searchTerm"
+        (input)="onSearchInput()"
+        placeholder="Search by name, email, phone..."
+      />
+    </div>
+  </div>
+
+  <!-- Messages Table -->
+  <div class="card">
+    <div class="card-body">
+      <!-- Loading State -->
+      <div *ngIf="isLoading" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+      </div>
+
+      <!-- Messages List -->
+      <div *ngIf="!isLoading" class="table-responsive">
+        <table class="table table-hover align-middle messages-table">
+          <thead class="table-light">
+            <tr>
+              <th scope="col">Name</th>
+              <th scope="col">Email</th>
+              <th scope="col">Phone</th>
+              <th scope="col">Message Preview</th>
+              <th scope="col" (click)="onSort('createdAt')" style="cursor: pointer;">
+                Date
+                <i *ngIf="sortBy === 'createdAt'" class="fas fa-sort-{{sortOrder === 'asc' ? 'up' : 'down'}} ms-1"></i>
+                <i *ngIf="sortBy !== 'createdAt'" class="fas fa-sort ms-1 text-muted"></i>
+              </th>
+              <th scope="col" class="text-end">view</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let message of filteredContactForms">
+              <td>
+                <strong class="text-dark">{{ message.name }}</strong>
+              </td>
+              <td>
+                <a href="mailto:{{ message.email }}" class="text-primary text-decoration-none">
+                  {{ message.email }}
+                </a>
+              </td>
+              <td>
+                <a class="text-primary text-decoration-none">
+                  {{ message.phone }}
+                </a>
+              </td>
+              <td>
+                <span class="text-muted">{{ getMessagePreview(message.message, 50) }}</span>
+              </td>
+              <td>
+                <small class="text-muted">
+                  <span *ngIf="message.createdAt">{{ message.createdAt | date : "dd-MM-yyyy h:mm a" }}</span>
+                  <span *ngIf="!message.createdAt" class="text-muted">{{ message.updatedAt | date : "dd-MM-yyyy h:mm a" }}</span>
+                  <span *ngIf="!message.updatedAt" class="text-muted">N/A</span>
+                </small>
+              </td>
+
+              <td class="text-end">
+                <button
+                  type="button"
+                  class="btn btn-sm btn-action btn-info"
+                  (click)="showViewMessageModal(message)"
+                  title="View Message"
+                >
+                  <i class="fas fa-eye me-1"></i>View
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Empty State -->
+      <div
+        *ngIf="!isLoading && filteredContactForms.length === 0"
+        class="text-center py-5"
+      >
+        <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+        <h5 class="text-muted">No messages found</h5>
+        <p class="text-muted">No contact messages match your search criteria.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Pagination -->
+  <div *ngIf="!isLoading && totalItems > 0 && totalPages > 0" class="mt-4">
+    <nav aria-label="Messages pagination">
+      <ul class="pagination justify-content-center mb-3">
+        <li class="page-item" [class.disabled]="currentPage === 1">
+          <a
+            class="page-link"
+            href="#"
+            (click)="goToPage(currentPage - 1); $event.preventDefault()"
+            [attr.aria-disabled]="currentPage === 1"
+            [class.disabled]="currentPage === 1"
+          >
+            <i class="fas fa-chevron-left" style="color: #2563eb !important;"></i>
+            <span class="visually-hidden">Previous</span>
+          </a>
+        </li>
+        <li
+          *ngFor="let page of pageNumbers"
+          class="page-item"
+          [class.active]="page === currentPage"
+        >
+          <a
+            class="page-link"
+            href="#"
+            (click)="goToPage(page); $event.preventDefault()"
+          >
+            {{ page }}
+          </a>
+        </li>
+        <li class="page-item" [class.disabled]="currentPage === totalPages">
+          <a
+            class="page-link"
+            href="#"
+            (click)="goToPage(currentPage + 1); $event.preventDefault()"
+            [attr.aria-disabled]="currentPage === totalPages"
+            [class.disabled]="currentPage === totalPages"
+          >
+            <i class="fas fa-chevron-right" style="color: #2563eb !important;"></i>
+            <span class="visually-hidden">Next</span>
+          </a>
+        </li>
+      </ul>
+    </nav>
+    <div class="text-center text-muted">
+      <small>
+        Showing <strong>{{ (currentPage - 1) * itemsPerPage + 1 }}</strong> to
+        <strong>{{ Math.min(currentPage * itemsPerPage, totalItems) }}</strong> of
+        <strong>{{ totalItems }}</strong>
+        {{ totalItems === 1 ? 'result' : 'results' }}
+        <span *ngIf="totalPages > 1"> | Page <strong>{{ currentPage }}</strong> of <strong>{{ totalPages }}</strong></span>
+      </small>
+    </div>
+  </div>
+</div>
+
+<!-- View Message Modal -->
+<div
+  class="modal fade"
+  [class.show]="showViewModal"
+  [style.display]="showViewModal ? 'block' : 'none'"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="viewMessageModalLabel"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="viewMessageModalLabel">
+          <i class="fas fa-envelope me-2"></i>Message Details
+        </h5>
+        <button
+          type="button"
+          class="btn-close"
+          (click)="closeModals()"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body" *ngIf="selectedForm">
+        <!-- Sender Information -->
+        <div class="mb-4">
+          <h6 class="text-muted mb-3 border-bottom pb-2 fw-semibold">Sender Information</h6>
+          <div class="row g-3">
+            <div class="col-md-6">
+              <strong>Name:</strong>
+              <p class="mb-0">{{ selectedForm.name }}</p>
+            </div>
+            <div class="col-md-6">
+              <strong>Email:</strong>
+              <p class="mb-0">
+                <a href="mailto:{{ selectedForm.email }}" class="text-primary text-decoration-none">
+                  {{ selectedForm.email }}
+                </a>
+              </p>
+            </div>
+            <div class="col-md-6">
+              <strong>Phone:</strong>
+              <p class="mb-0">
+                <a href="tel:{{ selectedForm.phone }}" class="text-primary text-decoration-none">
+                  {{ selectedForm.phone }}
+                </a>
+              </p>
+            </div>
+            <div class="col-md-6">
+              <strong>Date:</strong>
+              <p class="mb-0 text-muted">
+                <span *ngIf="selectedForm.createdAt">{{ selectedForm.createdAt | date : "dd-MM-yyyy h:mm a" }}</span>
+                <span *ngIf="!selectedForm.createdAt">N/A</span>
+              </p>
+            </div>
+            <div class="col-12">
+              <strong>Status:</strong>
+              <span
+                class="badge ms-2"
+                [ngClass]="selectedForm.isReplied ? 'bg-success' : 'bg-warning'"
+              >
+                {{ selectedForm.isReplied ? 'Replied' : 'Pending Reply' }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Message Content -->
+        <div class="mb-4">
+          <h6 class="text-muted mb-3 border-bottom pb-2 fw-semibold">Message</h6>
+          <div class="bg-light p-3 rounded">
+            <p class="mb-0" style="white-space: pre-wrap;">{{ selectedForm.message }}</p>
+          </div>
+        </div>
+
+        <!-- Admin Reply -->
+        <div class="mb-0" *ngIf="selectedForm.isReplied && selectedForm.adminReply">
+          <h6 class="text-muted mb-3 border-bottom pb-2 fw-semibold">Admin Reply</h6>
+          <div class="bg-primary bg-opacity-10 p-3 rounded border-start border-primary border-3">
+            <p class="mb-0" style="white-space: pre-wrap;">{{ selectedForm.adminReply }}</p>
+          </div>
+        </div>
+        <div class="mb-0" *ngIf="selectedForm.isReplied && !selectedForm.adminReply">
+          <h6 class="text-muted mb-3 border-bottom pb-2 fw-semibold">Admin Reply</h6>
+          <p class="text-muted mb-0">No reply message available.</p>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button
+          type="button"
+          class="btn btn-secondary"
+          (click)="closeModals()"
+        >
+          Close
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Backdrop -->
+<div
+  *ngIf="showViewModal"
+  class="modal-backdrop fade show"
+  (click)="closeModals()"
+></div>

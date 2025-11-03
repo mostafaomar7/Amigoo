@@ -1,0 +1,513 @@
+/* Categories Management Styles */
+
+/* Equal Width Table Columns */
+.categories-table {
+  table-layout: fixed;
+  width: 100%;
+}
+
+.categories-table th,
+.categories-table td {
+  width: 25%;
+}
+
+/* Responsive Table */
+@media (max-width: 768px) {
+  .table-responsive {
+    font-size: 0.875rem;
+  }
+
+  .table th,
+  .table td {
+    padding: 0.5rem;
+  }
+
+  .btn-group {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+  }
+
+  .btn-sm {
+    font-size: 0.75rem;
+    padding: 0.25rem 0.5rem;
+  }
+}
+
+/* Modal Styles */
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1055;
+  display: none;
+  width: 100%;
+  height: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+  outline: 0;
+}
+
+.modal.show {
+  display: block !important;
+  opacity: 1;
+}
+
+.modal.fade {
+  transition: opacity 0.15s linear;
+}
+
+.modal.fade.show {
+  opacity: 1;
+}
+
+.modal-dialog {
+  position: relative;
+  width: auto;
+  margin: 1.75rem auto;
+  max-width: 500px;
+  pointer-events: none;
+}
+
+.modal-dialog-centered {
+  display: flex;
+  align-items: center;
+  min-height: calc(100% - 3.5rem);
+}
+
+.modal-content {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  pointer-events: auto;
+  background-color: #fff;
+  background-clip: padding-box;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  border-radius: 0.375rem;
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+  outline: 0;
+}
+
+.modal-header {
+  display: flex;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: space-between;
+  padding: 1rem 1rem;
+  background-color: #4e73df;
+  color: #fff;
+  border-bottom: 1px solid #4e73df;
+  border-top-left-radius: calc(0.375rem - 1px);
+  border-top-right-radius: calc(0.375rem - 1px);
+}
+
+.modal-header .modal-title {
+  color: #fff;
+  font-weight: 600;
+}
+
+.modal-header .btn-close {
+  filter: invert(1) grayscale(100%) brightness(200%);
+}
+
+.modal-footer {
+  display: flex;
+  flex-wrap: wrap;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: flex-end;
+  padding: 0.75rem;
+  border-top: 1px solid #dee2e6;
+  border-bottom-right-radius: calc(0.375rem - 1px);
+  border-bottom-left-radius: calc(0.375rem - 1px);
+}
+
+.modal-body {
+  position: relative;
+  flex: 1 1 auto;
+  padding: 1rem;
+}
+
+.modal-backdrop.show {
+  opacity: 0.5;
+}
+
+/* Form Label Styles - Enhanced Contrast */
+.modal .form-label {
+  color: #212529 !important;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  font-size: 0.9375rem;
+}
+
+/* Modal body text - ensure strong contrast */
+.modal-body {
+  color: #212529 !important;
+}
+
+.modal-body p,
+.modal-body label {
+  color: #212529 !important;
+}
+
+/* Modal text in delete confirmation */
+.modal-body h5 {
+  color: #212529 !important;
+  font-weight: 600;
+}
+
+.modal-body p.text-muted {
+  color: #495057 !important;
+}
+
+.modal-body p.text-muted strong {
+  color: #212529 !important;
+  font-weight: 600;
+}
+
+/* Form text helper text */
+.form-text {
+  color: #495057 !important;
+  font-size: 0.875rem;
+}
+
+/* Image Preview Styles */
+.img-thumbnail {
+  border: 1px solid #dee2e6;
+  border-radius: 0.375rem;
+  padding: 0.25rem;
+  background-color: #f8f9fa;
+}
+
+/* Table Row Hover */
+.table-hover tbody tr:hover {
+  background-color: #f8f9fa;
+  transition: background-color 0.15s ease-in-out;
+}
+
+/* Button Group Spacing */
+.btn-group .btn {
+  margin: 0;
+}
+
+/* Empty State */
+.text-center.py-5 {
+  padding: 3rem 1rem;
+}
+
+/* Adjust Edit, Delete buttons and Pagination arrows colors */
+.btn-edit, .btn-primary, .btn-outline-primary {
+  background-color: #4e73df !important;
+  border-color: #4e73df !important;
+  color: #fff !important;
+}
+
+.btn-edit:hover, .btn-primary:hover, .btn-outline-primary:hover {
+  background-color: #2e59d9 !important;
+  border-color: #2e59d9 !important;
+}
+
+.btn-delete, .btn-danger, .btn-outline-danger {
+  background-color: #e74a3b !important;
+  border-color: #e74a3b !important;
+  color: #fff !important;
+}
+
+.btn-delete:hover, .btn-danger:hover, .btn-outline-danger:hover {
+  background-color: #c82333 !important;
+  border-color: #c82333 !important;
+}
+
+/* Pagination Enhanced Styles - Strong Contrast */
+.pagination {
+  margin-bottom: 0.5rem;
+}
+
+.pagination .page-link {
+  color: #2563eb !important; /* Darker blue for better contrast */
+  background-color: #fff;
+  border: 1px solid #d1d5db;
+  border-radius: 0.375rem;
+  margin: 0 0.25rem;
+  transition: all 0.2s ease;
+  min-width: 40px;
+  text-align: center;
+  font-weight: 500;
+  font-size: 0.875rem;
+}
+
+.pagination .page-item.active .page-link {
+  background-color: #2563eb !important;
+  border-color: #2563eb !important;
+  color: #ffffff !important;
+  font-weight: 600;
+  box-shadow: 0 2px 4px rgba(37, 99, 235, 0.3);
+}
+
+.pagination .page-link:hover:not(.disabled) {
+  background-color: #eff6ff;
+  border-color: #2563eb;
+  color: #1d4ed8 !important; /* Darker on hover for better contrast */
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.pagination .page-item:first-child .page-link,
+.pagination .page-item:last-child .page-link {
+  border-radius: 50%;
+  width: 36px;
+  height: 36px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.page-item.disabled .page-link {
+  background-color: #f8f9fa;
+  border-color: #dee2e6;
+  color: #495057 !important; /* Darker for better contrast */
+  cursor: not-allowed;
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+.page-link.disabled {
+  background-color: #f8f9fa;
+  border-color: #dee2e6;
+  color: #495057 !important; /* Darker for better contrast */
+  cursor: not-allowed;
+  opacity: 0.7;
+  pointer-events: none;
+}
+
+/* Pagination Responsive */
+@media (max-width: 576px) {
+  .pagination {
+    font-size: 0.875rem;
+  }
+
+  .page-link {
+    padding: 0.375rem 0.5rem;
+    min-width: 36px;
+    margin: 0 0.125rem;
+  }
+}
+
+/* Card Styles */
+.card {
+  border: 1px solid #dee2e6;
+  box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+}
+
+.card-body {
+  padding: 1.5rem;
+}
+
+@media (max-width: 768px) {
+  .card-body {
+    padding: 1rem;
+  }
+}
+
+/* Form Input Styles */
+.form-control:focus,
+.form-select:focus {
+  border-color: #86b7fe;
+  box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+/* Loading Spinner */
+.spinner-border {
+  width: 3rem;
+  height: 3rem;
+}
+
+/* Action Buttons - Enhanced Design */
+.btn-action {
+  border: none;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.375rem;
+  transition: all 0.2s ease;
+  font-size: 0.875rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 36px;
+  height: 36px;
+}
+
+.btn-group .btn-action + .btn-action {
+  margin-left: 0.5rem;
+}
+
+.btn-action i {
+  font-size: 0.875rem;
+}
+
+/* Prevent body scroll when modal is open */
+body.modal-open {
+  overflow: hidden;
+}
+
+/* Ensure modal backdrop appears correctly */
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1040;
+  width: 100vw;
+  height: 100vh;
+  background-color: #000;
+  opacity: 0.5;
+}
+
+.modal-backdrop.fade {
+  transition: opacity 0.15s linear;
+}
+
+.modal-backdrop.fade.show {
+  opacity: 0.5;
+}
+
+/* Container Padding for Mobile */
+@media (max-width: 576px) {
+  .container-fluid {
+    padding-left: 1rem;
+    padding-right: 1rem;
+  }
+}
+
+/* Icon Spacing */
+.fas,
+.far {
+  margin-right: 0.25rem;
+}
+
+/* Code Tag Styling - Enhanced Contrast */
+code {
+  font-size: 0.875em;
+  padding: 0.125rem 0.25rem;
+  background-color: #f8f9fa;
+  border: 1px solid #dee2e6;
+  border-radius: 0.25rem;
+  color: #c41d7f; /* Darker pink for better contrast */
+  font-weight: 500;
+}
+
+/* Text Muted - Enhanced Contrast for Readability */
+/* Changed from #6c757d to #495057 for better contrast ratio (WCAG AA compliant) */
+.text-muted {
+  color: #495057 !important;
+  font-weight: 400;
+}
+
+/* Ensure small text in muted state is still readable */
+small.text-muted,
+.text-muted small {
+  font-size: 0.875rem;
+  color: #495057 !important;
+  font-weight: 400;
+}
+
+/* Empty state muted text - ensure sufficient contrast */
+.text-center .text-muted {
+  color: #495057 !important;
+}
+
+/* Table Headers - Enhanced Contrast */
+.categories-table thead th {
+  color: #212529 !important;
+  font-weight: 600;
+  background-color: #f8f9fa !important;
+  border-bottom: 2px solid #dee2e6;
+  font-size: 0.875rem;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+/* Table Cells - Strong Contrast */
+.categories-table tbody td {
+  color: #212529 !important;
+}
+
+.categories-table tbody td strong {
+  color: #212529 !important;
+  font-weight: 600;
+}
+
+/* Responsive Header */
+@media (max-width: 768px) {
+  .d-flex.flex-column.flex-md-row h1 {
+    font-size: 1.5rem;
+  }
+
+  .d-flex.flex-column.flex-md-row p {
+    font-size: 0.875rem;
+  }
+}
+
+/* Pagination Info Text - Enhanced Contrast */
+.pagination + .text-center.text-muted {
+  color: #495057 !important;
+}
+
+.pagination + .text-center.text-muted small strong {
+  color: #212529 !important;
+  font-weight: 600;
+}
+
+/* Header Text - Ensure Strong Contrast */
+.h2, h2 {
+  font-weight: 600;
+}
+
+/* Empty State - Enhanced Contrast */
+.text-center.py-5 .text-muted {
+  color: #495057 !important;
+}
+
+.text-center.py-5 h5.text-muted {
+  color: #495057 !important;
+  font-weight: 600;
+}
+
+.text-center.py-5 p.text-muted {
+  color: #495057 !important;
+}
+
+/* Input Placeholder - Ensure Readability */
+.form-control::placeholder {
+  color: #6b7280 !important; /* Darker gray for placeholder */
+  opacity: 0.8;
+}
+
+/* Search Input Icon - Ensure Visibility */
+.input-group-text {
+  background-color: #f8f9fa;
+  border-color: #dee2e6;
+  color: #495057 !important;
+}
+
+/* Minimum Font Size for Readability - WCAG Guidelines */
+body,
+.container-fluid,
+.card,
+.table,
+.modal,
+.btn,
+.form-label,
+.pagination {
+  font-size: clamp(0.875rem, 1vw, 1rem); /* Minimum 14px, scalable */
+}
+
+/* Ensure all text meets minimum size requirements */
+small {
+  font-size: 0.8125rem !important; /* Minimum 13px */
+}
+
+@media (max-width: 576px) {
+  .btn-sm {
+    font-size: 0.8125rem !important; /* Minimum 13px on mobile */
+  }
+}

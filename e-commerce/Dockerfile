@@ -18,5 +18,5 @@ EXPOSE 8000
 # Set environment variables
 ENV NODE_ENV=production
 
-# Start the application
-CMD ["npx", "nodemon", "app.js"]
+# Start the application (use node for production, not nodemon)
+CMD ["node", "app.js"]

@@ -1,0 +1,1 @@
+{"ast":null,"code":"export const environment = {\n  production: false,\n  apiUrl: 'http://localhost:3000/api/v1',\n  appName: 'Amigo Store',\n  imageBaseUrl: 'http://localhost:3000'\n};","map":null,"metadata":{},"sourceType":"module","externalDependencies":[]}

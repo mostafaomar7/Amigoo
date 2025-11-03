@@ -1,0 +1,36 @@
+<!-- Notification Toast Container -->
+<div class="notification-container">
+  <div *ngFor="let notification of notifications"
+       class="notification-item"
+       [attr.data-type]="notification.type">
+    <div class="notification-content">
+      <!-- Icon Badge -->
+      <div class="notification-icon" [attr.data-type]="notification.type">
+        <span *ngIf="notification.type === 'success'" class="icon-success">✓</span>
+        <span *ngIf="notification.type === 'error'" class="icon-error">✕</span>
+        <span *ngIf="notification.type === 'warning'" class="icon-warning">⚠</span>
+        <span *ngIf="notification.type === 'info'" class="icon-info">ℹ</span>
+      </div>
+
+      <!-- Content -->
+      <div class="notification-text">
+        <h4 class="notification-title">{{notification.title}}</h4>
+        <p class="notification-message">{{notification.message}}</p>
+      </div>
+
+      <!-- Close Button -->
+      <button
+        (click)="removeNotification(notification.id)"
+        class="notification-close"
+        aria-label="Close notification"
+        type="button">
+        <span class="close-icon">×</span>
+      </button>
+    </div>
+    <!-- Progress Bar -->
+    <div
+      class="notification-progress"
+      *ngIf="notification.duration"
+      [style.animation-duration]="getProgressDuration(notification)"></div>
+  </div>
+</div>

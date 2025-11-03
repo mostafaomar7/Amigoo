@@ -6,6 +6,14 @@ const Category = require('../../models/categoryModel');
 exports.createProductValidator = [
   (req, res, next) => {
     console.log('createProductValidator middleware called');
+    // Parse quantity if it's a JSON string
+    if (req.body.quantity && typeof req.body.quantity === 'string') {
+      try {
+        req.body.quantity = JSON.parse(req.body.quantity);
+      } catch (e) {
+        // If parsing fails, leave it as is to let validation handle it
+      }
+    }
     next(); // انتقل إلى الفالديشن التالي
   },
   check('title')
@@ -22,11 +30,6 @@ exports.createProductValidator = [
     .withMessage('Product description is required')
     .isLength({ max: 2000 })
     .withMessage('Too long description'),
-  check('quantity')
-    .notEmpty()
-    .withMessage('Product quantity is required')
-    .isNumeric()
-    .withMessage('Product quantity must be a number'),
   check('sold')
     .optional()
     .isNumeric()
@@ -73,7 +76,32 @@ exports.createProductValidator = [
         }
       })
     ),
-    
+  check('quantity')
+    .optional()
+    .isArray()
+    .withMessage('Quantity must be an array')
+    .custom((quantity) => {
+      if (quantity.length === 0) {
+        return true; // Empty array is allowed
+      }
+      for (const item of quantity) {
+        if (!item.size) {
+          throw new Error('Each quantity item must have a size');
+        }
+        if (item.no === undefined || item.no === null) {
+          throw new Error('Each quantity item must have a no (number) field');
+        }
+        if (typeof item.no !== 'number' && typeof item.no !== 'string') {
+          throw new Error('Quantity no must be a number');
+        }
+        const numValue = Number(item.no);
+        if (isNaN(numValue) || numValue < 0) {
+          throw new Error('Quantity no must be a non-negative number');
+        }
+      }
+      return true;
+    }),
+
   validatorMiddleware,
 
 ];
@@ -85,10 +113,46 @@ exports.getProductValidator = [
 
 exports.updateProductValidator = [
   check('id').isMongoId().withMessage('Invalid ID formate'),
+  (req, res, next) => {
+    // Parse quantity if it's a JSON string
+    if (req.body.quantity && typeof req.body.quantity === 'string') {
+      try {
+        req.body.quantity = JSON.parse(req.body.quantity);
+      } catch (e) {
+        // If parsing fails, leave it as is to let validation handle it
+      }
+    }
+    next();
+  },
   body('title')
     .optional()
     .custom((val, { req }) => {
       req.body.slug = slugify(val);
+      return true;
+    }),
+  check('quantity')
+    .optional()
+    .isArray()
+    .withMessage('Quantity must be an array')
+    .custom((quantity) => {
+      if (quantity.length === 0) {
+        return true; // Empty array is allowed
+      }
+      for (const item of quantity) {
+        if (!item.size) {
+          throw new Error('Each quantity item must have a size');
+        }
+        if (item.no === undefined || item.no === null) {
+          throw new Error('Each quantity item must have a no (number) field');
+        }
+        if (typeof item.no !== 'number' && typeof item.no !== 'string') {
+          throw new Error('Quantity no must be a number');
+        }
+        const numValue = Number(item.no);
+        if (isNaN(numValue) || numValue < 0) {
+          throw new Error('Quantity no must be a non-negative number');
+        }
+      }
       return true;
     }),
   validatorMiddleware,

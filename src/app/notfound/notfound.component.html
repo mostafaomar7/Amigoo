@@ -1,2 +1,12 @@
-<app-navbar></app-navbar>
-<div class="container w-100 m-5"><img src="../../assets/img/notfound.png" alt=""></div>
+<div class="notfound-wrapper">
+  <div class="notfound-container" [style.background-image]="'url(' + backgroundImageUrl + ')'"></div>
+  <!-- Actions -->
+  <div class="error-actions">
+    <a routerLink="/" class="button-primary">
+      <span>Go Home</span>
+    </a>
+    <button (click)="goBack()" class="button-secondary">
+      <span>Go Back</span>
+    </button>
+  </div>
+</div>

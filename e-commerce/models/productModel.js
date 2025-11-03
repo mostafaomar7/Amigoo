@@ -19,14 +19,6 @@ const productSchema = new mongoose.Schema(
       required: [true, 'Product description is required'],
       minlength: [5, 'Too short product description'],
     },
-    originalQuantity: {
-      type: Number,
-      // required: [true, 'Original product quantity is required'],
-    },
-    quantity: {
-      type: Number,
-      required: [true, 'Product quantity is required'],
-    },
     sold: {
       type: Number,
       default: 0,
@@ -41,10 +33,6 @@ const productSchema = new mongoose.Schema(
       type: Number,
     },
     colors: [String],
-    size: {
-      type: [String], 
-      // required: true, 
-    },
     imageCover: {
       type: String,
       required: [true, 'Product Image cover is required'],
@@ -54,8 +42,42 @@ const productSchema = new mongoose.Schema(
       type: mongoose.Schema.ObjectId,
       ref: 'Category',
       required: [true, 'Product must be belong to category'],
-    }},{ timestamps: true }
+    },
+    isDeleted: {
+      type: Boolean,
+      default: false,
+    },
+    quantity: [
+      {
+        size: {
+          type: String,
+          required: true,
+          lowercase: true,
+          trim: true,
+        },
+        no: {
+          type: Number,
+          required: true,
+          min: [0, 'Quantity cannot be negative'],
+          default: 0,
+        },
+      },
+    ],
+  },
+  { timestamps: true }
 );
+
+// Pre-save hook to normalize size names in quantity array
+productSchema.pre('save', function(next) {
+  if (this.quantity && Array.isArray(this.quantity)) {
+    this.quantity.forEach((item) => {
+      if (item.size) {
+        item.size = item.size.toLowerCase().trim();
+      }
+    });
+  }
+  next();
+});
 
 // Mongoose query middleware
 productSchema.pre(/^find/, function (next) {

@@ -1,0 +1,847 @@
+{
+  "info": {
+    "name": "E-commerce Admin API",
+    "description": "Complete admin API collection for e-commerce backend",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{admin_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:8000/api/v1",
+      "type": "string"
+    },
+    {
+      "key": "admin_token",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Admin Login",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"admin@example.com\",\n  \"password\": \"admin123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/user/login",
+              "host": ["{{base_url}}"],
+              "path": ["user", "login"]
+            }
+          }
+        },
+        {
+          "name": "Admin Register",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Admin User\",\n  \"email\": \"admin@example.com\",\n  \"password\": \"admin123\",\n  \"role\": \"Admin\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/user/register",
+              "host": ["{{base_url}}"],
+              "path": ["user", "register"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Categories",
+      "item": [
+        {
+          "name": "Get All Categories",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/categories?page=1&limit=10",
+              "host": ["{{base_url}}"],
+              "path": ["categories"],
+              "query": [
+                {"key": "page", "value": "1"},
+                {"key": "limit", "value": "10"}
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Category by ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/categories/:id",
+              "host": ["{{base_url}}"],
+              "path": ["categories", ":id"],
+              "variable": [
+                {"key": "id", "value": "category_id_here"}
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Category",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "name",
+                  "value": "Electronics",
+                  "type": "text"
+                },
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": "/path/to/category/image.jpg"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/categories",
+              "host": ["{{base_url}}"],
+              "path": ["categories"]
+            }
+          }
+        },
+        {
+          "name": "Update Category",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "name",
+                  "value": "Updated Electronics",
+                  "type": "text"
+                },
+                {
+                  "key": "image",
+                  "type": "file",
+                  "src": "/path/to/new/category/image.jpg"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/categories/:id",
+              "host": ["{{base_url}}"],
+              "path": ["categories", ":id"],
+              "variable": [
+                {"key": "id", "value": "category_id_here"}
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete Category",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{base_url}}/categories/:id",
+              "host": ["{{base_url}}"],
+              "path": ["categories", ":id"],
+              "variable": [
+                {"key": "id", "value": "category_id_here"}
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Products",
+      "item": [
+        {
+          "name": "Get All Products",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/product?page=1&limit=16&sort=createdAt",
+              "host": ["{{base_url}}"],
+              "path": ["product"],
+              "query": [
+                {"key": "page", "value": "1"},
+                {"key": "limit", "value": "16"},
+                {"key": "sort", "value": "createdAt"}
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Product by ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/product/:id",
+              "host": ["{{base_url}}"],
+              "path": ["product", ":id"],
+              "variable": [
+                {"key": "id", "value": "product_id_here"}
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Products by Category",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/product/category/:categoryId",
+              "host": ["{{base_url}}"],
+              "path": ["product", "category", ":categoryId"],
+              "variable": [
+                {"key": "categoryId", "value": "category_id_here"}
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Product",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "title",
+                  "value": "iPhone 15 Pro",
+                  "type": "text"
+                },
+                {
+                  "key": "description",
+                  "value": "Latest iPhone with advanced features",
+                  "type": "text"
+                },
+                {
+                  "key": "price",
+                  "value": "999",
+                  "type": "text"
+                },
+                {
+                  "key": "priceAfterDiscount",
+                  "value": "899",
+                  "type": "text"
+                },
+                {
+                  "key": "category",
+                  "value": "category_id_here",
+                  "type": "text"
+                },
+                {
+                  "key": "colors",
+                  "value": "[\"Black\", \"White\", \"Blue\"]",
+                  "type": "text"
+                },
+                {
+                  "key": "imageCover",
+                  "type": "file",
+                  "src": "/path/to/cover/image.jpg"
+                },
+                {
+                  "key": "images",
+                  "type": "file",
+                  "src": "/path/to/image1.jpg"
+                },
+                {
+                  "key": "images",
+                  "type": "file",
+                  "src": "/path/to/image2.jpg"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/product",
+              "host": ["{{base_url}}"],
+              "path": ["product"]
+            }
+          }
+        },
+        {
+          "name": "Update Product",
+          "request": {
+            "method": "PUT",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "title",
+                  "value": "iPhone 15 Pro Max",
+                  "type": "text"
+                },
+                {
+                  "key": "description",
+                  "value": "Updated description",
+                  "type": "text"
+                },
+                {
+                  "key": "price",
+                  "value": "1099",
+                  "type": "text"
+                },
+                {
+                  "key": "imageCover",
+                  "type": "file",
+                  "src": "/path/to/new/cover/image.jpg"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{base_url}}/product/:id",
+              "host": ["{{base_url}}"],
+              "path": ["product", ":id"],
+              "variable": [
+                {"key": "id", "value": "product_id_here"}
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete Product",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{base_url}}/product/:id",
+              "host": ["{{base_url}}"],
+              "path": ["product", ":id"],
+              "variable": [
+                {"key": "id", "value": "product_id_here"}
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Sizes",
+      "item": [
+        {
+          "name": "Get All Sizes",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/sizes?page=1&limit=10",
+              "host": ["{{base_url}}"],
+              "path": ["sizes"],
+              "query": [
+                {"key": "page", "value": "1"},
+                {"key": "limit", "value": "10"}
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Size by ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/sizes/:id",
+              "host": ["{{base_url}}"],
+              "path": ["sizes", ":id"],
+              "variable": [
+                {"key": "id", "value": "size_id_here"}
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Sizes by Product",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/sizes/product/:productId",
+              "host": ["{{base_url}}"],
+              "path": ["sizes", "product", ":productId"],
+              "variable": [
+                {"key": "productId", "value": "product_id_here"}
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Size",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"productId\": \"product_id_here\",\n  \"sizeName\": \"L\",\n  \"quantity\": 50\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/sizes",
+              "host": ["{{base_url}}"],
+              "path": ["sizes"]
+            }
+          }
+        },
+        {
+          "name": "Update Size",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sizeName\": \"XL\",\n  \"quantity\": 75\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/sizes/:id",
+              "host": ["{{base_url}}"],
+              "path": ["sizes", ":id"],
+              "variable": [
+                {"key": "id", "value": "size_id_here"}
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete Size",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{base_url}}/sizes/:id",
+              "host": ["{{base_url}}"],
+              "path": ["sizes", ":id"],
+              "variable": [
+                {"key": "id", "value": "size_id_here"}
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Orders",
+      "item": [
+        {
+          "name": "Get All Orders",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/Order?page=1&limit=10&status=pending",
+              "host": ["{{base_url}}"],
+              "path": ["Order"],
+              "query": [
+                {"key": "page", "value": "1"},
+                {"key": "limit", "value": "10"},
+                {"key": "status", "value": "pending"}
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Order by ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/Order/:id",
+              "host": ["{{base_url}}"],
+              "path": ["Order", ":id"],
+              "variable": [
+                {"key": "id", "value": "order_id_here"}
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Order Status",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"status\": \"completed\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/Order/:id/status",
+              "host": ["{{base_url}}"],
+              "path": ["Order", ":id", "status"],
+              "variable": [
+                {"key": "id", "value": "order_id_here"}
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete Order",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{base_url}}/Order/:id",
+              "host": ["{{base_url}}"],
+              "path": ["Order", ":id"],
+              "variable": [
+                {"key": "id", "value": "order_id_here"}
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Order Statistics",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/Order/stats",
+              "host": ["{{base_url}}"],
+              "path": ["Order", "stats"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Contact Forms",
+      "item": [
+        {
+          "name": "Get All Contact Forms",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/submit?page=1&limit=10&isReplied=false",
+              "host": ["{{base_url}}"],
+              "path": ["submit"],
+              "query": [
+                {"key": "page", "value": "1"},
+                {"key": "limit", "value": "10"},
+                {"key": "isReplied", "value": "false"}
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get Contact Form by ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/submit/:id",
+              "host": ["{{base_url}}"],
+              "path": ["submit", ":id"],
+              "variable": [
+                {"key": "id", "value": "contact_form_id_here"}
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update Contact Form",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated Name\",\n  \"email\": \"updated@example.com\",\n  \"phone\": \"1234567890\",\n  \"message\": \"Updated message\",\n  \"termsAccepted\": true\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/submit/:id",
+              "host": ["{{base_url}}"],
+              "path": ["submit", ":id"],
+              "variable": [
+                {"key": "id", "value": "contact_form_id_here"}
+              ]
+            }
+          }
+        },
+        {
+          "name": "Reply to Contact Form",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"adminReply\": \"Thank you for your message. We will get back to you soon.\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/submit/:id/reply",
+              "host": ["{{base_url}}"],
+              "path": ["submit", ":id", "reply"],
+              "variable": [
+                {"key": "id", "value": "contact_form_id_here"}
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete Contact Form",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{base_url}}/submit/:id",
+              "host": ["{{base_url}}"],
+              "path": ["submit", ":id"],
+              "variable": [
+                {"key": "id", "value": "contact_form_id_here"}
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Settings",
+      "item": [
+        {
+          "name": "Get Settings",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/settings",
+              "host": ["{{base_url}}"],
+              "path": ["settings"]
+            }
+          }
+        },
+        {
+          "name": "Get Setting by Key",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/settings/:key",
+              "host": ["{{base_url}}"],
+              "path": ["settings", ":key"],
+              "variable": [
+                {"key": "key", "value": "site_name"}
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Settings",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"site_name\": \"My E-commerce Store\",\n  \"contact_email\": \"admin@mystore.com\",\n  \"contact_phone\": \"1234567890\",\n  \"site_logo\": \"https://example.com/logo.png\",\n  \"site_description\": \"Best online store for electronics\",\n  \"currency\": \"USD\",\n  \"currency_symbol\": \"$\",\n  \"shipping_cost\": 10,\n  \"free_shipping_threshold\": 100,\n  \"social_media\": {\n    \"facebook\": \"https://facebook.com/mystore\",\n    \"twitter\": \"https://twitter.com/mystore\",\n    \"instagram\": \"https://instagram.com/mystore\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/settings",
+              "host": ["{{base_url}}"],
+              "path": ["settings"]
+            }
+          }
+        },
+        {
+          "name": "Update Settings",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"site_name\": \"Updated Store Name\",\n  \"contact_email\": \"newadmin@mystore.com\",\n  \"shipping_cost\": 15\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/settings",
+              "host": ["{{base_url}}"],
+              "path": ["settings"]
+            }
+          }
+        },
+        {
+          "name": "Update Setting by Key",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"value\": \"New Site Name\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/settings/:key",
+              "host": ["{{base_url}}"],
+              "path": ["settings", ":key"],
+              "variable": [
+                {"key": "key", "value": "site_name"}
+              ]
+            }
+          }
+        },
+        {
+          "name": "Reset Settings",
+          "request": {
+            "method": "POST",
+            "url": {
+              "raw": "{{base_url}}/settings/reset",
+              "host": ["{{base_url}}"],
+              "path": ["settings", "reset"]
+            }
+          }
+        },
+        {
+          "name": "Get Shipping Info",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/settings/shipping/info",
+              "host": ["{{base_url}}"],
+              "path": ["settings", "shipping", "info"]
+            }
+          }
+        },
+        {
+          "name": "Calculate Shipping",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"totalAmount\": 150\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/settings/shipping/calculate",
+              "host": ["{{base_url}}"],
+              "path": ["settings", "shipping", "calculate"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "Get All Users",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/user?page=1&limit=10",
+              "host": ["{{base_url}}"],
+              "path": ["user"],
+              "query": [
+                {"key": "page", "value": "1"},
+                {"key": "limit", "value": "10"}
+              ]
+            }
+          }
+        },
+        {
+          "name": "Get User by ID",
+          "request": {
+            "method": "GET",
+            "url": {
+              "raw": "{{base_url}}/user/:id",
+              "host": ["{{base_url}}"],
+              "path": ["user", ":id"],
+              "variable": [
+                {"key": "id", "value": "user_id_here"}
+              ]
+            }
+          }
+        },
+        {
+          "name": "Update User",
+          "request": {
+            "method": "PUT",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Updated User Name\",\n  \"email\": \"updated@example.com\",\n  \"role\": \"Admin\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/user/:id",
+              "host": ["{{base_url}}"],
+              "path": ["user", ":id"],
+              "variable": [
+                {"key": "id", "value": "user_id_here"}
+              ]
+            }
+          }
+        },
+        {
+          "name": "Delete User",
+          "request": {
+            "method": "DELETE",
+            "url": {
+              "raw": "{{base_url}}/user/:id",
+              "host": ["{{base_url}}"],
+              "path": ["user", ":id"],
+              "variable": [
+                {"key": "id", "value": "user_id_here"}
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

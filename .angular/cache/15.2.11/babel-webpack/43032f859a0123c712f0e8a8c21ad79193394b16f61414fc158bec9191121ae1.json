@@ -1,0 +1,1 @@
+{"ast":null,"code":"export const environment = {\n  production: true,\n  apiUrl: 'https://amigoapi.mosalam.com/api/v1',\n  appName: 'Amigo Store',\n  imageBaseUrl: 'https://amigoapi.mosalam.com'\n};","map":null,"metadata":{},"sourceType":"module","externalDependencies":[]}

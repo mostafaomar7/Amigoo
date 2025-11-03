@@ -1,0 +1,92 @@
+<a class="d-flex what" href="https://api.whatsapp.com/send/?phone=201030204693&text&type=phone_number&app_absent=0" target="_blank">
+  <span>What's App us</span>
+  <img class="" src="../../../assets/img/pngegg (5).png" alt="">
+</a>
+<header class="header">
+  <section class="move">
+    <h1 class="slide-in d-flex">
+      <span >New Arrival !</span><span>5% DISCOUNT IN AMIGO WEBSITE</span>
+    </h1>
+  </section>
+  <div class="container">
+    <a routerLink="/home" class="logo">
+      <img src="../../../assets/img/logo.jpg" alt="Amigo Store Logo">
+    </a>
+    <div class="heading justify-content-center">
+      <img class="amigologo" src="../../../assets/img/amigo png 2.png" alt="">
+      <img src="../../../assets/img/verified.png" alt="">
+    </div>
+
+    <div class="icons d-flex">
+      <div class="fas fa-search" id="search-btn" (click)="toggleSearchForm()"></div>
+      <div class="fas fa-shopping-cart" id="cart-btn" (click)="toggleCartItem()" style="position: relative;"><span style="position: absolute; top: -48%; left: 50%; transform: translateX(-50%); width: 10px; height: 10px; border-radius: 50%; background-color: rgb(116, 13, 13); font-size: 15px;">{{cartproduct.length}}</span></div>
+      <div class="fas fa-solid fa-star" id="star-btn" (click)="togglestarItem()" style="position: relative;"><span style="position: absolute; top: -48%; left: 50%; transform: translateX(-50%); width: 10px; height: 10px; border-radius: 50%; background-color: rgb(116, 13, 13); font-size: 15px;">{{starproduct.length}}</span></div>
+      <div class="fas fa-bars" id="menu-btn" (click)="toggleNavbar()"></div>
+    </div>
+  </div>
+
+  <nav class="navbar">
+    <a routerLink="/home">HOME</a>
+    <li class="nav-item dropdown">
+      <select style="background-color: #010103;" name="" id="se" value="OurShop" class="form-select" (click)="goToParentPage(); " (change)="onCategoryChange($event.target.value)">
+        <option value="OurShop" >Our Shop</option>
+        <option  value="{{option._id}}" *ngFor="let option of allcatgory">{{option.name}}</option>
+      </select>
+    </li>
+    <a routerLink="/shipping">SHIPPING AND RETURNS POLICY</a>
+    <a routerLink="/contact">CONTACT US</a>
+  </nav>
+  <div class="search-form">
+    <input type="search" id="search-box" placeholder="search here...">
+    <label for="search-box" class="fas fa-search"></label>
+  </div>
+
+  <div class="cart-items-container">
+    <div class="cart-item">
+      <ul>
+        <ul *ngFor="let item of cartproduct; let index = index ;" class="d-flex">
+          <li><img [src]="'https://amigoapi.mosalam.com/uploads/products/'+item.imageCover" alt=""></li>
+          <li>{{item.title}}</li>
+          <li>
+              <div class="counter d-flex">
+              <button id="decrease" class="counter-btn bg-black text-white w-25 mx-2" (click)="decrease(index)"  >-</button>
+              <input  class="form-control w-75"  (change)="detectedchange()" type="number" id="quantity" value="1" min="1" [(ngModel)]="item.quantity"  >
+              <button id="increase" class="counter-btn bg-black text-white w-25 mx-2" (click)="increase(index)"  >+</button>
+              </div>
+            </li>
+          <li>subtotal : {{item.price * item.quantity}} </li>
+          <li><button class="fas fa-trash" (click)="delete(index)"></button></li>
+            </ul>
+      </ul>
+    </div>
+    <h4 class="fw-bold fs-3 text-primary">Total Price : {{total}}</h4>
+    <a routerLink="/checkout" class="btn">checkout now</a>
+  </div>
+  <div class="star-items-container">
+    <div class="cart-item star">
+      <ul>
+        <ul *ngFor="let item of starproduct; let index = index ;" class="d-flex mb-3">
+          <li><img [src]="'https://amigoapi.mosalam.com/uploads/products/'+item.imageCover" alt=""></li>
+          <li>{{item.title}}</li>
+          <li>
+              <div class="counter d-flex">
+              <input class="form-control mr-1" (change)="detectedchange()" type="number" id="quantity" value="1" min="1" [(ngModel)]="item.quantity"  >
+              </div></li>
+          <li>total : {{item.price * item.quantity}} </li>
+          <li><button class="fas fa-trash" (click)="delete(index)"></button></li>
+            </ul>
+      </ul>
+    </div>
+
+
+  </div>
+
+
+</header>
+<div class="container">
+  <div class="row">
+    <div class="col-lg-3"  *ngFor="let item of alldata" >
+      <app-boy-friend></app-boy-friend>
+    </div>
+  </div>
+</div>

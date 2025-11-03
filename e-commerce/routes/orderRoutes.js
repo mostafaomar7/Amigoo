@@ -5,19 +5,30 @@ const {
     createOrder,
     getAllOrders,
     getOrderById,
-    updateOrderById,
-    deleteOrderById,
+    updateOrderStatus,
+    deleteOrder,
+    getUserOrders,
+    getOrderStats,
 } = require("../services/orderService");
 const { validateOrder } = require("../utils/validators/validateOrder");
 const {authenticate,authorize} =require("../middlewares/authMW")
 
+// Public routes
+router.route('/').post(validateOrder, createOrder);
 
-router.route('/').get(authenticate,authorize(['Admin']),getAllOrders).post(validateOrder,createOrder);
-router
-  .route('/:id')
-  .get(authenticate,authorize(['Admin']),getOrderById)
-  .put(authenticate,authorize(['Admin']),validateOrder,updateOrderById)
-  .delete(authenticate,authorize(['Admin']),deleteOrderById);
+// Protected routes
+router.use(authenticate);
+
+// User routes
+router.route('/my-orders').get(getUserOrders);
+
+// Admin routes
+router.use(authorize(['Admin']));
+
+router.route('/').get(getAllOrders);
+router.route('/stats').get(getOrderStats);
+router.route('/:id').get(getOrderById);
+router.route('/:id/status').put(updateOrderStatus);
+router.route('/:id').delete(deleteOrder);
 
 module.exports = router;
-

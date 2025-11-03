@@ -1,0 +1,186 @@
+<!-- Order Statistics Section -->
+<div class="order-statistics-section">
+  <!-- Section Header -->
+  <div class="mb-4">
+    <h2 class="h3 mb-2 text-white">Order Statistics</h2>
+    <p class="text-white-50 mb-0">Overview of all order metrics</p>
+  </div>
+
+  <!-- Statistics Cards -->
+  <ng-container *ngIf="displayStats as stats">
+    <!-- Loading State -->
+    <div *ngIf="stats === 'loading'">
+      <ng-container *ngTemplateOutlet="loadingTemplate"></ng-container>
+    </div>
+
+    <!-- Error State -->
+    <div *ngIf="stats === null">
+      <ng-container *ngTemplateOutlet="errorTemplate"></ng-container>
+    </div>
+
+    <!-- Data State -->
+    <div *ngIf="stats !== null && stats !== 'loading'" class="row g-3 g-md-4">
+    <!-- Total Orders Card -->
+    <div class="col-12 col-sm-6 col-lg-3">
+      <div class="stat-card stat-card-primary h-100">
+        <div class="stat-card-body">
+          <div class="stat-icon-wrapper">
+            <i class="fas fa-shopping-bag fa-2x"></i>
+          </div>
+          <div class="stat-content">
+            <p class="stat-label">Total Orders</p>
+            <h3 class="stat-value">{{ stats.totalOrders | number }}</h3>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Pending Orders Card -->
+    <div class="col-12 col-sm-6 col-lg-3">
+      <div class="stat-card stat-card-warning h-100">
+        <div class="stat-card-body">
+          <div class="stat-icon-wrapper">
+            <i class="fas fa-clock fa-2x"></i>
+          </div>
+          <div class="stat-content">
+            <p class="stat-label">Pending Orders</p>
+            <h3 class="stat-value">
+              {{ stats.pendingOrders | number }}
+              <span class="badge bg-warning text-dark ms-2">Pending</span>
+            </h3>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Completed Orders Card -->
+    <div class="col-12 col-sm-6 col-lg-3">
+      <div class="stat-card stat-card-success h-100">
+        <div class="stat-card-body">
+          <div class="stat-icon-wrapper">
+            <i class="fas fa-check-circle fa-2x"></i>
+          </div>
+          <div class="stat-content">
+            <p class="stat-label">Completed Orders</p>
+            <h3 class="stat-value">
+              {{ stats.completedOrders | number }}
+              <span class="badge bg-success ms-2">Completed</span>
+            </h3>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Cancelled Orders Card -->
+    <div class="col-12 col-sm-6 col-lg-3">
+      <div class="stat-card stat-card-danger h-100">
+        <div class="stat-card-body">
+          <div class="stat-icon-wrapper">
+            <i class="fas fa-times-circle fa-2x"></i>
+          </div>
+          <div class="stat-content">
+            <p class="stat-label">Cancelled Orders</p>
+            <h3 class="stat-value">
+              {{ stats.cancelledOrders | number }}
+              <span class="badge bg-danger ms-2">Cancelled</span>
+            </h3>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Total Revenue Card (Full width on mobile, 2 columns on desktop) -->
+    <div class="col-12 col-lg-6">
+      <div class="stat-card stat-card-revenue h-100">
+        <div class="stat-card-body">
+          <div class="stat-icon-wrapper">
+            <i class="fas fa-dollar-sign fa-2x"></i>
+          </div>
+          <div class="stat-content">
+            <p class="stat-label">Total Revenue</p>
+            <h3 class="stat-value">{{ formatCurrency(stats.totalRevenue) }}</h3>
+          </div>
+        </div>
+      </div>
+    </div>
+    </div>
+  </ng-container>
+
+  <!-- Error Template -->
+  <ng-template #errorTemplate>
+    <div class="alert alert-danger" role="alert">
+      <i class="fas fa-exclamation-triangle me-2"></i>
+      Unable to load order statistics. Please refresh the page or try again later.
+    </div>
+  </ng-template>
+
+  <!-- Loading Skeleton Template -->
+  <ng-template #loadingTemplate>
+    <div class="row g-3 g-md-4">
+      <!-- Skeleton for Total Orders -->
+      <div class="col-12 col-sm-6 col-lg-3">
+        <div class="stat-card stat-card-skeleton h-100">
+          <div class="stat-card-body">
+            <div class="skeleton-icon"></div>
+            <div class="skeleton-content">
+              <div class="skeleton-line skeleton-label"></div>
+              <div class="skeleton-line skeleton-value"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Skeleton for Pending Orders -->
+      <div class="col-12 col-sm-6 col-lg-3">
+        <div class="stat-card stat-card-skeleton h-100">
+          <div class="stat-card-body">
+            <div class="skeleton-icon"></div>
+            <div class="skeleton-content">
+              <div class="skeleton-line skeleton-label"></div>
+              <div class="skeleton-line skeleton-value"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Skeleton for Completed Orders -->
+      <div class="col-12 col-sm-6 col-lg-3">
+        <div class="stat-card stat-card-skeleton h-100">
+          <div class="stat-card-body">
+            <div class="skeleton-icon"></div>
+            <div class="skeleton-content">
+              <div class="skeleton-line skeleton-label"></div>
+              <div class="skeleton-line skeleton-value"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Skeleton for Cancelled Orders -->
+      <div class="col-12 col-sm-6 col-lg-3">
+        <div class="stat-card stat-card-skeleton h-100">
+          <div class="stat-card-body">
+            <div class="skeleton-icon"></div>
+            <div class="skeleton-content">
+              <div class="skeleton-line skeleton-label"></div>
+              <div class="skeleton-line skeleton-value"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Skeleton for Total Revenue -->
+      <div class="col-12 col-lg-6">
+        <div class="stat-card stat-card-skeleton h-100">
+          <div class="stat-card-body">
+            <div class="skeleton-icon"></div>
+            <div class="skeleton-content">
+              <div class="skeleton-line skeleton-label"></div>
+              <div class="skeleton-line skeleton-value"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </ng-template>
+</div>

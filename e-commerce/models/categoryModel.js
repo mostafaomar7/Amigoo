@@ -4,19 +4,23 @@ const categorySchema = new mongoose.Schema(
   {
     name: {
       type: String,
-      required: [true, 'Category required'],
-      unique: [true, 'Category must be unique'],
-      minlength: [3, 'Too short category name'],
-      maxlength: [32, 'Too long category name'],
+      required: [true, 'اسم الفئة مطلوب'],
+      unique: [true, 'اسم الفئة يجب أن يكون فريداً'],
+      minlength: [3, 'اسم الفئة قصير جداً'],
+      maxlength: [32, 'اسم الفئة طويل جداً'],
     },
     // A and B => shoping.com/a-and-b
     slug: {
       type: String,
       lowercase: true,
     },
-    image:{type: String,
-      required: [true, 'image required']
-
+    image: {
+      type: String,
+      required: [true, 'صورة الفئة مطلوبة']
+    },
+    isDeleted: {
+      type: Boolean,
+      default: false,
     }
   },
   { timestamps: true }

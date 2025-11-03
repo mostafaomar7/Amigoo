@@ -1,25 +1,12 @@
 const slugify = require('slugify')
 const asyncHandler = require('express-async-handler')
-const Category = require('../models/categoryModel');
-///// image
 const multer  = require('multer')
 const { v4: uuidv4 } = require('uuid');
+const sharp = require('sharp');
+const path = require('path');
+const Category = require('../models/categoryModel');
 
-const storage = multer.diskStorage({
-  destination: function (req, file, cb) {
-    cb(null, 'uploads/category')
-  },
-  filename: function (req, file, cb) {
-    const ext = file.mimetype.split("/")[1];
-    const filename =`category-${uuidv4()}-${Date.now()}-.${ext}`
-    cb(null,filename  )
-    console.log(req.file);
-    
-    req.body.image=filename
-
-  }
-
-})
+const multerStorage = multer.memoryStorage();
 
 const multerFilter = function  (req, file, cb) {
   if(file.mimetype.startsWith("image")){
@@ -32,18 +19,36 @@ const multerFilter = function  (req, file, cb) {
   }
 }
 
-const upload = multer({ storage: storage,fileFilter:multerFilter })
+const upload = multer({ storage: multerStorage, fileFilter: multerFilter })
 exports.uploadimage = upload.single('image');
+
+// Middleware to convert category image to WebP
+exports.resizeCategoryImage = asyncHandler(async (req, res, next) => {
+  if (!req.file) {
+    return next();
+  }
+
+  const webpFileName = `category-${uuidv4()}-${Date.now()}.webp`;
+  const outputPath = path.join(__dirname, '..', 'uploads', 'category', webpFileName);
+
+  await sharp(req.file.buffer)
+    .resize({ width: 800, height: 600, fit: 'cover' })
+    .webp({ quality: 85 })
+    .toFile(outputPath);
+
+  req.body.image = webpFileName;
+  next();
+});
 ////
 
 //get all categore
 exports.getCategories = asyncHandler(async(req, res) => {
-    const page = req.query.page * 1 || 1;
-    const limit = req.query.limit * 1 ;
-    const skip = (page - 1) * limit /*skip categore*/ 
-    const sortBy = req.query.sort || 'createdAt'; // معيار الفرز الافتراضي
-    const fields = req.query.fields; // الحقول المطلوبة
-    const keyword = req.query.keyword || ''; // الكلمة المفتاحية للبحث
+    const { page = 1, limit = 10, sort = 'createdAt', fields, keyword = '' } = req.query;
+    const pageNum = page * 1 || 1;
+    const limitNum = limit * 1 || 10;
+    const skip = (pageNum - 1) * limitNum; /*skip categore*/
+    const sortBy = sort; // معيار الفرز الافتراضي
+    const selectFields = fields ? fields.split(',').join(' ') : ''; // تحويل الحقول إلى صيغة Mongoose
 
     const searchQuery = keyword
     ? {
@@ -53,85 +58,163 @@ exports.getCategories = asyncHandler(async(req, res) => {
       }
     : {};
 
-    const selectFields = fields ? fields.split(',').join(' ') : ''; // تحويل الحقول إلى صيغة Mongoose
+    const query = { ...searchQuery, isDeleted: false };
 
-    const AllCategore = await Category.find(searchQuery).select(selectFields).skip(skip).limit(limit).sort(sortBy); 
-    res.status(201).json({data:AllCategore})
+    // Get total count for pagination
+    const totalItems = await Category.countDocuments(query);
+    const totalPages = Math.ceil(totalItems / limitNum);
+
+    const AllCategore = await Category.find(query).select(selectFields).skip(skip).limit(limitNum).sort(sortBy);
+
+    res.status(200).json({
+      success: true,
+      message: 'تم جلب الفئات بنجاح',
+      data: AllCategore,
+      pagination: {
+        currentPage: pageNum,
+        itemsPerPage: limitNum,
+        totalItems: totalItems,
+        totalPages: totalPages,
+        hasNextPage: pageNum < totalPages,
+        hasPrevPage: pageNum > 1
+      }
+    })
 });
 
 exports.getCategory = asyncHandler(async (req, res) => {
     const { id } = req.params;
-    const category = await Category.findById(id);
+    const category = await Category.findOne({ _id: id, isDeleted: false });
     if (!category) {
-      res.status(404).json({ msg: `No category for this id ${id}` });
+      res.status(404).json({
+        success: false,
+        message: `لا توجد فئة بهذا المعرف ${id}`
+      });
     }
-    res.status(200).json({ data: category });
+    res.status(200).json({
+      success: true,
+      message: 'تم جلب الفئة بنجاح',
+      data: category
+    });
   });
 
 //CREAT categore
 exports.CreatCategories = asyncHandler(async(req, res) => {
-    const name = req.body.name ;
-    const image = req.body.image || req.file;
-    const category = await Category.create({name:name,slug:slugify(name),image:image})
-    res.status(201).json({data:category})
-    
-    
+    const { name } = req.body;
+    const image = req.body.image;
+
+    try {
+        const category = await Category.create({name:name,slug:slugify(name),image:image})
+        res.status(201).json({
+            success: true,
+            message: 'تم إنشاء الفئة بنجاح',
+            data: category
+        });
+    } catch (error) {
+        // Handle validation errors
+        if (error.name === 'ValidationError') {
+            const validationErrors = Object.values(error.errors).map(err => ({
+                field: err.path,
+                message: err.message
+            }));
+            return res.status(400).json({
+                success: false,
+                message: 'فشل في التحقق من صحة البيانات',
+                errors: validationErrors
+            });
+        }
+
+        // Handle duplicate key error
+        if (error.code === 11000) {
+            const field = Object.keys(error.keyValue)[0];
+            const fieldNames = {
+                'name': 'الاسم',
+                'email': 'البريد الإلكتروني',
+                'slug': 'الرابط'
+            };
+            const fieldName = fieldNames[field] || field;
+            return res.status(400).json({
+                success: false,
+                message: `${fieldName} يجب أن يكون فريداً`,
+                errors: [{
+                    field: field,
+                    message: `${fieldName} يجب أن يكون فريداً`
+                }]
+            });
+        }
+
+        // Handle mongoose duplicate key error
+        if (error.name === 'MongooseError' && error.message.includes('must be unique')) {
+            const field = error.message.split(' ')[0];
+            const fieldNames = {
+                'Category': 'الفئة',
+                'Product': 'المنتج',
+                'User': 'المستخدم'
+            };
+            const fieldName = fieldNames[field] || field;
+            return res.status(400).json({
+                success: false,
+                message: `${fieldName} يجب أن يكون فريداً`,
+                errors: [{
+                    field: field.toLowerCase(),
+                    message: `${fieldName} يجب أن يكون فريداً`
+                }]
+            });
+        }
+
+        // Re-throw other errors to be handled by global error handler
+        throw error;
+    }
 });
 
 exports.updateCategory = asyncHandler(async (req, res) => {
   const { id } = req.params;
   const { name } = req.body;
-  const image = req.body.image || (req.file ? req.file.filename : null);
+  const image = req.body.image;
 
   if (!name || typeof name !== 'string' || name.trim() === '') {
-    return res.status(400).json({ msg: 'Category name is required and must be a valid string.' });
+    return res.status(400).json({
+      success: false,
+      message: 'اسم الفئة مطلوب ويجب أن يكون نصاً صالحاً.'
+    });
   }
 
   const updateData = { name, slug: slugify(name, { lower: true }) };
   if (image) updateData.image = image;
 
-  const category = await Category.findOneAndUpdate({ _id: id }, updateData, { new: true });
+  const category = await Category.findOneAndUpdate({ _id: id, isDeleted: false }, updateData, { new: true });
 
   if (!category) {
-    return res.status(404).json({ msg: `No category found for this ID: ${id}` });
+    return res.status(404).json({
+      success: false,
+      message: `لا توجد فئة بهذا المعرف: ${id}`
+    });
   }
 
-  res.status(200).json({ data: category });
+  res.status(200).json({
+    success: true,
+    message: 'تم تحديث الفئة بنجاح',
+    data: category
+  });
 });
-
-// exports.updateCategory = asyncHandler(async (req, res) => {
-//   const { id } = req.params;
-//   const { name, image } = req.body;
-
-//   // التحقق من أن `name` موجود وصالح
-//   if (!name || typeof name !== 'string' || name.trim() === '') {
-//     return res.status(400).json({ msg: 'Category name is required and must be a valid string.' });
-//   }
-
-//   const category = await Category.findOneAndUpdate(
-//     { _id: id },
-//     { 
-//       name, 
-//       slug: slugify(name, { lower: true }), // تأكد أن الاسم يستخدم في slugify بعد التحقق
-//       image // تحديث الصورة أيضًا
-//     },
-//     { new: true }
-//   );
-
-//   if (!category) {
-//     return res.status(404).json({ msg: `No category for this id ${id}` });
-//   }
-
-//   res.status(200).json({ data: category });
-// });
 
 
 exports.deleteCategory = asyncHandler(async (req, res) => {
     const { id } = req.params;
-    const category = await Category.findByIdAndDelete(id);
-  
+    const category = await Category.findOneAndUpdate(
+      { _id: id, isDeleted: false },
+      { isDeleted: true },
+      { new: true }
+    );
+
     if (!category) {
-      res.status(404).json({ msg: `No category for this id ${id}` });
+      res.status(404).json({
+        success: false,
+        message: `لا توجد فئة بهذا المعرف ${id}`
+      });
     }
-    res.status(200).json({msg: "Category deleted successfully", data: category,});
-  });   
+    res.status(200).json({
+      success: true,
+      message: "تم حذف الفئة بنجاح",
+      data: category
+    });
+  });

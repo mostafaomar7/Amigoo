@@ -1,6 +1,7 @@
-const User = require('../models/User');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const asyncHandler = require('express-async-handler');
+const User = require('../models/User');
 
 exports.registerUser = async (req, res) => {
     try {
@@ -61,7 +62,7 @@ exports.loginUser = async (req, res) => {
         if (!isPasswordValid) {
             console.log(password,user.password);
             return res.status(401).json({ message: 'كلمة المرور غير صحيحة' });
-        } 
+        }
 
 
          // إنشاء JWT
@@ -73,3 +74,74 @@ exports.loginUser = async (req, res) => {
         res.status(500).json({ message: 'خطأ في الخادم', error });
     }
 };
+
+// Get all users (admin only) with pagination
+exports.getAllUsers = asyncHandler(async (req, res) => {
+    const { page: pageQuery, limit: limitQuery, sort: sortQuery, keyword: keywordQuery, role } = req.query;
+    const page = pageQuery * 1 || 1;
+    const limit = limitQuery * 1 || 10;
+    const skip = (page - 1) * limit;
+    const sort = sortQuery || 'createdAt';
+    const keyword = keywordQuery || '';
+
+    // Build search query
+    const searchQuery = keyword
+        ? {
+            $or: [
+                { name: { $regex: keyword, $options: 'i' } },
+                { email: { $regex: keyword, $options: 'i' } },
+            ],
+        }
+        : {};
+
+    // Build filter
+    const filter = Object.assign({}, searchQuery);
+    if (role) {
+        filter.role = role;
+    }
+
+    // Get total count for pagination
+    const totalItems = await User.countDocuments(filter);
+    const totalPages = Math.ceil(totalItems / limit);
+
+    // Get users
+    const users = await User.find(filter)
+        .select('-password') // Exclude password from response
+        .skip(skip)
+        .limit(limit)
+        .sort(sort);
+
+    res.status(200).json({
+        success: true,
+        message: 'Users retrieved successfully',
+        data: users,
+        pagination: {
+            currentPage: page,
+            itemsPerPage: limit,
+            totalItems: totalItems,
+            totalPages: totalPages,
+            hasNextPage: page < totalPages,
+            hasPrevPage: page > 1,
+        },
+    });
+});
+
+// Get user by ID (admin only)
+exports.getUserById = asyncHandler(async (req, res) => {
+    const { id } = req.params;
+
+    const user = await User.findById(id).select('-password');
+
+    if (!user) {
+        return res.status(404).json({
+            success: false,
+            message: 'User not found',
+        });
+    }
+
+    res.status(200).json({
+        success: true,
+        message: 'User retrieved successfully',
+        data: user,
+    });
+});

@@ -1,0 +1,237 @@
+<!-- Settings Management Page -->
+<div class="container-fluid py-4">
+  <!-- Header -->
+  <div class="mb-4">
+    <h1 class="h2 mb-1 text-white">Settings Management</h1>
+    <p class="text-white mb-0">Manage your site settings and configuration</p>
+  </div>
+
+  <!-- Settings Form Card -->
+  <div class="card">
+    <div class="card-body">
+      <!-- Loading State -->
+      <div *ngIf="isLoading" class="text-center py-5">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+        <p class="text-muted mt-3">Loading settings...</p>
+      </div>
+
+      <!-- Settings Form -->
+      <form
+        *ngIf="!isLoading"
+        [formGroup]="settingsForm"
+        (ngSubmit)="saveSettings()"
+        class="settings-form"
+      >
+        <div class="row">
+          <!-- Site Information Section -->
+          <div class="col-12 mb-4">
+            <h4 class="text-dark mb-3">
+              <i class="fas fa-globe me-2"></i>Site Information
+            </h4>
+          </div>
+
+          <!-- Site Name -->
+          <div class="col-md-6 mb-3">
+            <label for="site_name" class="form-label">
+              Site Name <span class="text-danger">*</span>
+            </label>
+            <input
+              type="text"
+              id="site_name"
+              class="form-control"
+              [class.is-invalid]="hasFieldError('site_name')"
+              formControlName="site_name"
+              placeholder="Enter site name"
+            />
+            <div *ngIf="hasFieldError('site_name')" class="invalid-feedback">
+              {{ getFieldError("site_name") }}
+            </div>
+          </div>
+
+          <!-- Contact Email -->
+          <div class="col-md-6 mb-3">
+            <label for="contact_email" class="form-label">
+              Contact Email <span class="text-danger">*</span>
+            </label>
+            <input
+              type="email"
+              id="contact_email"
+              class="form-control"
+              [class.is-invalid]="hasFieldError('contact_email')"
+              formControlName="contact_email"
+              placeholder="Enter contact email"
+            />
+            <div *ngIf="hasFieldError('contact_email')" class="invalid-feedback">
+              {{ getFieldError("contact_email") }}
+            </div>
+          </div>
+
+          <!-- Contact Phone -->
+          <div class="col-md-6 mb-3">
+            <label for="contact_phone" class="form-label">
+              Contact Phone <span class="text-danger">*</span>
+            </label>
+            <input
+              type="text"
+              id="contact_phone"
+              class="form-control"
+              [class.is-invalid]="hasFieldError('contact_phone')"
+              formControlName="contact_phone"
+              placeholder="Enter contact phone"
+            />
+            <div *ngIf="hasFieldError('contact_phone')" class="invalid-feedback">
+              {{ getFieldError("contact_phone") }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Shipping Section -->
+        <div class="row mt-4">
+          <div class="col-12 mb-4">
+            <h4 class="text-dark mb-3">
+              <i class="fas fa-shipping-fast me-2"></i>Shipping Configuration
+            </h4>
+          </div>
+
+          <!-- Shipping Cost -->
+          <div class="col-md-6 mb-3">
+            <label for="shipping_cost" class="form-label">
+              Shipping Cost <span class="text-danger">*</span>
+            </label>
+            <input
+              type="number"
+              id="shipping_cost"
+              class="form-control"
+              [class.is-invalid]="hasFieldError('shipping_cost')"
+              formControlName="shipping_cost"
+              placeholder="0.00"
+              min="0"
+              step="0.01"
+            />
+            <div *ngIf="hasFieldError('shipping_cost')" class="invalid-feedback">
+              {{ getFieldError("shipping_cost") }}
+            </div>
+          </div>
+
+          <!-- Shipping -->
+          <div class="col-md-6 mb-3">
+            <label for="shipping" class="form-label">
+              Shipping <span class="text-danger">*</span>
+            </label>
+            <input
+              type="number"
+              id="shipping"
+              class="form-control"
+              [class.is-invalid]="hasFieldError('shipping')"
+              formControlName="shipping"
+              placeholder="0.00"
+              min="0"
+              step="0.01"
+            />
+            <div *ngIf="hasFieldError('shipping')" class="invalid-feedback">
+              {{ getFieldError("shipping") }}
+            </div>
+          </div>
+        </div>
+
+        <!-- Social Media Section -->
+        <div class="row mt-4">
+          <div class="col-12 mb-4">
+            <h4 class="text-dark mb-3">
+              <i class="fas fa-share-alt me-2"></i>Social Media Links
+            </h4>
+          </div>
+
+          <!-- Facebook -->
+          <div class="col-md-6 mb-3">
+            <label for="facebook" class="form-label">
+              <i class="fab fa-facebook-f me-2"></i>Facebook
+            </label>
+            <input
+              type="url"
+              id="facebook"
+              class="form-control"
+              formControlName="facebook"
+              placeholder="https://facebook.com/yourpage"
+            />
+          </div>
+
+          <!-- Instagram -->
+          <div class="col-md-6 mb-3">
+            <label for="instgram" class="form-label">
+              <i class="fab fa-instagram me-2"></i>Instagram
+            </label>
+            <input
+              type="url"
+              id="instgram"
+              class="form-control"
+              formControlName="instgram"
+              placeholder="https://instagram.com/yourpage"
+            />
+          </div>
+
+          <!-- Messenger -->
+          <div class="col-md-6 mb-3">
+            <label for="messanger" class="form-label">
+              <i class="fab fa-facebook-messenger me-2"></i>Messenger
+            </label>
+            <input
+              type="url"
+              id="messanger"
+              class="form-control"
+              formControlName="messanger"
+              placeholder="https://m.me/yourpage"
+            />
+          </div>
+
+          <!-- WhatsApp -->
+          <div class="col-md-6 mb-3">
+            <label for="whatsapp" class="form-label">
+              <i class="fab fa-whatsapp me-2"></i>WhatsApp
+            </label>
+            <input
+              type="text"
+              id="whatsapp"
+              class="form-control"
+              formControlName="whatsapp"
+              placeholder="Enter WhatsApp number or link"
+            />
+          </div>
+        </div>
+
+        <!-- Form Actions -->
+        <div class="row mt-4">
+          <div class="col-12">
+            <div class="d-flex flex-column flex-md-row gap-2 justify-content-end">
+              <button
+                type="button"
+                class="btn btn-secondary"
+                (click)="resetSettings()"
+                [disabled]="isResetting || isSaving"
+              >
+                <i class="fas fa-undo me-2" *ngIf="!isResetting"></i>
+                <span *ngIf="isResetting" class="spinner-border spinner-border-sm me-2" role="status">
+                  <span class="visually-hidden">Loading...</span>
+                </span>
+                {{ isResetting ? 'Resetting...' : 'Reset to Default' }}
+              </button>
+              <button
+                type="submit"
+                class="btn btn-primary"
+                [disabled]="!settingsForm.valid || isSaving || isResetting"
+              >
+                <i class="fas fa-save me-2" *ngIf="!isSaving"></i>
+                <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-2" role="status">
+                  <span class="visually-hidden">Loading...</span>
+                </span>
+                {{ isSaving ? 'Saving...' : 'Save Settings' }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>

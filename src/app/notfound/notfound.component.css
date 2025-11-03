@@ -1,0 +1,128 @@
+.notfound-wrapper {
+  min-height: 100vh;
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  background: #191919;
+}
+
+/* Content Container */
+.notfound-container {
+  position: absolute;
+  top: 45%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 0;
+  background-size: contain;
+  background-position: center;
+  background-repeat: no-repeat;
+  height: 80vh;
+  width: 100%;
+  max-width: 800px;
+  max-height: 600px;
+}
+
+/* Error Actions */
+.error-actions {
+  position: absolute;
+  bottom: 15%;
+  transform: translateX(-50%);
+  z-index: 1;
+  display: flex;
+  gap: var(--spacing-4);
+  justify-content: center;
+  flex-wrap: wrap;
+  animation: fadeInUp 0.8s ease-out 0.4s both;
+  width: 100%;
+  padding: 0 var(--spacing-4);
+  box-sizing: border-box;
+  text-align: center;
+}
+
+.button-primary,
+.button-secondary {
+  padding: var(--spacing-4) var(--spacing-8);
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+  text-transform: uppercase;
+  letter-spacing: var(--letter-spacing-wider);
+  border: 1px solid;
+  cursor: pointer;
+  transition: var(--transition-base);
+  text-decoration: none;
+  display: inline-block;
+  outline: none;
+  font-family: inherit;
+}
+
+.button-primary {
+  background-color: var(--color-black);
+  color: var(--color-white);
+  border-color: var(--color-black);
+}
+
+.button-primary:hover {
+  background-color: var(--color-gray-900);
+  border-color: var(--color-gray-900);
+}
+
+.button-secondary {
+  background-color: transparent;
+  color: var(--color-text-primary);
+  border-color: var(--color-border-medium);
+}
+
+.button-secondary:hover {
+  background-color: var(--color-bg-secondary);
+  border-color: var(--color-black);
+}
+
+/* Responsive Design */
+@media (max-width: 1024px) {
+  .notfound-container {
+    height: 60vh;
+    width: 85%;
+    max-height: 500px;
+  }
+}
+
+@media (max-width: 768px) {
+  .notfound-container {
+    height: 55vh;
+    width: 90%;
+    max-height: 400px;
+    top: 30%;
+  }
+
+  .error-actions {
+    gap: var(--spacing-3);
+    padding: 0 var(--spacing-3);
+  }
+
+  .button-primary,
+  .button-secondary {
+    width: 45%;
+    max-width: 300px;
+  }
+}
+
+@media (max-width: 480px) {
+  .notfound-container {
+    height: 50vh;
+    width: 95%;
+    top: 30%;
+    max-height: 350px;
+  }
+
+  .error-actions {
+    padding: 0 var(--spacing-2);
+  }
+
+  .button-primary,
+  .button-secondary {
+    max-width: 49%;
+  }
+}
