@@ -79,11 +79,13 @@
               class="form-control"
               [class.is-invalid]="hasFieldError('contact_phone')"
               formControlName="contact_phone"
-              placeholder="Enter contact phone"
+              placeholder="Enter 11-digit phone number"
+              maxlength="11"
             />
             <div *ngIf="hasFieldError('contact_phone')" class="invalid-feedback">
               {{ getFieldError("contact_phone") }}
             </div>
+            <small class="form-text text-muted">Phone number must be exactly 11 digits</small>
           </div>
         </div>
 
@@ -115,24 +117,25 @@
             </div>
           </div>
 
-          <!-- Shipping -->
+          <!-- Free Shipping Threshold -->
           <div class="col-md-6 mb-3">
-            <label for="shipping" class="form-label">
-              Shipping <span class="text-danger">*</span>
+            <label for="free_shipping_threshold" class="form-label">
+              Free Shipping Threshold <span class="text-danger">*</span>
             </label>
             <input
               type="number"
-              id="shipping"
+              id="free_shipping_threshold"
               class="form-control"
-              [class.is-invalid]="hasFieldError('shipping')"
-              formControlName="shipping"
+              [class.is-invalid]="hasFieldError('free_shipping_threshold')"
+              formControlName="free_shipping_threshold"
               placeholder="0.00"
               min="0"
               step="0.01"
             />
-            <div *ngIf="hasFieldError('shipping')" class="invalid-feedback">
-              {{ getFieldError("shipping") }}
+            <div *ngIf="hasFieldError('free_shipping_threshold')" class="invalid-feedback">
+              {{ getFieldError("free_shipping_threshold") }}
             </div>
+            <small class="form-text text-muted">Amount above which shipping is free</small>
           </div>
         </div>
 
@@ -158,36 +161,36 @@
             />
           </div>
 
-          <!-- Instagram -->
+          Instagram
           <div class="col-md-6 mb-3">
-            <label for="instgram" class="form-label">
+            <label for="instagram" class="form-label">
               <i class="fab fa-instagram me-2"></i>Instagram
             </label>
             <input
               type="url"
-              id="instgram"
+              id="instagram"
               class="form-control"
-              formControlName="instgram"
+              formControlName="instagram"
               placeholder="https://instagram.com/yourpage"
             />
           </div>
 
           <!-- Messenger -->
-          <div class="col-md-6 mb-3">
-            <label for="messanger" class="form-label">
+          <!-- <div class="col-md-6 mb-3">
+            <label for="messenger" class="form-label">
               <i class="fab fa-facebook-messenger me-2"></i>Messenger
             </label>
             <input
               type="url"
-              id="messanger"
+              id="messenger"
               class="form-control"
-              formControlName="messanger"
+              formControlName="messenger"
               placeholder="https://m.me/yourpage"
             />
-          </div>
+          </div> -->
 
           <!-- WhatsApp -->
-          <div class="col-md-6 mb-3">
+          <!-- <div class="col-md-6 mb-3">
             <label for="whatsapp" class="form-label">
               <i class="fab fa-whatsapp me-2"></i>WhatsApp
             </label>
@@ -198,7 +201,7 @@
               formControlName="whatsapp"
               placeholder="Enter WhatsApp number or link"
             />
-          </div>
+          </div> -->
         </div>
 
         <!-- Form Actions -->

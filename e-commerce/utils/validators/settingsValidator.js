@@ -28,8 +28,8 @@ const createSettingsValidator = [
     .normalizeEmail(),
 
   body('contact_phone')
-    .matches(/^\d{10,15}$/)
-    .withMessage('Phone number must be between 10 and 15 digits'),
+    .matches(/^\d{11}$/)
+    .withMessage('Phone number must be exactly 11 digits'),
 
   body('site_logo')
     .optional()
@@ -82,6 +82,16 @@ const createSettingsValidator = [
     .optional()
     .isURL()
     .withMessage('LinkedIn URL must be valid'),
+
+  body('social_media.messenger')
+    .optional()
+    .isURL()
+    .withMessage('Messenger URL must be valid'),
+
+  body('social_media.whatsapp')
+    .optional()
+    .isString()
+    .withMessage('WhatsApp must be a valid string'),
 
   handleValidationErrors,
 ];
@@ -155,6 +165,16 @@ const updateSettingsValidator = [
     .optional()
     .isURL()
     .withMessage('LinkedIn URL must be valid'),
+
+  body('social_media.messenger')
+    .optional()
+    .isURL()
+    .withMessage('Messenger URL must be valid'),
+
+  body('social_media.whatsapp')
+    .optional()
+    .isString()
+    .withMessage('WhatsApp must be a valid string'),
 
   handleValidationErrors,
 ];

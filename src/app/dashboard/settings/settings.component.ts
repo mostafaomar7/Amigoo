@@ -10,11 +10,15 @@ export interface Settings {
   contact_email: string;
   contact_phone: string;
   shipping_cost: number;
-  shipping: number;
-  facebook?: string;
-  instgram?: string;
-  messanger?: string;
-  whatsapp?: string;
+  free_shipping_threshold: number;
+  social_media?: {
+    facebook?: string;
+    instagram?: string;
+    messenger?: string;
+    whatsapp?: string;
+    twitter?: string;
+    linkedin?: string;
+  };
 }
 
 @Component({
@@ -39,12 +43,12 @@ export class SettingsComponent implements OnInit {
     this.settingsForm = this.fb.group({
       site_name: ['', Validators.required],
       contact_email: ['', [Validators.required, Validators.email]],
-      contact_phone: ['', Validators.required],
+      contact_phone: ['', [Validators.required, Validators.pattern(/^\d{11}$/)]],
       shipping_cost: [0, [Validators.required, Validators.min(0)]],
-      shipping: [0, [Validators.required, Validators.min(0)]],
+      free_shipping_threshold: [0, [Validators.required, Validators.min(0)]],
       facebook: [''],
-      instgram: [''],
-      messanger: [''],
+      instagram: [''],
+      messenger: [''],
       whatsapp: ['']
     });
   }
@@ -81,11 +85,11 @@ export class SettingsComponent implements OnInit {
       contact_email: settings.contact_email || '',
       contact_phone: settings.contact_phone || '',
       shipping_cost: settings.shipping_cost || 0,
-      shipping: settings.shipping || 0,
-      facebook: settings.facebook || '',
-      instgram: settings.instgram || '',
-      messanger: settings.messanger || '',
-      whatsapp: settings.whatsapp || ''
+      free_shipping_threshold: settings.free_shipping_threshold || 0,
+      facebook: settings.social_media?.facebook || '',
+      instagram: settings.social_media?.instagram || '',
+      messenger: settings.social_media?.messenger || '',
+      whatsapp: settings.social_media?.whatsapp || ''
     });
   }
 
@@ -93,17 +97,26 @@ export class SettingsComponent implements OnInit {
     if (this.settingsForm.valid) {
       this.isSaving = true;
       const formValue = this.settingsForm.value;
-      const settingsData: Settings = {
+
+      // Build social media object only if at least one field has a value
+      const socialMedia: any = {};
+      if (formValue.facebook) socialMedia.facebook = formValue.facebook;
+      if (formValue.instagram) socialMedia.instagram = formValue.instagram;
+      if (formValue.messenger) socialMedia.messenger = formValue.messenger;
+      if (formValue.whatsapp) socialMedia.whatsapp = formValue.whatsapp;
+
+      const settingsData: any = {
         site_name: formValue.site_name,
         contact_email: formValue.contact_email,
         contact_phone: formValue.contact_phone,
         shipping_cost: formValue.shipping_cost,
-        shipping: formValue.shipping,
-        facebook: formValue.facebook || undefined,
-        instgram: formValue.instgram || undefined,
-        messanger: formValue.messanger || undefined,
-        whatsapp: formValue.whatsapp || undefined
+        free_shipping_threshold: formValue.free_shipping_threshold
       };
+
+      // Only include social_media if it has at least one property
+      if (Object.keys(socialMedia).length > 0) {
+        settingsData.social_media = socialMedia;
+      }
 
       this.apiService.putCustom<Settings>('/settings', settingsData).subscribe({
         next: (response: any) => {
@@ -153,6 +166,9 @@ export class SettingsComponent implements OnInit {
       if (control.errors?.['email']) {
         return 'Please enter a valid email address';
       }
+      if (control.errors?.['pattern'] && fieldName === 'contact_phone') {
+        return 'Phone number must be exactly 11 digits';
+      }
       if (control.errors?.['min']) {
         return `${this.getFieldLabel(fieldName)} must be 0 or greater`;
       }
@@ -171,10 +187,10 @@ export class SettingsComponent implements OnInit {
       contact_email: 'Contact Email',
       contact_phone: 'Contact Phone',
       shipping_cost: 'Shipping Cost',
-      shipping: 'Shipping',
+      free_shipping_threshold: 'Free Shipping Threshold',
       facebook: 'Facebook',
-      instgram: 'Instagram',
-      messanger: 'Messenger',
+      instagram: 'Instagram',
+      messenger: 'Messenger',
       whatsapp: 'WhatsApp'
     };
     return labels[fieldName] || fieldName;

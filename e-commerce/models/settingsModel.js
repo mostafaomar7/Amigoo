@@ -20,7 +20,7 @@ const settingsSchema = new mongoose.Schema(
     contact_phone: {
       type: String,
       required: [true, 'Contact phone is required'],
-      match: [/^\d{10,15}$/, 'Phone number must be valid'],
+      match: [/^\d{11}$/, 'Phone number must be exactly 11 digits'],
     },
     site_description: {
       type: String,
@@ -50,6 +50,8 @@ const settingsSchema = new mongoose.Schema(
       twitter: { type: String, trim: true },
       instagram: { type: String, trim: true },
       linkedin: { type: String, trim: true },
+      messenger: { type: String, trim: true },
+      whatsapp: { type: String, trim: true },
     },
     isActive: {
       type: Boolean,
