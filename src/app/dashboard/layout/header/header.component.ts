@@ -72,7 +72,7 @@ export class DashboardHeaderComponent implements OnInit, OnDestroy {
   }
 
   getTotalNotifications(): number {
-    return this.pendingOrders + this.unreadMessages;
+    return this.pendingOrders;
   }
 
   @HostListener('document:click', ['$event'])

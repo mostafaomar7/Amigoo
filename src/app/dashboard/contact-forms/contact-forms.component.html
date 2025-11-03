@@ -212,17 +212,7 @@
               <strong>Date:</strong>
               <p class="mb-0 text-muted">
                 <span *ngIf="selectedForm.createdAt">{{ selectedForm.createdAt | date : "dd-MM-yyyy h:mm a" }}</span>
-                <span *ngIf="!selectedForm.createdAt">N/A</span>
               </p>
-            </div>
-            <div class="col-12">
-              <strong>Status:</strong>
-              <span
-                class="badge ms-2"
-                [ngClass]="selectedForm.isReplied ? 'bg-success' : 'bg-warning'"
-              >
-                {{ selectedForm.isReplied ? 'Replied' : 'Pending Reply' }}
-              </span>
             </div>
           </div>
         </div>

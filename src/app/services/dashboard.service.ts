@@ -175,13 +175,17 @@ export class DashboardService {
   }> {
     return this.http.get<any>(`${this.apiUrl}/Order/stats`, { headers: this.getHeaders() })
       .pipe(
-        map(response => ({
-          totalOrders: response.totalOrders || 0,
-          pendingOrders: response.pendingOrders || 0,
-          completedOrders: response.completedOrders || 0,
-          cancelledOrders: response.cancelledOrders || 0,
-          totalRevenue: response.totalRevenue || 0
-        })),
+        map(response => {
+          // API returns data in response.data object
+          const stats = response.data || response;
+          return {
+            totalOrders: stats.totalOrders || 0,
+            pendingOrders: stats.pendingOrders || 0,
+            completedOrders: stats.completedOrders || stats.deliveredOrders || 0,
+            cancelledOrders: stats.cancelledOrders || 0,
+            totalRevenue: stats.totalRevenue || 0
+          };
+        }),
         shareReplay({ bufferSize: 1, refCount: true })
       );
   }
