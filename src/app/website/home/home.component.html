@@ -1,0 +1,257 @@
+<!-- Hero Section -->
+<section class="hero-section min-vh-75">
+  <div class="hero-background">
+    <div class="hero-pattern"></div>
+  </div>
+  <div class="container">
+    <div class="row align-items-center">
+      <div class="col-lg-6 hero-image fade-in delay-1">
+        <div class="hero-image-wrapper">
+          <div class="hero-image-glow"></div>
+          <img
+            src="assets/img/banner.png"
+            alt="Amigo Store"
+            class="img-fluid hero-main-image"
+            loading="eager"
+            onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 400 300%22%3E%3Crect fill=%22%23f0f0f0%22 width=%22400%22 height=%22300%22/%3E%3Ctext fill=%22%23999%22 font-family=%22sans-serif%22 font-size=%2220%22 dy=%2210.5%22 font-weight=%22bold%22 x=%2250%25%22 y=%2250%25%22 text-anchor=%22middle%22%3EAmigo Store%3C/text%3E%3C/svg%3E'">
+          <div class="hero-floating-card hero-card-1">
+            <div class="floating-icon">🏆</div>
+            <div class="floating-text">جودة ممتازة</div>
+          </div>
+          <div class="hero-floating-card hero-card-2">
+            <div class="floating-icon">🚚</div>
+            <div class="floating-text">توصيل سريع</div>
+          </div>
+        </div>
+      </div>
+      <div class="col-lg-6 hero-content fade-in-up">
+        <div class="hero-badge fade-in delay-1">
+          <span class="badge-icon">✨</span>
+          <span>ملابس عالية الجودة</span>
+        </div>
+        <h1 class="hero-title">
+          <span class="hero-title-highlight">مرحباً بك في</span>
+          <span style="color:#000000 !important;">متجر أميجو</span>
+        </h1>
+        <p class="hero-subtitle">
+          اكتشف الملابس المميزة والمنتجات العالية الجودة. تسوق أحدث الصيحات واستمتع بالعروض الحصرية في مجموعتنا المختارة.
+        </p>
+        <div class="hero-cta fade-in delay-2">
+          <button class="btn btn-primary btn-hero-primary" (click)="navigateToProducts()">
+            <span>تسوق الآن</span>
+            <i class="fas fa-arrow-left ms-2"></i>
+          </button>
+        </div>
+        <div class="hero-stats fade-in delay-3">
+          <div class="stat-item">
+            <div class="stat-number">1000+</div>
+            <div class="stat-label">عميل سعيد</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-number">500+</div>
+            <div class="stat-label">منتج</div>
+          </div>
+          <div class="stat-item">
+            <div class="stat-number">24/7</div>
+            <div class="stat-label">دعم فني</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="hero-scroll-indicator">
+    <div class="scroll-mouse">
+      <div class="scroll-wheel"></div>
+    </div>
+  </div>
+</section>
+
+<!-- Categories Section -->
+<section class="categories-section">
+  <div class="container">
+    <h2 class="section-title fade-in-up">... قسمنالك منتجاتنا</h2>
+
+    <!-- Loading State -->
+    <div *ngIf="loadingCategories" class="categories-slider-wrapper">
+      <div class="categories-slider">
+        <div class="category-slide" *ngFor="let i of getSkeletonItems()">
+          <div class="skeleton-card">
+            <div class="skeleton-image"></div>
+            <div class="skeleton-text"></div>
+            <div class="skeleton-text short"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Categories Slider -->
+    <div *ngIf="!loadingCategories && categories.length > 0" class="categories-slider-container">
+      <button
+        class="slider-nav-btn slider-nav-prev"
+        (click)="scrollCategories('prev')"
+        [class.disabled]="!canScrollPrev"
+        aria-label="Previous categories">
+        <i class="fas fa-chevron-left"></i>
+      </button>
+
+      <div class="categories-slider-wrapper" #categoriesSlider>
+        <div class="categories-slider">
+          <div
+            class="category-slide"
+            *ngFor="let category of categories; trackBy: trackByCategoryId"
+            (click)="navigateToCategory(category._id || '')">
+            <div class="category-card">
+              <div class="category-image-wrapper">
+                <img
+                  *ngIf="!hasImageError('category-' + category._id)"
+                  [src]="getCategoryImageUrl(category)"
+                  [alt]="category.name"
+                  class="category-image"
+                  (error)="onImageError('category-' + category._id)"
+                  loading="lazy">
+                <div *ngIf="hasImageError('category-' + category._id) || !category.image"
+                     class="category-image d-flex align-items-center justify-content-center bg-light">
+                  <div class="text-center p-4">
+                    <i class="fas fa-image fa-3x text-muted mb-3"></i>
+                    <p class="text-muted mb-0">No image available</p>
+                  </div>
+                </div>
+                <div class="category-overlay">
+                  <h3 class="category-name">{{ category.name }}</h3>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <button
+        class="slider-nav-btn slider-nav-next"
+        (click)="scrollCategories('next')"
+        [class.disabled]="!canScrollNext"
+        aria-label="Next categories">
+        <i class="fas fa-chevron-right"></i>
+      </button>
+
+      <!-- Slider Dots Indicator -->
+      <div class="slider-dots" *ngIf="categories.length > 4">
+        <span
+          *ngFor="let dot of getSliderDots(); let i = index"
+          class="slider-dot"
+          [class.active]="i === currentSlideIndex"
+          (click)="goToSlide(i)"
+          [attr.aria-label]="'Go to slide ' + (i + 1)">
+        </span>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!loadingCategories && categories.length === 0" class="text-center py-5">
+      <p class="text-muted">No categories available at the moment.</p>
+    </div>
+  </div>
+</section>
+
+<!-- Featured Products Section -->
+<section class="featured-products-section bg-light">
+  <div class="container">
+    <div class="section-header">
+      <h2 class="section-title fade-in-up" style="text-align: center;">المنتجات المميزة</h2>
+      <button class="btn btn-view-all" (click)="navigateToProducts()">
+        عرض الكل
+        <i class="fas fa-arrow-left ms-2"></i>
+      </button>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="loadingProducts" class="row g-4">
+      <div class="col-6 col-md-4 col-lg-3" *ngFor="let i of [1,2,3,4,5,6,7,8]">
+        <div class="skeleton-card">
+          <div class="skeleton-image"></div>
+          <div class="skeleton-text"></div>
+          <div class="skeleton-text"></div>
+          <div class="skeleton-text short"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Products Grid -->
+    <div *ngIf="!loadingProducts" class="row g-4">
+      <div class="col-6 col-md-4 col-lg-3" *ngFor="let product of getDisplayedProducts(); trackBy: trackByProductId">
+        <div class="product-card" (click)="navigateToProduct(product._id)">
+          <div class="product-image-wrapper">
+            <img
+              *ngIf="!hasImageError('product-' + product._id)"
+              [src]="getProductImageUrl(product)"
+              [alt]="product.title"
+              class="product-image"
+              (error)="onImageError('product-' + product._id)"
+              loading="lazy">
+            <div *ngIf="hasImageError('product-' + product._id) || !product.imageCover"
+                 class="product-image d-flex align-items-center justify-content-center bg-light">
+              <div class="text-center p-4">
+                <i class="fas fa-image fa-3x text-muted mb-3"></i>
+                <p class="text-muted small mb-0">لا توجد صورة</p>
+              </div>
+            </div>
+
+            <!-- Discount Badge -->
+            <span *ngIf="product.priceAfterDiscount" class="badge-sale" style="color: var(--text-dark) !important;">
+              -{{ getDiscountPercentage(product) }}%
+            </span>
+
+            <!-- Hover Overlay with Actions -->
+            <div class="product-overlay">
+              <div class="d-flex gap-2">
+                <button
+                  class="btn btn-light"
+                  [class.active]="isFavorite(product._id)"
+                  (click)="toggleFavorite(product, $event)"
+                  [attr.aria-label]="isFavorite(product._id) ? 'Remove from favorites' : 'Add to favorites'">
+                  <i class="fas"
+                     [ngClass]="{'fa-heart': isFavorite(product._id), 'far fa-heart': !isFavorite(product._id)}"
+                     [style.font-weight]="isFavorite(product._id) ? '900' : '400'"></i>
+                </button>
+                <button
+                  class="btn btn-light"
+                  (click)="addToCart(product, $event)"
+                  aria-label="Add to cart">
+                  <i class="fas fa-shopping-cart"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="product-info">
+            <h3 class="product-title" [title]="product.title">
+              {{ product.title }}
+            </h3>
+            <div class="product-price">
+              <span class="current-price">{{ getProductPrice(product) | currency:'EGP':'symbol':'1.0-0' }}</span>
+              <span *ngIf="getOriginalPrice(product)" class="original-price has-discount">
+                {{ getOriginalPrice(product) | currency:'EGP':'symbol':'1.0-0' }}
+              </span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Show More Button -->
+    <div *ngIf="!loadingProducts && hasMoreProducts()" class="text-center mt-5">
+      <button class="btn btn-show-more" (click)="showMoreProducts()">
+        <span>اعرض اكتر</span>
+        <i class="fas fa-arrow-left ms-2"></i>
+      </button>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!loadingProducts && featuredProducts.length === 0" class="text-center py-5">
+      <i class="fas fa-box-open fa-4x text-muted mb-3"></i>
+      <p class="text-muted mb-3">لا توجد منتجات متاحة في الوقت الحالي</p>
+      <button class="btn btn-primary" (click)="navigateToProducts()">
+        <span style="color: var(--text-dark) !important;">تصفح جميع المنتجات</span>
+      </button>
+    </div>
+  </div>
+</section>

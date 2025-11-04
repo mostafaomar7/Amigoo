@@ -2,6 +2,8 @@ const slugify = require('slugify')
 const asyncHandler = require('express-async-handler')
 const { v4: uuidv4 } = require('uuid');
 const sharp = require('sharp');
+const path = require('path');
+const fs = require('fs');
 const { uploadMixOfImages } = require('../middlewares/uploadImageMiddleware');
 const product = require('../models/productModel');
 const Size = require('../models/sizeModel');
@@ -19,13 +21,21 @@ exports.uploadProductImages = uploadMixOfImages([
 ]);
 
 exports.resizeProductImages = asyncHandler(async (req, res, next) => {
+  const productsDir = path.join(__dirname, '..', 'uploads', 'products');
+
+  // Ensure the products directory exists
+  if (!fs.existsSync(productsDir)) {
+    fs.mkdirSync(productsDir, { recursive: true });
+  }
+
   if (req.files.imageCover) {
     const imageCoverFileName = `product-${uuidv4()}-${Date.now()}-cover.webp`;
+    const imageCoverPath = path.join(productsDir, imageCoverFileName);
 
     await sharp(req.files.imageCover[0].buffer)
       .resize({ width: 2000, withoutEnlargement: true }) // تعديل للحفاظ على نسبة الأبعاد الأصلية
       .webp({ quality: 90 })
-      .toFile(`uploads/products/${imageCoverFileName}`);
+      .toFile(imageCoverPath);
 
     req.body.imageCover = imageCoverFileName;
   }
@@ -35,11 +45,12 @@ exports.resizeProductImages = asyncHandler(async (req, res, next) => {
     await Promise.all(
       req.files.images.map(async (img, index) => {
         const imageName = `product-${uuidv4()}-${Date.now()}-${index + 1}.webp`;
+        const imagePath = path.join(productsDir, imageName);
 
         await sharp(img.buffer)
           .resize({ width: 2000, withoutEnlargement: true }) // تعديل للحفاظ على نسبة الأبعاد الأصلية
           .webp({ quality: 90 })
-          .toFile(`uploads/products/${imageName}`);
+          .toFile(imagePath);
 
         req.body.images.push(imageName);
       })

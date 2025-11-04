@@ -1,139 +1,79 @@
 import { ApifunctionService } from '../../../services/apifunction.service';
-import { CartService , CartItem } from '../../../services/cart.service';
-import { Component, OnInit, OnDestroy , Input, Output , EventEmitter } from '@angular/core';
-import { Router, RouterModule } from "@angular/router";
+import { CartService, CartItem } from '../../../services/cart.service';
+import { Component, OnInit, OnDestroy, Input, Output, EventEmitter, ChangeDetectionStrategy, ChangeDetectorRef, ViewChild, ElementRef, AfterViewInit } from '@angular/core';
+import { Router, RouterModule, ActivatedRoute } from "@angular/router";
 import { OpencartService } from '../../../services/opencart.service';
-import {  ElementRef, ViewChild, AfterViewInit } from '@angular/core';
+import { EnvironmentService } from '../../../services/environment.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { BoyFriendComponent } from '../../boy-friend/boy-friend.component';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
 
 @Component({
   selector: 'app-navbar',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule, BoyFriendComponent],
+  imports: [CommonModule, RouterModule, FormsModule],
   templateUrl: './navbar.component.html',
-  styleUrls: ['./navbar.component.css']
+  styleUrls: ['./navbar.component.css'],
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
-export class NavbarComponent implements OnInit, OnDestroy {
-  @Input() nav:any = {};
+export class NavbarComponent implements OnInit, OnDestroy, AfterViewInit {
+  @Input() nav: any = {};
   @Output() itemnav = new EventEmitter();
-  // DOM element references
+  @Output() categorySelected = new EventEmitter<string>();
+  @ViewChild('categoriesContainer', { static: false }) categoriesContainer!: ElementRef<HTMLDivElement>;
 
-  navbar: HTMLElement | null = null;
-  searchForm: HTMLElement | null = null;
-  cartItem: HTMLElement | null = null;
-  starItem: HTMLElement | null = null;
+  // State
+  navbarActive = false;
+  searchActive = false;
+  cartActive = false;
+  favoritesActive = false;
+  canScrollLeft = false;
+  canScrollRight = false;
 
-  cartItems: CartItem[] = []; // Store the cart items
+  // Data
+  cartItems: CartItem[] = [];
   alldata: any[] = [];
   allcatgory: any[] = [];
-  allproduct: any[] = [];
-  constructor(private openser:OpencartService, private cartService: CartService , private serv : ApifunctionService , private router : Router) {}
+  cartproduct: any[] = [];
+  starproduct: any[] = [];
+  total: any = 0;
 
-  @Output() categorySelected = new EventEmitter<string>();
+  private destroy$ = new Subject<void>();
 
-  onCategoryChange(category: string) {
-    this.categorySelected.emit(category);
-    console.log(category);
-  }
-  cartproduct :any [] = [];
-  starproduct :any [] = [];
-  getstarproducts(){
-    if("star" in localStorage){
-    this.starproduct = JSON.parse(localStorage.getItem("star")!)
-  }
-  this.gettotalprice()
-  }
-  total:any = 0;
-  getcartproducts(){
-    if("cart" in localStorage){
-    this.cartproduct = JSON.parse(localStorage.getItem("cart")!)
-  }
-  this.gettotalprice()
-  }
-  gettotalprice(){
-    this.total = 0 ;
-    for (let x in this.cartproduct){
-      this.total += this.cartproduct[x].price *  this.cartproduct[x].quantity
+  constructor(
+    private openser: OpencartService,
+    private cartService: CartService,
+    private serv: ApifunctionService,
+    private router: Router,
+    private route: ActivatedRoute,
+    private cdr: ChangeDetectorRef,
+    private environmentService: EnvironmentService
+  ) {}
+
+  /**
+   * Get product image URL
+   */
+  getProductImageUrl(imageCover: string): string {
+    if (!imageCover) return '';
+    if (imageCover.startsWith('http://') || imageCover.startsWith('https://')) {
+      return imageCover;
     }
+    return `${this.environmentService.imageBaseUrl}uploads/products/${imageCover}`;
   }
-  increase(index){
-      this.cartproduct[index].quantity++;
-      localStorage.setItem("cart" , JSON.stringify(this.cartproduct));
-      this.gettotalprice();
-  }
-  decrease(index){
-    if(this.cartproduct[index].quantity>1){
-      this.cartproduct[index].quantity--;
-    localStorage.setItem("cart" , JSON.stringify(this.cartproduct))
-    this.gettotalprice();
-    }
-  }
-  detectedchange(){
-    localStorage.setItem("cart" , JSON.stringify(this.cartproduct))
-    this.gettotalprice();
-    localStorage.setItem("star" , JSON.stringify(this.starproduct))
-  }
-  delete(index){
-    this.cartproduct.splice(index , 1)
-    localStorage.setItem("cart" , JSON.stringify(this.cartproduct))
-    this.gettotalprice();
-    this.starproduct.splice(index , 1)
-    localStorage.setItem("star" , JSON.stringify(this.starproduct))
-  }
-  ClearAllProducts(){
-    this.cartproduct.splice(0,this.cartproduct.length);
-    localStorage.setItem("cart" , JSON.stringify(this.cartproduct))
-    this.gettotalprice();
-  }
-  getdata(){  //getallcategory
-    this.serv.getcatgory().subscribe((data:any)=>{
-      this.allcatgory = Object.values(data);  // تحويل الكائن إلى مصفوفة
-    }, error=>{
-      alert(error)
-    })
-  }
-  getproductcatgory(id:any){
-      this.serv.getproductybycatgory(id).subscribe((res:any)=>{
-      this.alldata=res;
-      this.alldata = Object.values(this.alldata)
-      console.log(this.alldata);
 
-    })
-  }
-  // filltercategory(event){
-  //     let value = event.target.value ;
-  //     this.getproductcatgory(value);
-  // }
-  goToParentPage() {
-    this.router.navigate(['/cargo']);  // الانتقال إلى صفحة الـ cargo
+  /**
+   * Handle image error
+   */
+  onImageError(item: any): void {
+    item.imageError = true;
+    this.cdr.markForCheck();
   }
 
   ngOnInit(): void {
-    this.cartItem = document.querySelector('.cart-items-container');
-   console.log('Navbar Element:', this.navbar);
-    // this.openser.cartToggle$.subscribe((toggle) => {
-    //   if (toggle && this.cartItem) {
-    //     this.cartItem.classList.add('active'); // فتح القائمة عند إضافة منتج
-    //   }
-    // });
     this.getdata();
     this.getcartproducts();
     this.getstarproducts();
-    console.log(this.alldata);
-
-    // Initialize the DOM elements
-    this.navbar = document.querySelector('.navbar');
-    this.searchForm = document.querySelector('.search-form');
-    this.cartItem = document.querySelector('.cart-items-container');
-    this.starItem = document.querySelector('.star-items-container');
-
-    // Add event listeners to buttons
-
-
-    // Handle window scroll
-    window.addEventListener('scroll', this.closeAllMenus.bind(this));
 
     // Listen for storage changes (cross-tab updates)
     window.addEventListener('storage', this.onStorageChange.bind(this));
@@ -142,19 +82,53 @@ export class NavbarComponent implements OnInit, OnDestroy {
     document.addEventListener('cartUpdated', this.updateCartAndFavoritesCount.bind(this));
     document.addEventListener('favoritesUpdated', this.updateCartAndFavoritesCount.bind(this));
 
+    // Listen for clicks outside mobile menu
+    document.addEventListener('click', this.handleDocumentClick.bind(this));
+
     this.cartService.getCartItems().subscribe((items) => {
       this.cartItems = items;
+      this.cdr.markForCheck();
     });
 
-    // Periodically update counts (as a fallback) - check every 2 seconds to reduce overhead
+    // Periodically update counts (as a fallback)
     setInterval(() => {
       this.updateCartAndFavoritesCount();
     }, 2000);
   }
 
+  ngAfterViewInit(): void {
+    // Check scroll position after view init
+    setTimeout(() => {
+      this.checkScrollPosition();
+      if (this.categoriesContainer) {
+        this.categoriesContainer.nativeElement.addEventListener('scroll', () => {
+          this.checkScrollPosition();
+        });
+        // Also check when window resizes
+        window.addEventListener('resize', () => {
+          this.checkScrollPosition();
+        });
+      }
+    }, 200);
+  }
+
+  ngOnDestroy(): void {
+    this.destroy$.next();
+    this.destroy$.complete();
+    window.removeEventListener('storage', this.onStorageChange.bind(this));
+    window.removeEventListener('resize', this.checkScrollPosition.bind(this));
+    document.removeEventListener('cartUpdated', this.updateCartAndFavoritesCount.bind(this));
+    document.removeEventListener('favoritesUpdated', this.updateCartAndFavoritesCount.bind(this));
+    document.removeEventListener('click', this.handleDocumentClick.bind(this));
+    if (this.categoriesContainer) {
+      this.categoriesContainer.nativeElement.removeEventListener('scroll', this.checkScrollPosition.bind(this));
+    }
+  }
+
   updateCartAndFavoritesCount(): void {
     this.getcartproducts();
     this.getstarproducts();
+    this.cdr.markForCheck();
   }
 
   onStorageChange(event: StorageEvent): void {
@@ -163,49 +137,235 @@ export class NavbarComponent implements OnInit, OnDestroy {
     }
   }
 
-  ngOnDestroy(): void {
-    // Clean up event listeners when the component is destroyed
-    window.removeEventListener('scroll', this.closeAllMenus.bind(this));
-    window.removeEventListener('storage', this.onStorageChange.bind(this));
-    document.removeEventListener('cartUpdated', this.updateCartAndFavoritesCount.bind(this));
-    document.removeEventListener('favoritesUpdated', this.updateCartAndFavoritesCount.bind(this));
-  }
-
-  toggleNavbar(): void {
-    if (this.navbar) {
-      this.navbar.classList.toggle('active');
+  getstarproducts(): void {
+    if ("star" in localStorage) {
+      this.starproduct = JSON.parse(localStorage.getItem("star")!);
     }
-    this.closeOtherMenus(this.searchForm, this.cartItem, this.starItem);
+    this.gettotalprice();
   }
 
-  toggleSearchForm(): void {
-    if (this.searchForm) {
-      this.searchForm.classList.toggle('active');
+  getcartproducts(): void {
+    if ("cart" in localStorage) {
+      this.cartproduct = JSON.parse(localStorage.getItem("cart")!);
+      // Initialize imageError for each item
+      this.cartproduct.forEach((item: any) => {
+        if (!item.hasOwnProperty('imageError')) {
+          item.imageError = false;
+        }
+      });
     }
-    this.closeOtherMenus(this.navbar, this.cartItem, this.starItem);
+    this.gettotalprice();
   }
 
-  toggleCartItem(): void {
-    if (this.cartItem) {
-      this.cartItem.classList.toggle('active');
+  gettotalprice(): void {
+    this.total = 0;
+    for (let x in this.cartproduct) {
+      this.total += this.cartproduct[x].price * this.cartproduct[x].quantity;
     }
-    this.closeOtherMenus(this.navbar, this.searchForm, this.starItem);
+    this.cdr.markForCheck();
   }
 
-  togglestarItem(): void {
-    if (this.starItem) {
-      this.starItem.classList.toggle('active');
+  increase(index: number): void {
+    this.cartproduct[index].quantity++;
+    localStorage.setItem("cart", JSON.stringify(this.cartproduct));
+    this.gettotalprice();
+  }
+
+  decrease(index: number): void {
+    if (this.cartproduct[index].quantity > 1) {
+      this.cartproduct[index].quantity--;
+      localStorage.setItem("cart", JSON.stringify(this.cartproduct));
+      this.gettotalprice();
     }
-    this.closeOtherMenus(this.navbar, this.searchForm,this.cartItem);
   }
 
-  closeOtherMenus(...elements: (HTMLElement | null)[]): void {
-    elements.forEach(el => {
-      if (el) el.classList.remove('active');
+  detectedchange(): void {
+    localStorage.setItem("cart", JSON.stringify(this.cartproduct));
+    this.gettotalprice();
+    localStorage.setItem("star", JSON.stringify(this.starproduct));
+  }
+
+  delete(index: number): void {
+    this.cartproduct.splice(index, 1);
+    localStorage.setItem("cart", JSON.stringify(this.cartproduct));
+    this.gettotalprice();
+    if (this.starproduct[index]) {
+      this.starproduct.splice(index, 1);
+      localStorage.setItem("star", JSON.stringify(this.starproduct));
+    }
+    this.cdr.markForCheck();
+  }
+
+  ClearAllProducts(): void {
+    this.cartproduct.splice(0, this.cartproduct.length);
+    localStorage.setItem("cart", JSON.stringify(this.cartproduct));
+    this.gettotalprice();
+  }
+
+  getdata(): void {
+    this.serv.getcatgory().subscribe((data: any) => {
+      // Handle different response structures
+      if (data && data.data && Array.isArray(data.data)) {
+        // Response has { data: [...] } structure
+        this.allcatgory = data.data;
+      } else if (Array.isArray(data)) {
+        // Response is directly an array
+        this.allcatgory = data;
+      } else if (typeof data === 'object') {
+        // Response is an object, try to extract array
+        this.allcatgory = Object.values(data);
+      } else {
+        this.allcatgory = [];
+      }
+      this.cdr.markForCheck();
+      // Check scroll position after categories load
+      setTimeout(() => {
+        this.checkScrollPosition();
+      }, 100);
+    }, error => {
+      console.error('Error loading categories:', error);
+      this.allcatgory = [];
+      this.cdr.markForCheck();
     });
   }
 
-  closeAllMenus(): void {
-    this.closeOtherMenus(this.navbar, this.searchForm, this.cartItem,this.starItem);
+  getproductcatgory(id: any): void {
+    this.serv.getproductybycatgory(id).subscribe((res: any) => {
+      this.alldata = res;
+      this.alldata = Object.values(this.alldata);
+    });
+  }
+
+  onCategoryChange(value: string): void {
+    if (value && value !== 'OurShop') {
+      this.categorySelected.emit(value);
+      this.router.navigate(['/product'], { queryParams: { category: value } });
+    } else {
+      this.router.navigate(['/product']);
+    }
+  }
+
+  navigateToCategory(categoryId: string): void {
+    this.router.navigate(['/product'], { queryParams: { category: categoryId } });
+    this.cdr.markForCheck();
+  }
+
+  isCategoryActive(categoryId: string): boolean {
+    return this.route.snapshot.queryParams['category'] === categoryId;
+  }
+
+  scrollCategories(direction: 'left' | 'right'): void {
+    // Use setTimeout to ensure DOM is ready
+    setTimeout(() => {
+      if (!this.categoriesContainer || !this.categoriesContainer.nativeElement) {
+        console.log('Categories container not found');
+        return;
+      }
+
+      const container = this.categoriesContainer.nativeElement;
+      const scrollAmount = 200;
+      const currentScroll = container.scrollLeft;
+
+      // Calculate new scroll position
+      let newScroll: number;
+      if (direction === 'left') {
+        newScroll = Math.max(0, currentScroll - scrollAmount);
+      } else {
+        const maxScroll = container.scrollWidth - container.clientWidth;
+        newScroll = Math.min(maxScroll, currentScroll + scrollAmount);
+      }
+
+      // Scroll the container
+      container.scrollTo({
+        left: newScroll,
+        behavior: 'smooth'
+      });
+
+      // Update scroll buttons after scroll animation
+      setTimeout(() => {
+        this.checkScrollPosition();
+      }, 350);
+
+      this.cdr.markForCheck();
+    }, 0);
+  }
+
+  checkScrollPosition(): void {
+    if (!this.categoriesContainer) return;
+
+    const container = this.categoriesContainer.nativeElement;
+    const scrollLeft = container.scrollLeft;
+    const scrollWidth = container.scrollWidth;
+    const clientWidth = container.clientWidth;
+    const maxScroll = scrollWidth - clientWidth;
+
+    // Check if we can scroll in either direction (with small threshold)
+    this.canScrollLeft = scrollLeft > 5;
+    this.canScrollRight = scrollLeft < (maxScroll - 5);
+
+    this.cdr.markForCheck();
+  }
+
+  trackByCategoryId(index: number, category: any): string {
+    return category._id || index.toString();
+  }
+
+  toggleNavbar(): void {
+    this.navbarActive = !this.navbarActive;
+    if (this.navbarActive) {
+      this.searchActive = false;
+      this.cartActive = false;
+      this.favoritesActive = false;
+    }
+    this.cdr.markForCheck();
+  }
+
+  closeNavbar(): void {
+    this.navbarActive = false;
+    this.cdr.markForCheck();
+  }
+
+  handleDocumentClick(event: MouseEvent): void {
+    if (!this.navbarActive) return;
+
+    const target = event.target as HTMLElement;
+    const menuBtn = document.getElementById('menu-btn');
+    const mobileMenu = document.querySelector('.mobile-menu');
+
+    // Close menu if click is outside menu and not on menu button
+    if (menuBtn && !menuBtn.contains(target) &&
+        mobileMenu && !mobileMenu.contains(target)) {
+      this.closeNavbar();
+    }
+  }
+
+  toggleSearchForm(): void {
+    this.searchActive = !this.searchActive;
+    if (this.searchActive) {
+      this.navbarActive = false;
+      this.cartActive = false;
+      this.favoritesActive = false;
+    }
+    this.cdr.markForCheck();
+  }
+
+  toggleCartItem(): void {
+    this.cartActive = !this.cartActive;
+    if (this.cartActive) {
+      this.navbarActive = false;
+      this.searchActive = false;
+      this.favoritesActive = false;
+    }
+    this.cdr.markForCheck();
+  }
+
+  togglestarItem(): void {
+    this.favoritesActive = !this.favoritesActive;
+    if (this.favoritesActive) {
+      this.navbarActive = false;
+      this.searchActive = false;
+      this.cartActive = false;
+    }
+    this.cdr.markForCheck();
   }
 }

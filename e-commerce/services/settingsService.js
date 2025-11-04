@@ -16,14 +16,39 @@ exports.getSettings = asyncHandler(async (req, res) => {
 exports.updateSettings = asyncHandler(async (req, res) => {
   let settings = await Settings.findOne({ isActive: true });
 
+  // Filter out unwanted fields from req.body
+  const allowedFields = ['contact_email', 'contact_phone', 'shipping_cost', 'address', 'social_media', 'isActive'];
+  const updateData = {};
+  Object.keys(req.body).forEach(key => {
+    if (allowedFields.includes(key)) {
+      updateData[key] = req.body[key];
+    }
+  });
+
+  // Fields to remove from existing documents
+  const fieldsToRemove = ['site_name', 'site_logo', 'site_description', 'currency', 'currency_symbol', 'free_shipping_threshold'];
+  const unsetData = {};
+  fieldsToRemove.forEach(field => {
+    unsetData[field] = '';
+  });
+
   if (!settings) {
     // Create new settings if none exist
-    settings = await Settings.create(req.body);
+    settings = await Settings.create(updateData);
   } else {
-    // Update existing settings
+    // First, remove old fields without validation
+    if (Object.keys(unsetData).length > 0) {
+      await Settings.findByIdAndUpdate(
+        settings._id,
+        { $unset: unsetData },
+        { runValidators: false }
+      );
+    }
+
+    // Then update with new data (validators will run)
     settings = await Settings.findByIdAndUpdate(
       settings._id,
-      req.body,
+      { $set: updateData },
       { new: true, runValidators: true }
     );
   }
@@ -40,7 +65,16 @@ exports.createSettings = asyncHandler(async (req, res) => {
   // Deactivate any existing settings
   await Settings.updateMany({}, { isActive: false });
 
-  const settings = await Settings.create(req.body);
+  // Filter out unwanted fields from req.body
+  const allowedFields = ['contact_email', 'contact_phone', 'shipping_cost', 'address', 'social_media', 'isActive'];
+  const createData = {};
+  Object.keys(req.body).forEach(key => {
+    if (allowedFields.includes(key)) {
+      createData[key] = req.body[key];
+    }
+  });
+
+  const settings = await Settings.create(createData);
 
   res.status(201).json({
     success: true,
@@ -76,7 +110,7 @@ exports.updateSettingByKey = asyncHandler(async (req, res) => {
   const { key } = req.params;
   const { value } = req.body;
 
-  let settings = await Settings.findOne({ isActive: true });
+  const settings = await Settings.findOne({ isActive: true });
 
   if (!settings) {
     return res.status(404).json({
@@ -106,13 +140,9 @@ exports.resetSettings = asyncHandler(async (req, res) => {
 
   // Create default settings
   const defaultSettings = {
-    site_name: 'E-commerce Store',
     contact_email: 'admin@example.com',
-    contact_phone: '1234567890',
-    currency: 'USD',
-    currency_symbol: '$',
+    contact_phone: '12345678901',
     shipping_cost: 0,
-    free_shipping_threshold: 100,
   };
 
   const settings = await Settings.create(defaultSettings);
@@ -132,31 +162,22 @@ exports.getShippingInfo = asyncHandler(async (req, res) => {
     success: true,
     message: 'Shipping information retrieved successfully',
     data: {
-      shipping_cost: settings.shipping_cost,
-      free_shipping_threshold: settings.free_shipping_threshold,
-      currency: settings.currency,
-      currency_symbol: settings.currency_symbol,
+      shipping_cost: settings.shipping_cost || 0,
     },
   });
 });
 
 // Calculate shipping cost
 exports.calculateShipping = asyncHandler(async (req, res) => {
-  const { totalAmount } = req.body;
   const settings = await Settings.getSettings();
 
-  let shippingCost = 0;
-  if (totalAmount < settings.free_shipping_threshold) {
-    shippingCost = settings.shipping_cost;
-  }
+  const shippingCost = settings.shipping_cost || 0;
 
   res.status(200).json({
     success: true,
     message: 'Shipping cost calculated successfully',
     data: {
       shipping_cost: shippingCost,
-      free_shipping_threshold: settings.free_shipping_threshold,
-      is_free_shipping: totalAmount >= settings.free_shipping_threshold,
     },
   });
 });

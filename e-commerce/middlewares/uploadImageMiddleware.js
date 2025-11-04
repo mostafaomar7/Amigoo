@@ -2,6 +2,7 @@ const multer = require('multer');
 const sharp = require('sharp');
 const { v4: uuidv4 } = require('uuid');
 const path = require('path');
+const fs = require('fs');
 
 const multerOptions = () => {
   const multerStorage = multer.memoryStorage();
@@ -26,11 +27,16 @@ exports.uploadMixOfImages = (arrayOfFields) => multerOptions().fields(arrayOfFie
 // Middleware to convert images to WEBP format
 exports.convertToWebP = async (req, res, next) => {
   try {
+    const uploadsDir = path.join(__dirname, '..', 'uploads');
+    if (!fs.existsSync(uploadsDir)) {
+      fs.mkdirSync(uploadsDir, { recursive: true });
+    }
+
     if (req.files) {
       // Handle single file uploads
       if (req.file) {
         const webpFileName = `image-${uuidv4()}-${Date.now()}.webp`;
-        const outputPath = path.join(__dirname, '..', 'uploads', webpFileName);
+        const outputPath = path.join(uploadsDir, webpFileName);
 
         await sharp(req.file.buffer)
           .resize({ width: 2000, withoutEnlargement: true })
@@ -49,7 +55,7 @@ exports.convertToWebP = async (req, res, next) => {
           for (let i = 0; i < files.length; i++) {
             const file = files[i];
             const webpFileName = `image-${uuidv4()}-${Date.now()}-${i}.webp`;
-            const outputPath = path.join(__dirname, '..', 'uploads', webpFileName);
+            const outputPath = path.join(uploadsDir, webpFileName);
 
             await sharp(file.buffer)
               .resize({ width: 2000, withoutEnlargement: true })
@@ -72,8 +78,13 @@ exports.convertToWebP = async (req, res, next) => {
 exports.convertCategoryImage = async (req, res, next) => {
   try {
     if (req.file) {
+      const categoryDir = path.join(__dirname, '..', 'uploads', 'category');
+      if (!fs.existsSync(categoryDir)) {
+        fs.mkdirSync(categoryDir, { recursive: true });
+      }
+
       const webpFileName = `category-${uuidv4()}-${Date.now()}.webp`;
-      const outputPath = path.join(__dirname, '..', 'uploads', 'category', webpFileName);
+      const outputPath = path.join(categoryDir, webpFileName);
 
       await sharp(req.file.buffer)
         .resize({ width: 800, height: 600, fit: 'cover' })
@@ -93,10 +104,15 @@ exports.convertCategoryImage = async (req, res, next) => {
 exports.convertProductImages = async (req, res, next) => {
   try {
     if (req.files) {
+      const productsDir = path.join(__dirname, '..', 'uploads', 'products');
+      if (!fs.existsSync(productsDir)) {
+        fs.mkdirSync(productsDir, { recursive: true });
+      }
+
       // Handle cover image
       if (req.files.imageCover) {
         const webpFileName = `product-${uuidv4()}-${Date.now()}-cover.webp`;
-        const outputPath = path.join(__dirname, '..', 'uploads', 'products', webpFileName);
+        const outputPath = path.join(productsDir, webpFileName);
 
         await sharp(req.files.imageCover[0].buffer)
           .resize({ width: 2000, withoutEnlargement: true })
@@ -111,7 +127,7 @@ exports.convertProductImages = async (req, res, next) => {
       if (req.files.images) {
         for (let i = 0; i < req.files.images.length; i++) {
           const webpFileName = `product-${uuidv4()}-${Date.now()}-${i + 1}.webp`;
-          const outputPath = path.join(__dirname, '..', 'uploads', 'products', webpFileName);
+          const outputPath = path.join(productsDir, webpFileName);
 
           await sharp(req.files.images[i].buffer)
             .resize({ width: 2000, withoutEnlargement: true })

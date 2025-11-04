@@ -22,10 +22,29 @@ export class OpencartService {
   }
 
   addToCart(product: any) {
-    let exist = this.cartproduct.find(item => item._id === product._id);
+    // Check if product with same ID and size already exists
+    let exist = this.cartproduct.find(item => {
+      if (item._id !== product._id) return false;
+      // If both have selectedSize, compare them
+      if (item.selectedSize && product.selectedSize) {
+        return item.selectedSize === product.selectedSize;
+      }
+      // If neither has selectedSize, they're the same
+      if (!item.selectedSize && !product.selectedSize) {
+        return true;
+      }
+      // If one has size and other doesn't, they're different
+      return false;
+    });
+
     if (exist) {
       alert("Your Product is Already in Cart");
     } else {
+      // Ensure product has quantity
+      if (!product.quantity) {
+        product.quantity = 1;
+      }
+
       this.cartproduct.push(product);
       localStorage.setItem("cart", JSON.stringify(this.cartproduct));
 

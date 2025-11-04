@@ -1,0 +1,128 @@
+/* ============================================
+   TERMS OF SERVICE PAGE STYLES
+   ============================================ */
+
+:host {
+  display: block;
+  width: 100%;
+  min-height: 100vh;
+  background: linear-gradient(135deg, #fafafa 0%, #f0f0f0 100%);
+}
+
+.policy-page {
+  padding: 120px 0 80px;
+  direction: rtl;
+  min-height: 100vh;
+}
+
+.container {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* Header Section */
+.policy-header {
+  text-align: center;
+  margin-bottom: 60px;
+  padding-bottom: 30px;
+  border-bottom: 3px solid #720a0a;
+}
+
+.policy-header h1 {
+  font-size: 3rem;
+  font-weight: 700;
+  color: #2c3e50;
+  margin-bottom: 0;
+  line-height: 1.2;
+}
+
+/* Content Section */
+.policy-content {
+  background: white;
+  border-radius: 12px;
+  padding: 50px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+}
+
+/* Policy Sections */
+.policy-section {
+  margin-bottom: 50px;
+}
+
+.policy-section:last-child {
+  margin-bottom: 0;
+}
+
+.policy-section h2 {
+  font-size: 2rem;
+  font-weight: 700;
+  color: #720a0a;
+  margin-bottom: 25px;
+  padding-bottom: 15px;
+  border-bottom: 2px solid #e9ecef;
+}
+
+.policy-section p {
+  font-size: 1.05rem;
+  line-height: 1.9;
+  color: #4a5568;
+  margin-bottom: 20px;
+  text-align: justify;
+}
+
+/* Responsive Design */
+@media (max-width: 991px) {
+  .policy-page {
+    padding: 100px 0 60px;
+  }
+
+  .policy-header h1 {
+    font-size: 2.5rem;
+  }
+
+  .policy-content {
+    padding: 40px;
+  }
+}
+
+@media (max-width: 767px) {
+  .policy-page {
+    padding: 90px 0 50px;
+  }
+
+  .policy-header h1 {
+    font-size: 2rem;
+  }
+
+  .policy-content {
+    padding: 30px 20px;
+    border-radius: 8px;
+  }
+
+  .policy-section h2 {
+    font-size: 1.75rem;
+  }
+
+  .policy-section p {
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 575px) {
+  .policy-page {
+    padding: 80px 0 40px;
+  }
+
+  .policy-header h1 {
+    font-size: 1.75rem;
+  }
+
+  .policy-content {
+    padding: 25px 15px;
+  }
+
+  .policy-section h2 {
+    font-size: 1.5rem;
+  }
+}

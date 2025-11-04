@@ -6,18 +6,15 @@ import { NotificationService } from '../../services/notification.service';
 
 export interface Settings {
   _id?: string;
-  site_name: string;
   contact_email: string;
   contact_phone: string;
   shipping_cost: number;
-  free_shipping_threshold: number;
+  address?: string;
   social_media?: {
     facebook?: string;
     instagram?: string;
-    messenger?: string;
     whatsapp?: string;
-    twitter?: string;
-    linkedin?: string;
+    tiktok?: string;
   };
 }
 
@@ -41,15 +38,14 @@ export class SettingsComponent implements OnInit {
     private fb: FormBuilder
   ) {
     this.settingsForm = this.fb.group({
-      site_name: ['', Validators.required],
       contact_email: ['', [Validators.required, Validators.email]],
       contact_phone: ['', [Validators.required, Validators.pattern(/^\d{11}$/)]],
       shipping_cost: [0, [Validators.required, Validators.min(0)]],
-      free_shipping_threshold: [0, [Validators.required, Validators.min(0)]],
-      facebook: [''],
-      instagram: [''],
-      messenger: [''],
-      whatsapp: ['']
+      address: ['', Validators.maxLength(500)],
+      facebook: ['', this.urlValidator],
+      instagram: ['', this.urlValidator],
+      whatsapp: ['', this.whatsappValidator],
+      tiktok: ['', this.urlValidator]
     });
   }
 
@@ -81,15 +77,14 @@ export class SettingsComponent implements OnInit {
 
   populateForm(settings: Settings): void {
     this.settingsForm.patchValue({
-      site_name: settings.site_name || '',
       contact_email: settings.contact_email || '',
       contact_phone: settings.contact_phone || '',
       shipping_cost: settings.shipping_cost || 0,
-      free_shipping_threshold: settings.free_shipping_threshold || 0,
+      address: settings.address || '',
       facebook: settings.social_media?.facebook || '',
       instagram: settings.social_media?.instagram || '',
-      messenger: settings.social_media?.messenger || '',
-      whatsapp: settings.social_media?.whatsapp || ''
+      whatsapp: settings.social_media?.whatsapp || '',
+      tiktok: settings.social_media?.tiktok || ''
     });
   }
 
@@ -102,15 +97,14 @@ export class SettingsComponent implements OnInit {
       const socialMedia: any = {};
       if (formValue.facebook) socialMedia.facebook = formValue.facebook;
       if (formValue.instagram) socialMedia.instagram = formValue.instagram;
-      if (formValue.messenger) socialMedia.messenger = formValue.messenger;
       if (formValue.whatsapp) socialMedia.whatsapp = formValue.whatsapp;
+      if (formValue.tiktok) socialMedia.tiktok = formValue.tiktok;
 
       const settingsData: any = {
-        site_name: formValue.site_name,
         contact_email: formValue.contact_email,
         contact_phone: formValue.contact_phone,
         shipping_cost: formValue.shipping_cost,
-        free_shipping_threshold: formValue.free_shipping_threshold
+        address: formValue.address || ''
       };
 
       // Only include social_media if it has at least one property
@@ -166,11 +160,22 @@ export class SettingsComponent implements OnInit {
       if (control.errors?.['email']) {
         return 'Please enter a valid email address';
       }
-      if (control.errors?.['pattern'] && fieldName === 'contact_phone') {
-        return 'Phone number must be exactly 11 digits';
+      if (control.errors?.['pattern']) {
+        if (fieldName === 'contact_phone' || fieldName === 'whatsapp') {
+          return 'Must be exactly 11 digits';
+        }
       }
       if (control.errors?.['min']) {
         return `${this.getFieldLabel(fieldName)} must be 0 or greater`;
+      }
+      if (control.errors?.['maxlength']) {
+        return `${this.getFieldLabel(fieldName)} cannot exceed ${control.errors['maxlength'].requiredLength} characters`;
+      }
+      if (control.errors?.['invalidUrl']) {
+        return 'Please enter a valid URL (must start with http:// or https://)';
+      }
+      if (control.errors?.['invalidWhatsApp']) {
+        return 'WhatsApp must be exactly 11 digits';
       }
     }
     return '';
@@ -183,16 +188,35 @@ export class SettingsComponent implements OnInit {
 
   private getFieldLabel(fieldName: string): string {
     const labels: { [key: string]: string } = {
-      site_name: 'Site Name',
       contact_email: 'Contact Email',
       contact_phone: 'Contact Phone',
       shipping_cost: 'Shipping Cost',
-      free_shipping_threshold: 'Free Shipping Threshold',
+      address: 'Address',
       facebook: 'Facebook',
       instagram: 'Instagram',
-      messenger: 'Messenger',
-      whatsapp: 'WhatsApp'
+      whatsapp: 'WhatsApp',
+      tiktok: 'TikTok'
     };
     return labels[fieldName] || fieldName;
   }
+
+  // Custom validator for URLs - only validates if value is provided
+  private urlValidator = (control: any) => {
+    const value = control.value;
+    if (!value || (typeof value === 'string' && value.trim().length === 0)) {
+      return null; // Valid if empty (optional field)
+    }
+    const urlPattern = /^https?:\/\/.+/;
+    return urlPattern.test(value.trim()) ? null : { invalidUrl: true };
+  };
+
+  // Custom validator for WhatsApp - only validates if value is provided
+  private whatsappValidator = (control: any) => {
+    const value = control.value;
+    if (!value || (typeof value === 'string' && value.trim().length === 0)) {
+      return null; // Valid if empty (optional field)
+    }
+    const phonePattern = /^\d{11}$/;
+    return phonePattern.test(value.trim()) ? null : { invalidWhatsApp: true };
+  };
 }

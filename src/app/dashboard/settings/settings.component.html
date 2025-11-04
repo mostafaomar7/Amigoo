@@ -25,29 +25,11 @@
         class="settings-form"
       >
         <div class="row">
-          <!-- Site Information Section -->
+          <!-- Contact Information Section -->
           <div class="col-12 mb-4">
             <h4 class="text-dark mb-3">
-              <i class="fas fa-globe me-2"></i>Site Information
+              <i class="fas fa-envelope me-2"></i>Contact Information
             </h4>
-          </div>
-
-          <!-- Site Name -->
-          <div class="col-md-6 mb-3">
-            <label for="site_name" class="form-label">
-              Site Name <span class="text-danger">*</span>
-            </label>
-            <input
-              type="text"
-              id="site_name"
-              class="form-control"
-              [class.is-invalid]="hasFieldError('site_name')"
-              formControlName="site_name"
-              placeholder="Enter site name"
-            />
-            <div *ngIf="hasFieldError('site_name')" class="invalid-feedback">
-              {{ getFieldError("site_name") }}
-            </div>
           </div>
 
           <!-- Contact Email -->
@@ -87,6 +69,26 @@
             </div>
             <small class="form-text text-muted">Phone number must be exactly 11 digits</small>
           </div>
+
+          <!-- Address -->
+          <div class="col-12 mb-3">
+            <label for="address" class="form-label">
+              <i class="fas fa-map-marker-alt me-2"></i>Address
+            </label>
+            <input
+              type="text"
+              id="address"
+              class="form-control"
+              [class.is-invalid]="hasFieldError('address')"
+              formControlName="address"
+              placeholder="Enter address"
+              maxlength="500"
+            />
+            <div *ngIf="hasFieldError('address')" class="invalid-feedback">
+              {{ getFieldError("address") }}
+            </div>
+            <small class="form-text text-muted">Maximum 500 characters</small>
+          </div>
         </div>
 
         <!-- Shipping Section -->
@@ -116,27 +118,6 @@
               {{ getFieldError("shipping_cost") }}
             </div>
           </div>
-
-          <!-- Free Shipping Threshold -->
-          <div class="col-md-6 mb-3">
-            <label for="free_shipping_threshold" class="form-label">
-              Free Shipping Threshold <span class="text-danger">*</span>
-            </label>
-            <input
-              type="number"
-              id="free_shipping_threshold"
-              class="form-control"
-              [class.is-invalid]="hasFieldError('free_shipping_threshold')"
-              formControlName="free_shipping_threshold"
-              placeholder="0.00"
-              min="0"
-              step="0.01"
-            />
-            <div *ngIf="hasFieldError('free_shipping_threshold')" class="invalid-feedback">
-              {{ getFieldError("free_shipping_threshold") }}
-            </div>
-            <small class="form-text text-muted">Amount above which shipping is free</small>
-          </div>
         </div>
 
         <!-- Social Media Section -->
@@ -156,12 +137,16 @@
               type="url"
               id="facebook"
               class="form-control"
+              [class.is-invalid]="hasFieldError('facebook')"
               formControlName="facebook"
               placeholder="https://facebook.com/yourpage"
             />
+            <div *ngIf="hasFieldError('facebook')" class="invalid-feedback">
+              {{ getFieldError("facebook") }}
+            </div>
           </div>
 
-          Instagram
+          <!-- Instagram -->
           <div class="col-md-6 mb-3">
             <label for="instagram" class="form-label">
               <i class="fab fa-instagram me-2"></i>Instagram
@@ -170,27 +155,17 @@
               type="url"
               id="instagram"
               class="form-control"
+              [class.is-invalid]="hasFieldError('instagram')"
               formControlName="instagram"
               placeholder="https://instagram.com/yourpage"
             />
+            <div *ngIf="hasFieldError('instagram')" class="invalid-feedback">
+              {{ getFieldError("instagram") }}
+            </div>
           </div>
 
-          <!-- Messenger -->
-          <!-- <div class="col-md-6 mb-3">
-            <label for="messenger" class="form-label">
-              <i class="fab fa-facebook-messenger me-2"></i>Messenger
-            </label>
-            <input
-              type="url"
-              id="messenger"
-              class="form-control"
-              formControlName="messenger"
-              placeholder="https://m.me/yourpage"
-            />
-          </div> -->
-
           <!-- WhatsApp -->
-          <!-- <div class="col-md-6 mb-3">
+          <div class="col-md-6 mb-3">
             <label for="whatsapp" class="form-label">
               <i class="fab fa-whatsapp me-2"></i>WhatsApp
             </label>
@@ -198,10 +173,34 @@
               type="text"
               id="whatsapp"
               class="form-control"
+              [class.is-invalid]="hasFieldError('whatsapp')"
               formControlName="whatsapp"
-              placeholder="Enter WhatsApp number or link"
+              placeholder="Enter 11-digit WhatsApp number"
+              maxlength="11"
             />
-          </div> -->
+            <div *ngIf="hasFieldError('whatsapp')" class="invalid-feedback">
+              {{ getFieldError("whatsapp") }}
+            </div>
+            <small class="form-text text-muted">WhatsApp number must be exactly 11 digits</small>
+          </div>
+
+          <!-- TikTok -->
+          <div class="col-md-6 mb-3">
+            <label for="tiktok" class="form-label">
+              <i class="fab fa-tiktok me-2"></i>TikTok
+            </label>
+            <input
+              type="url"
+              id="tiktok"
+              class="form-control"
+              [class.is-invalid]="hasFieldError('tiktok')"
+              formControlName="tiktok"
+              placeholder="https://tiktok.com/@username"
+            />
+            <div *ngIf="hasFieldError('tiktok')" class="invalid-feedback">
+              {{ getFieldError("tiktok") }}
+            </div>
+          </div>
         </div>
 
         <!-- Form Actions -->

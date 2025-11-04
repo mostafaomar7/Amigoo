@@ -7,21 +7,24 @@ dotenv.config({ path: 'config.env' });
 
 const User = require('./models/User');
 
-const createAdminAccount = async () => {
+const freshSeedAdmin = async () => {
   try {
     // Connect to MongoDB
     await mongoose.connect(process.env.DB_URL);
-    console.log('Connected to MongoDB');
+    console.log('✓ Connected to MongoDB');
 
-    // Check if admin already exists
-    const existingAdmin = await User.findOne({ email: 'admin@gmail.com' });
-    if (existingAdmin) {
-      console.log('Admin account already exists!');
-      console.log('Email: admin@gmail.com');
-      console.log('You can login with this account.');
-      await mongoose.connection.close();
-      return;
+    // Get all collections
+    const collections = await mongoose.connection.db.listCollections().toArray();
+    console.log(`\n🗑️  Found ${collections.length} collections to drop...`);
+
+    // Drop all collections
+    for (const collection of collections) {
+      await mongoose.connection.db.dropCollection(collection.name);
+      console.log(`  ✓ Dropped collection: ${collection.name}`);
     }
+
+    console.log('\n✅ All collections dropped successfully!');
+    console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━');
 
     // Create admin user
     const hashedPassword = await bcrypt.hash('admin123', 12);
@@ -43,12 +46,13 @@ const createAdminAccount = async () => {
     console.log('━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\n');
 
     await mongoose.connection.close();
+    console.log('✓ Database connection closed');
     process.exit(0);
   } catch (error) {
-    console.error('Error creating admin account:', error);
+    console.error('❌ Error:', error);
     await mongoose.connection.close();
     process.exit(1);
   }
 };
 
-createAdminAccount();
+freshSeedAdmin();

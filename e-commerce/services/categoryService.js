@@ -4,6 +4,7 @@ const multer  = require('multer')
 const { v4: uuidv4 } = require('uuid');
 const sharp = require('sharp');
 const path = require('path');
+const fs = require('fs');
 const Category = require('../models/categoryModel');
 
 const multerStorage = multer.memoryStorage();
@@ -29,7 +30,13 @@ exports.resizeCategoryImage = asyncHandler(async (req, res, next) => {
   }
 
   const webpFileName = `category-${uuidv4()}-${Date.now()}.webp`;
-  const outputPath = path.join(__dirname, '..', 'uploads', 'category', webpFileName);
+  const categoryDir = path.join(__dirname, '..', 'uploads', 'category');
+  const outputPath = path.join(categoryDir, webpFileName);
+
+  // Ensure the category directory exists
+  if (!fs.existsSync(categoryDir)) {
+    fs.mkdirSync(categoryDir, { recursive: true });
+  }
 
   await sharp(req.file.buffer)
     .resize({ width: 800, height: 600, fit: 'cover' })
@@ -178,23 +185,76 @@ exports.updateCategory = asyncHandler(async (req, res) => {
     });
   }
 
-  const updateData = { name, slug: slugify(name, { lower: true }) };
-  if (image) updateData.image = image;
+  // Check if another category (excluding the current one) already has this name
+  const existingCategory = await Category.findOne({
+    name: name,
+    _id: { $ne: id },
+    isDeleted: false
+  });
 
-  const category = await Category.findOneAndUpdate({ _id: id, isDeleted: false }, updateData, { new: true });
-
-  if (!category) {
-    return res.status(404).json({
+  if (existingCategory) {
+    return res.status(400).json({
       success: false,
-      message: `لا توجد فئة بهذا المعرف: ${id}`
+      message: 'اسم الفئة يجب أن يكون فريداً',
+      errors: [{
+        field: 'name',
+        message: 'اسم الفئة يجب أن يكون فريداً'
+      }]
     });
   }
 
-  res.status(200).json({
-    success: true,
-    message: 'تم تحديث الفئة بنجاح',
-    data: category
-  });
+  const updateData = { name, slug: slugify(name, { lower: true }) };
+  if (image) updateData.image = image;
+
+  try {
+    const category = await Category.findOneAndUpdate(
+      { _id: id, isDeleted: false },
+      updateData,
+      { new: true, runValidators: true }
+    );
+
+    if (!category) {
+      return res.status(404).json({
+        success: false,
+        message: `لا توجد فئة بهذا المعرف: ${id}`
+      });
+    }
+
+    res.status(200).json({
+      success: true,
+      message: 'تم تحديث الفئة بنجاح',
+      data: category
+    });
+  } catch (error) {
+    // Handle validation errors
+    if (error.name === 'ValidationError') {
+      const validationErrors = Object.values(error.errors).map(err => ({
+        field: err.path,
+        message: err.message
+      }));
+      return res.status(400).json({
+        success: false,
+        message: 'فشل في التحقق من صحة البيانات',
+        errors: validationErrors
+      });
+    }
+
+    // Handle duplicate key error (fallback check)
+    if (error.code === 11000 || (error.name === 'MongooseError' && error.message.includes('must be unique'))) {
+      const field = error.keyValue ? Object.keys(error.keyValue)[0] : 'name';
+      return res.status(400).json({
+        success: false,
+        message: 'اسم الفئة يجب أن يكون فريداً',
+        errors: [{
+          field: field,
+          message: 'اسم الفئة يجب أن يكون فريداً'
+        }]
+      });
+    }
+
+    // Re-throw other errors to be handled by global error handler
+    throw error;
+  }
 });
 
 

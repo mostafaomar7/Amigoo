@@ -1,0 +1,420 @@
+<!-- Loading Skeleton -->
+<div *ngIf="loading" class="container py-5">
+  <div class="row">
+    <div class="col-md-6">
+      <div class="skeleton-image"></div>
+    </div>
+    <div class="col-md-6">
+      <div class="skeleton-title"></div>
+      <div class="skeleton-text"></div>
+      <div class="skeleton-text"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Error State -->
+<div *ngIf="error && !loading" class="container py-5">
+  <div class="error-state text-center py-5">
+    <div class="error-icon mb-4">
+      <i class="fas fa-exclamation-triangle fa-4x text-warning"></i>
+    </div>
+    <h2 class="mb-3">Oops! Something went wrong</h2>
+    <p class="text-muted mb-4">{{ error }}</p>
+    <button class="btn btn-primary btn-lg" (click)="retry()">
+      <i class="fas fa-redo me-2"></i>Retry
+    </button>
+    <button class="btn btn-outline-secondary btn-lg ms-2" routerLink="/">
+      <i class="fas fa-home me-2"></i>Back to Home
+    </button>
+  </div>
+</div>
+
+<!-- Product Details -->
+<div *ngIf="product && !loading && !error" class="product-details-page">
+  <!-- Breadcrumb -->
+  <nav aria-label="breadcrumb" class="breadcrumb-nav">
+    <div class="container">
+      <ol class="breadcrumb mb-0 py-3">
+        <li class="breadcrumb-item">
+          <a routerLink="/" class="text-decoration-none">
+            <i class="fas fa-home me-1"></i>Home
+          </a>
+        </li>
+        <li class="breadcrumb-item">
+          <a [routerLink]="['/product']" [queryParams]="{category: product.category._id}" class="text-decoration-none">
+            {{ product.category.name }}
+          </a>
+        </li>
+        <li class="breadcrumb-item active" aria-current="page">
+          {{ product.title }}
+        </li>
+      </ol>
+    </div>
+  </nav>
+
+  <div class="container py-4">
+    <!-- Main Product Section -->
+    <div class="row g-4 mb-5">
+      <!-- Left Column: Product Images -->
+      <div class="col-lg-6">
+        <div class="product-images">
+          <!-- Main Image -->
+          <div class="main-image-wrapper mb-3">
+            <div class="main-image-container">
+              <img
+                *ngIf="!mainImageError"
+                [src]="getImageUrl(getProductImages()[selectedImageIndex])"
+                [alt]="product.title"
+                class="main-image"
+                (error)="onImageError()"
+                loading="lazy"
+              />
+              <div *ngIf="mainImageError || !getProductImages()[selectedImageIndex]" class="image-placeholder">
+                <i class="fas fa-image fa-3x text-muted mb-3"></i>
+                <p class="text-muted">No image available</p>
+              </div>
+              <!-- Discount Badge -->
+              <span *ngIf="getDiscountPercentage()" class="discount-badge">
+                -{{ getDiscountPercentage() }}%
+              </span>
+            </div>
+          </div>
+
+          <!-- Thumbnail Gallery -->
+          <div *ngIf="getProductImages().length > 1" class="thumbnail-gallery">
+            <div class="row g-2">
+              <div class="col-3" *ngFor="let image of getProductImages(); let i = index">
+                <div
+                  class="thumbnail-item"
+                  [class.active]="i === selectedImageIndex"
+                  (click)="selectImage(i)"
+                >
+                  <img
+                    [src]="getImageUrl(image)"
+                    [alt]="product.title + ' - Image ' + (i + 1)"
+                    (error)="onThumbnailError($event)"
+                    loading="lazy"
+                  />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column: Product Info -->
+      <div class="col-lg-6">
+        <div class="product-info">
+          <!-- Product Title -->
+          <h1 class="product-title mb-3">{{ product.title }}</h1>
+
+          <!-- Category Link -->
+          <div class="mb-3">
+            <a
+              [routerLink]="['/product']"
+              [queryParams]="{category: product.category._id}"
+              class="category-link text-decoration-none"
+            >
+              <i class="fas fa-tag me-1"></i>{{ product.category.name }}
+            </a>
+          </div>
+
+          <!-- Price -->
+          <div class="price-section mb-4">
+            <div class="d-flex align-items-baseline gap-3">
+              <span class="current-price">{{ getPrice() | number:'1.0-2' }} EGP</span>
+              <span *ngIf="getOriginalPrice()" class="original-price">
+                {{ getOriginalPrice() | number:'1.0-2' }} EGP
+              </span>
+            </div>
+            <div *ngIf="getDiscountPercentage()" class="discount-text text-success mt-1">
+              <i class="fas fa-tag me-1"></i>Save {{ getDiscountPercentage() }}%
+            </div>
+          </div>
+
+          <!-- Stock Status -->
+          <div class="stock-status mb-4">
+            <span
+              class="badge"
+              [class.bg-success]="getStockStatus().inStock"
+              [class.bg-danger]="!getStockStatus().inStock"
+            >
+              <i class="fas fa-check-circle me-1" *ngIf="getStockStatus().inStock"></i>
+              <i class="fas fa-times-circle me-1" *ngIf="!getStockStatus().inStock"></i>
+              {{ getStockStatus().message }}
+            </span>
+          </div>
+
+          <!-- Short Description -->
+          <div class="description-preview mb-4">
+            <p class="description-text" [class.expanded]="showFullDescription">
+              {{ getDescriptionPreview() }}
+            </p>
+            <button
+              *ngIf="product.description && product.description.split('\n').length > descriptionPreviewLines"
+              class="btn btn-link p-0 text-primary text-decoration-none"
+              (click)="toggleDescription()"
+            >
+              {{ showFullDescription ? 'Show less' : 'Read more' }}
+              <i class="fas" [class.fa-chevron-up]="showFullDescription" [class.fa-chevron-down]="!showFullDescription"></i>
+            </button>
+          </div>
+
+          <!-- Size Selection -->
+          <div *ngIf="sizes.length > 0" class="size-selection mb-4">
+            <label class="form-label fw-bold mb-2">Size:</label>
+            <div class="size-options">
+              <button
+                *ngFor="let size of sizes"
+                type="button"
+                class="size-btn"
+                [class.active]="selectedSize === size.sizeName"
+                [class.disabled]="!size.isAvailable || size.quantity === 0"
+                [disabled]="!size.isAvailable || size.quantity === 0"
+                (click)="selectedSize = size.sizeName; quantity = 1"
+              >
+                {{ size.sizeName }}
+                <small *ngIf="size.quantity > 0" class="d-block text-muted">({{ size.quantity }})</small>
+              </button>
+            </div>
+          </div>
+
+          <!-- Quantity Selector -->
+          <div class="quantity-selector mb-4">
+            <label class="form-label fw-bold mb-2">Quantity:</label>
+            <div class="input-group" style="max-width: 150px;">
+              <button
+                class="btn btn-outline-secondary"
+                type="button"
+                [disabled]="quantity <= 1"
+                (click)="onQuantityChange(-1)"
+              >
+                <i class="fas fa-minus"></i>
+              </button>
+              <input
+                type="number"
+                class="form-control text-center"
+                [(ngModel)]="quantity"
+                [min]="1"
+                [max]="getMaxQuantity()"
+                readonly
+              />
+              <button
+                class="btn btn-outline-secondary"
+                type="button"
+                [disabled]="quantity >= getMaxQuantity()"
+                (click)="onQuantityChange(1)"
+              >
+                <i class="fas fa-plus"></i>
+              </button>
+            </div>
+            <small class="text-muted d-block mt-1">
+              Max: {{ getMaxQuantity() }} available
+            </small>
+          </div>
+
+          <!-- Action Buttons -->
+          <div class="action-buttons mb-4">
+            <button
+              class="btn btn-primary btn-lg w-100 mb-2 add-to-cart-btn"
+              [disabled]="!getStockStatus().inStock || (sizes.length > 0 && !selectedSize)"
+              (click)="addToCart()"
+            >
+              <i class="fas fa-shopping-cart me-2"></i>
+              {{ isInCart ? 'Already in Cart' : 'Add to Cart' }}
+            </button>
+            <button
+              class="btn btn-outline-danger btn-lg w-100 favorite-btn"
+              [class.active]="isFavorite"
+              (click)="toggleFavorite()"
+            >
+              <i class="fas" [class.fa-heart]="isFavorite" [class.fa-heart-o]="!isFavorite"></i>
+              {{ isFavorite ? 'Remove from Favorites' : 'Add to Favorites' }}
+            </button>
+          </div>
+
+          <!-- Additional Info -->
+          <div class="additional-info">
+            <div class="info-item">
+              <i class="fas fa-truck me-2 text-primary"></i>
+              <span>Free shipping on orders over 100 EGP</span>
+            </div>
+            <div class="info-item">
+              <i class="fas fa-undo me-2 text-primary"></i>
+              <span>30-day return policy</span>
+            </div>
+            <div class="info-item">
+              <i class="fas fa-shield-alt me-2 text-primary"></i>
+              <span>Secure payment</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tabs Section -->
+    <div class="product-tabs mb-5">
+      <ul class="nav nav-tabs" role="tablist">
+        <li class="nav-item" role="presentation">
+          <button
+            class="nav-link"
+            [class.active]="activeTab === 'description'"
+            (click)="setActiveTab('description')"
+            type="button"
+          >
+            <i class="fas fa-info-circle me-2"></i>Description
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button
+            class="nav-link"
+            [class.active]="activeTab === 'specifications'"
+            (click)="setActiveTab('specifications')"
+            type="button"
+          >
+            <i class="fas fa-list me-2"></i>Specifications
+          </button>
+        </li>
+        <li class="nav-item" role="presentation">
+          <button
+            class="nav-link"
+            [class.active]="activeTab === 'reviews'"
+            (click)="setActiveTab('reviews')"
+            type="button"
+          >
+            <i class="fas fa-star me-2"></i>Reviews
+            <span *ngIf="reviews.length > 0" class="badge bg-primary ms-2">{{ reviews.length }}</span>
+          </button>
+        </li>
+      </ul>
+
+      <div class="tab-content p-4 border border-top-0 rounded-bottom">
+        <!-- Description Tab -->
+        <div *ngIf="activeTab === 'description'" class="tab-pane fade show active">
+          <div class="description-content">
+            <h4 class="mb-3">Product Description</h4>
+            <p class="text-muted" [innerHTML]="getFormattedDescription()"></p>
+          </div>
+        </div>
+
+        <!-- Specifications Tab -->
+        <div *ngIf="activeTab === 'specifications'" class="tab-pane fade show active">
+          <div class="specifications-content">
+            <h4 class="mb-3">Specifications</h4>
+            <table class="table table-borderless">
+              <tbody>
+                <tr>
+                  <th scope="row" style="width: 200px;">Product ID</th>
+                  <td>{{ product._id }}</td>
+                </tr>
+                <tr>
+                  <th scope="row">Category</th>
+                  <td>{{ product.category.name }}</td>
+                </tr>
+                <tr *ngIf="product.colors && product.colors.length > 0">
+                  <th scope="row">Colors</th>
+                  <td>
+                    <span *ngFor="let color of product.colors" class="badge bg-primary me-2">
+                      {{ color }}
+                    </span>
+                  </td>
+                </tr>
+                <tr *ngIf="sizes.length > 0">
+                  <th scope="row">Available Sizes</th>
+                  <td>
+                    <span *ngFor="let size of sizes" class="badge bg-secondary me-2">
+                      {{ size.sizeName }} ({{ size.quantity }})
+                    </span>
+                  </td>
+                </tr>
+                <tr *ngIf="product.sold !== undefined">
+                  <th scope="row">Sold</th>
+                  <td>{{ product.sold }} units</td>
+                </tr>
+                <tr *ngIf="product.createdAt">
+                  <th scope="row">Added</th>
+                  <td>{{ product.createdAt | date:'mediumDate' }}</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- Reviews Tab -->
+        <div *ngIf="activeTab === 'reviews'" class="tab-pane fade show active">
+          <div class="reviews-content">
+            <h4 class="mb-3">Customer Reviews</h4>
+            <div *ngIf="reviews.length === 0" class="no-reviews text-center py-5">
+              <i class="fas fa-comment-slash fa-3x text-muted mb-3"></i>
+              <p class="text-muted">No reviews yet. Be the first to review this product!</p>
+            </div>
+            <div *ngFor="let review of reviews" class="review-item mb-4 p-3 border rounded">
+              <div class="d-flex justify-content-between mb-2">
+                <div>
+                  <strong>{{ review.userId || 'Anonymous' }}</strong>
+                  <div class="rating">
+                    <i
+                      *ngFor="let i of [1,2,3,4,5]"
+                      class="fas fa-star"
+                      [class.text-warning]="i <= review.rating"
+                      [class.text-muted]="i > review.rating"
+                    ></i>
+                  </div>
+                </div>
+                <small class="text-muted">{{ review.createdAt | date:'short' }}</small>
+              </div>
+              <p class="mb-0">{{ review.comment }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Related Products Section -->
+    <div *ngIf="relatedProducts.length > 0" class="related-products-section">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <h3 class="section-title mb-0">Related Products</h3>
+        <a
+          [routerLink]="['/product']"
+          [queryParams]="{category: product.category._id}"
+          class="btn btn-outline-primary"
+        >
+          View All <i class="fas fa-arrow-right ms-1"></i>
+        </a>
+      </div>
+      <div class="row g-4">
+        <div class="col-6 col-md-4 col-lg-3" *ngFor="let relatedProduct of relatedProducts; trackBy: trackByProductId">
+          <div class="product-card">
+            <div class="product-image-wrapper">
+              <a [routerLink]="['/product', relatedProduct._id]">
+                <img
+                  [src]="getImageUrl(relatedProduct.imageCover)"
+                  [alt]="relatedProduct.title"
+                  class="product-image"
+                  loading="lazy"
+                  (error)="$event.target.src='assets/img/404/404.png'"
+                />
+              </a>
+              <span *ngIf="relatedProduct.priceAfterDiscount" class="badge-sale">
+                -{{ calculateDiscountPercentage(relatedProduct) }}%
+              </span>
+            </div>
+            <div class="product-info">
+              <h5 class="product-title">
+                <a [routerLink]="['/product', relatedProduct._id]" class="text-decoration-none">
+                  {{ relatedProduct.title }}
+                </a>
+              </h5>
+              <div class="product-price">
+                <span class="current-price">{{ (relatedProduct.priceAfterDiscount || relatedProduct.price) | number:'1.0-2' }} EGP</span>
+                <span *ngIf="relatedProduct.priceAfterDiscount" class="original-price">
+                  {{ relatedProduct.price | number:'1.0-2' }} EGP
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
