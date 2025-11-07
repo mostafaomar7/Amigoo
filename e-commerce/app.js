@@ -14,6 +14,7 @@ const submitForm = require('./routes/contactFormRoutes');
 const OrderForm = require('./routes/orderRoutes');
 const sizeRoutes = require('./routes/sizeRoutes');
 const settingsRoutes = require('./routes/settingsRoutes');
+const seedRoute = require('./routes/seedRoute');
 
 const corsOptions = {
   origin: ["https://amigo.mosalam.com", "http://localhost:3000","http://localhost:4200","http://192.168.0.107:4200"],
@@ -41,6 +42,7 @@ app.use('/api/v1/submit', submitForm);
 app.use('/api/v1/Order', OrderForm);
 app.use('/api/v1/sizes', sizeRoutes);
 app.use('/api/v1/settings', settingsRoutes);
+app.use('/api/v1/seed', seedRoute);
 
 app.use(errorHandler);
 

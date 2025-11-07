@@ -31,6 +31,7 @@ export class NavbarComponent implements OnInit, OnDestroy, AfterViewInit {
   favoritesActive = false;
   canScrollLeft = false;
   canScrollRight = false;
+  isSeeding = false;
 
   // Data
   cartItems: CartItem[] = [];
@@ -413,6 +414,44 @@ export class NavbarComponent implements OnInit, OnDestroy, AfterViewInit {
 
     this.router.navigate(['/wishlist']).then(() => {
       this.cdr.markForCheck();
+    });
+  }
+
+  seedDatabase(): void {
+    if (this.isSeeding) {
+      return;
+    }
+
+    const confirmMessage = 'هل أنت متأكد من ملء قاعدة البيانات ببيانات وهمية؟\n\nسيتم إنشاء أقسام ومنتجات وطلبات جديدة.';
+    if (!confirm(confirmMessage)) {
+      return;
+    }
+
+    this.isSeeding = true;
+    this.cdr.markForCheck();
+
+    this.serv.seedDatabase().subscribe({
+      next: (response: any) => {
+        this.isSeeding = false;
+        this.cdr.markForCheck();
+
+        if (response.success) {
+          this.notificationService.success(
+            'تم بنجاح!',
+            `تم ملء قاعدة البيانات بنجاح: ${response.data.categories} أقسام، ${response.data.products} منتجات، ${response.data.orders} طلبات`
+          );
+          // إعادة تحميل الأقسام
+          this.getdata();
+        } else {
+          this.notificationService.error('خطأ', response.message || 'حدث خطأ أثناء ملء قاعدة البيانات');
+        }
+      },
+      error: (error: any) => {
+        this.isSeeding = false;
+        this.cdr.markForCheck();
+        const errorMessage = error.error?.message || error.message || 'حدث خطأ أثناء ملء قاعدة البيانات';
+        this.notificationService.error('خطأ', errorMessage);
+      }
     });
   }
 }
