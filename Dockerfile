@@ -14,7 +14,7 @@ RUN npm install --legacy-peer-deps
 COPY . .
 
 # Build the Angular application
-RUN npm run build --prod
+RUN npx ng build --configuration production
 
 # Use a minimal web server to serve the Angular app
 FROM node:16-slim
