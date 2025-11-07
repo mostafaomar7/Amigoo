@@ -2,6 +2,8 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
+import { NotificationService } from '../../services/notification.service';
+import { EnvironmentService } from '../../services/environment.service';
 
 @Component({
   selector: 'app-cart',
@@ -14,7 +16,10 @@ export class CartComponent implements OnInit {
   amount : Number = 1;
   cartproduct :any [] = [];
   total:any = 0;
-  constructor() { }
+  constructor(
+    private notificationService: NotificationService,
+    private environmentService: EnvironmentService
+  ) { }
   getcartproducts(){
     if("cart" in localStorage){
     this.cartproduct = JSON.parse(localStorage.getItem("cart")!)
@@ -44,19 +49,37 @@ export class CartComponent implements OnInit {
     this.gettotalprice();
   }
   delete(index){
-    this.cartproduct.splice(index , 1)
-    localStorage.setItem("cart" , JSON.stringify(this.cartproduct))
-    this.gettotalprice();
-
+    if (index >= 0 && index < this.cartproduct.length) {
+      const product = this.cartproduct[index];
+      this.cartproduct.splice(index , 1)
+      localStorage.setItem("cart" , JSON.stringify(this.cartproduct))
+      this.gettotalprice();
+      this.notificationService.success('تمت الإزالة من السلة', `تمت إزالة ${product.title || 'المنتج'} من السلة`);
+      document.dispatchEvent(new CustomEvent('cartUpdated'));
+    }
   }
   ClearAllProducts(){
-    this.cartproduct.splice(0,this.cartproduct.length);
-    localStorage.setItem("cart" , JSON.stringify(this.cartproduct))
-    this.gettotalprice();
+    if (this.cartproduct.length > 0) {
+      this.cartproduct.splice(0,this.cartproduct.length);
+      localStorage.setItem("cart" , JSON.stringify(this.cartproduct))
+      this.gettotalprice();
+      this.notificationService.success('تم مسح السلة', 'تمت إزالة جميع المنتجات من السلة');
+      document.dispatchEvent(new CustomEvent('cartUpdated'));
+    }
   }
   ngOnInit(): void {
     this.getcartproducts()
+  }
 
+  /**
+   * Get image URL for product
+   */
+  getImageUrl(imagePath: string): string {
+    if (!imagePath) return '';
+    if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+      return imagePath;
+    }
+    return `${this.environmentService.imageBaseUrl}uploads/products/${imagePath}`;
   }
 
 }

@@ -7,11 +7,12 @@ import { takeUntil, finalize } from 'rxjs/operators';
 
 import { ProductService, Product } from '../../services/product.service';
 import { CategoryService } from '../../services/category.service';
-import { Categoryinfo } from '../models/category';
+import { Categoryinfo, Contact } from '../models/category';
 import { FavoritesService } from '../../services/favorites.service';
 import { OpencartService } from '../../services/opencart.service';
 import { EnvironmentService } from '../../services/environment.service';
 import { NotificationService } from '../../services/notification.service';
+import { QuickAddModalService } from '../../services/quick-add-modal.service';
 import { ApiService } from '../../services/api.service';
 
 @Component({
@@ -39,6 +40,12 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
   newsletterSuccess = false;
   newsletterError: string | null = null;
 
+  // Contact Form
+  contactForm: FormGroup;
+  contactSubmitting = false;
+  contactSuccess = false;
+  contactError: string | null = null;
+
   // Cart & Favorites counts
   cartCount = 0;
   favoritesCount = 0;
@@ -64,6 +71,7 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
     private opencartService: OpencartService,
     private environmentService: EnvironmentService,
     private notificationService: NotificationService,
+    private quickAddModalService: QuickAddModalService,
     private apiService: ApiService,
     private fb: FormBuilder,
     private cdr: ChangeDetectorRef,
@@ -71,6 +79,13 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
   ) {
     this.newsletterForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]]
+    });
+
+    this.contactForm = this.fb.group({
+      name: ['', [Validators.required, Validators.minLength(2)]],
+      email: ['', [Validators.required, Validators.email]],
+      phone: ['', [Validators.required, Validators.pattern(/^[0-9]{11}$/)]],
+      message: ['', [Validators.required, Validators.minLength(10)]],
     });
   }
 
@@ -314,7 +329,8 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
    * Navigate to category products
    */
   navigateToCategory(categoryId: string): void {
-    this.router.navigate(['/product'], { queryParams: { category: categoryId } });
+    console.log('Navigating to shop with category:', categoryId);
+    this.router.navigate(['/shop'], { queryParams: { category: categoryId } });
   }
 
   /**
@@ -325,34 +341,32 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   /**
-   * Add product to cart
+   * Add product to cart - opens modal for selection
    */
   addToCart(product: Product, event: Event): void {
     event.stopPropagation();
 
-    const cartItem = {
-      ...product,
-      quantity: 1,
-      price: product.priceAfterDiscount || product.price
-    };
+    // Open modal for product selection
+    this.quickAddModalService.openModal({
+      product: product,
+      onConfirm: (selectedColor: string | null, selectedSize: string | null, quantity: number) => {
+        const cartItem = {
+          ...product,
+          quantity: quantity,
+          selectedColor: selectedColor,
+          selectedSize: selectedSize,
+          price: product.priceAfterDiscount || product.price
+        };
 
-    // Check if already in cart
-    const existingItem = this.opencartService.cartproduct.find(
-      (item: any) => item._id === product._id
-    );
+        // Add to cart using service (will show notification internally)
+        this.opencartService.addToCart(cartItem);
+        this.updateCartAndFavoritesCount();
+        this.cdr.markForCheck();
 
-    if (existingItem) {
-      this.notificationService.info('Already in Cart', 'This product is already in your cart');
-      return;
-    }
-
-    this.opencartService.addToCart(cartItem);
-    this.updateCartAndFavoritesCount();
-    this.notificationService.success('Added to Cart', `${product.title} has been added to your cart`);
-    this.cdr.markForCheck();
-
-    // Dispatch custom event for navbar update
-    document.dispatchEvent(new CustomEvent('cartUpdated'));
+        // Dispatch custom event for navbar update
+        document.dispatchEvent(new CustomEvent('cartUpdated'));
+      }
+    });
   }
 
   /**
@@ -364,10 +378,11 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
     const isFavorite = this.favoritesService.toggleFavorite(product);
     this.updateCartAndFavoritesCount();
 
-    const message = isFavorite
-      ? 'Added to favorites'
-      : 'Removed from favorites';
-    this.notificationService.success(message, product.title);
+    if (isFavorite) {
+      this.notificationService.success('تمت الإضافة إلى المفضلة', `تمت إضافة ${product.title} إلى المفضلة`);
+    } else {
+      this.notificationService.info('تمت الإزالة من المفضلة', `تمت إزالة ${product.title} من المفضلة`);
+    }
     this.cdr.markForCheck();
 
     // Dispatch custom event for navbar update
@@ -538,10 +553,92 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   /**
-   * Navigate to products page
+   * Navigate to products page (shop page)
    */
   navigateToProducts(): void {
-    this.router.navigate(['/product']);
+    this.router.navigate(['/shop']);
+  }
+
+  /**
+   * Submit contact form
+   */
+  onSubmitContactForm(): void {
+    if (this.contactForm.invalid) {
+      this.markFormGroupTouched(this.contactForm);
+      this.contactError = 'يرجى ملء جميع الحقول المطلوبة بشكل صحيح';
+      this.contactSuccess = false;
+      this.cdr.markForCheck();
+      return;
+    }
+
+    this.contactSubmitting = true;
+    this.contactError = null;
+    this.contactSuccess = false;
+    this.cdr.markForCheck();
+
+    const formValue = this.contactForm.value;
+    const contactData: Contact = {
+      name: formValue.name,
+      email: formValue.email,
+      phone: formValue.phone,
+      message: formValue.message,
+      termsAccepted: formValue.termsAccepted
+    };
+
+    this.categoryService.sendContactForm(contactData)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (response) => {
+          this.contactSuccess = true;
+          this.contactError = null;
+          this.contactForm.reset();
+          this.contactForm.patchValue({ termsAccepted: false });
+          this.notificationService.success('تم الإرسال بنجاح', 'شكراً لك! سنتواصل معك قريباً.');
+          this.contactSubmitting = false;
+          this.cdr.markForCheck();
+        },
+        error: (error) => {
+          console.error('Error submitting contact form:', error);
+          this.contactError = 'حدث خطأ أثناء الإرسال. يرجى المحاولة مرة أخرى.';
+          this.contactSuccess = false;
+          this.contactSubmitting = false;
+          this.notificationService.error('خطأ', 'فشل إرسال النموذج. يرجى المحاولة مرة أخرى.');
+          this.cdr.markForCheck();
+        }
+      });
+  }
+
+  /**
+   * Get contact form field error
+   */
+  getContactFieldError(fieldName: string): string {
+    const field = this.contactForm.get(fieldName);
+    if (!field || !field.errors || !field.touched) return '';
+
+    if (field.errors['required']) {
+      return 'هذا الحقل مطلوب';
+    }
+    if (field.errors['email']) {
+      return 'البريد الإلكتروني غير صحيح';
+    }
+    if (field.errors['minlength']) {
+      if (fieldName === 'name') {
+        return 'الاسم يجب أن يكون حرفين على الأقل';
+      }
+      if (fieldName === 'message') {
+        return 'الرسالة يجب أن تكون 10 أحرف على الأقل';
+      }
+      return `يجب أن يكون ${field.errors['minlength'].requiredLength} أحرف على الأقل`;
+    }
+    if (field.errors['pattern']) {
+      if (fieldName === 'phone') {
+        return 'رقم الهاتف يجب أن يكون 11 رقم';
+      }
+    }
+    if (field.errors['requiredTrue']) {
+      return 'يجب الموافقة على الشروط والأحكام';
+    }
+    return '';
   }
 
   /**

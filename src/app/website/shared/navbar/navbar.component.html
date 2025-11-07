@@ -4,7 +4,9 @@
 <!-- Announcement/Slogan -->
 <section class="announcement-section">
   <div class="container">
-    <p class="announcement-text">متجر أميجو .. المزيد من الأناقة والراحة القصوى</p>
+    <p class="announcement-text">
+      متجر أميجو .. المزيد من الأناقة والراحة القصوى
+    </p>
   </div>
 </section>
 
@@ -15,40 +17,65 @@
       <!-- Left: Logo -->
       <div class="navbar-left">
         <a routerLink="/home" class="logo-link">
-          <img src="../../../assets/img/logo/logo_dark.png" alt="Amigo Store" class="main-logo">
+          <img
+            src="../../../assets/img/logo/logo_dark.png"
+            alt="Amigo Store"
+            class="main-logo"
+          />
         </a>
       </div>
 
       <!-- Center: Categories Navigation -->
       <div class="navbar-center">
         <div class="categories-nav-wrapper">
-          <button class="nav-arrow nav-arrow-left"
-                  (click)="scrollCategories('left'); $event.preventDefault(); $event.stopPropagation()"
-                  [disabled]="!canScrollLeft"
-                  [attr.aria-disabled]="!canScrollLeft"
-                  aria-label="Scroll left"
-                  type="button">
+          <button
+            class="nav-arrow nav-arrow-left"
+            (click)="
+              scrollCategories('left');
+              $event.preventDefault();
+              $event.stopPropagation()
+            "
+            [disabled]="!canScrollLeft"
+            [attr.aria-disabled]="!canScrollLeft"
+            aria-label="Scroll left"
+            type="button"
+          >
             <i class="fas fa-chevron-right"></i>
           </button>
           <div class="categories-nav" #categoriesContainer>
             <div class="categories-nav-inner">
-              <a *ngFor="let category of allcatgory; trackBy: trackByCategoryId"
-                 class="category-nav-item"
-                 (click)="navigateToCategory(category._id)"
-                 [class.active]="isCategoryActive(category._id)">
+              <a
+                *ngFor="let category of allcatgory; trackBy: trackByCategoryId"
+                class="category-nav-item"
+                (click)="navigateToCategory(category._id)"
+                [class.active]="isCategoryActive(category._id)"
+              >
                 {{ category.name }}
+              </a>
+              <a
+                class="category-nav-item"
+                (click)="navigateToProducts()"
+                [class.active]="isProductsActive()"
+              >
+                {{ "جميع المنتجات" }}
               </a>
               <div *ngIf="allcatgory.length === 0" class="categories-loading">
                 <span class="loading-text">جاري التحميل...</span>
               </div>
             </div>
           </div>
-          <button class="nav-arrow nav-arrow-right"
-                  (click)="scrollCategories('right'); $event.preventDefault(); $event.stopPropagation()"
-                  [disabled]="!canScrollRight"
-                  [attr.aria-disabled]="!canScrollRight"
-                  aria-label="Scroll right"
-                  type="button">
+          <button
+            class="nav-arrow nav-arrow-right"
+            (click)="
+              scrollCategories('right');
+              $event.preventDefault();
+              $event.stopPropagation()
+            "
+            [disabled]="!canScrollRight"
+            [attr.aria-disabled]="!canScrollRight"
+            aria-label="Scroll right"
+            type="button"
+          >
             <i class="fas fa-chevron-left"></i>
           </button>
         </div>
@@ -56,15 +83,32 @@
 
       <!-- Right: Action Icons -->
       <div class="navbar-right">
-        <button class="icon-btn favorite-btn" (click)="togglestarItem()" aria-label="Favorites">
+        <button
+          class="icon-btn favorite-btn"
+          (click)="togglestarItem()"
+          aria-label="Favorites"
+        >
           <i class="fas fa-heart"></i>
-          <span class="favorite-badge" *ngIf="starproduct.length > 0">{{ starproduct.length }}</span>
+          <span class="favorite-badge" *ngIf="starproduct.length > 0">{{
+            starproduct.length
+          }}</span>
         </button>
-        <button class="icon-btn cart-btn" (click)="toggleCartItem()" aria-label="Shopping Cart">
+        <button
+          class="icon-btn cart-btn"
+          (click)="toggleCartItem()"
+          aria-label="Shopping Cart"
+        >
           <i class="fas fa-shopping-bag"></i>
-          <span class="cart-badge" *ngIf="cartproduct.length > 0">{{ cartproduct.length }}</span>
+          <span class="cart-badge" *ngIf="cartproduct.length > 0">{{
+            cartproduct.length
+          }}</span>
         </button>
-        <button class="icon-btn menu-btn" id="menu-btn" (click)="toggleNavbar()" aria-label="Menu">
+        <button
+          class="icon-btn menu-btn"
+          id="menu-btn"
+          (click)="toggleNavbar()"
+          aria-label="Menu"
+        >
           <i class="fas fa-bars"></i>
         </button>
       </div>
@@ -75,29 +119,40 @@
   <div class="navbar-divider"></div>
 
   <!-- Mobile Menu Overlay -->
-  <div class="mobile-menu-overlay"
-       [class.active]="navbarActive"
-       (click)="closeNavbar()"></div>
+  <div
+    class="mobile-menu-overlay"
+    [class.active]="navbarActive"
+    (click)="closeNavbar()"
+  ></div>
 
   <!-- Mobile Menu -->
-  <nav class="mobile-menu" [class.active]="navbarActive" (click)="$event.stopPropagation()">
+  <nav
+    class="mobile-menu"
+    [class.active]="navbarActive"
+    (click)="$event.stopPropagation()"
+  >
     <!-- Categories in Mobile Menu -->
     <div class="mobile-categories" *ngIf="allcatgory.length > 0">
-      <a *ngFor="let category of allcatgory; trackBy: trackByCategoryId"
-         class="mobile-category-item"
-         (click)="navigateToCategory(category._id); closeNavbar()">
+      <a
+        *ngFor="let category of allcatgory; trackBy: trackByCategoryId"
+        class="mobile-category-item"
+        (click)="navigateToCategory(category._id); closeNavbar()"
+      >
         {{ category.name }}
       </a>
     </div>
   </nav>
-
 </header>
 
 <!-- Cart Sidebar -->
 <div class="cart-sidebar" [class.active]="cartActive">
   <div class="sidebar-header">
     <h3>سلة التسوق</h3>
-    <button class="close-btn" (click)="toggleCartItem()" aria-label="إغلاق السلة">
+    <button
+      class="close-btn"
+      (click)="toggleCartItem()"
+      aria-label="إغلاق السلة"
+    >
       <i class="fas fa-times"></i>
     </button>
   </div>
@@ -106,46 +161,94 @@
     <div *ngIf="cartproduct.length === 0" class="empty-state">
       <i class="fas fa-shopping-cart fa-3x mb-3 text-muted"></i>
       <p class="text-muted">سلة التسوق فارغة</p>
-      <a routerLink="/product" class="btn btn-primary" (click)="toggleCartItem()">ابدأ التسوق</a>
+      <a
+        routerLink="/shop"
+        class="btn btn-primary"
+        (click)="toggleCartItem()"
+        >ابدأ التسوق</a
+      >
     </div>
 
     <div *ngIf="cartproduct.length > 0" class="cart-items-list">
-      <div *ngFor="let item of cartproduct; let index = index" class="cart-item-card">
-        <img [src]="getProductImageUrl(item.imageCover)"
-             [alt]="item.title"
-             class="cart-item-img"
-             onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Crect fill=%22%23f0f0f0%22 width=%22100%22 height=%22100%22/%3E%3C/svg%3E'">
+      <div
+        *ngFor="let item of cartproduct; let index = index"
+        class="cart-item-card"
+      >
+        <img
+          [src]="getProductImageUrl(item.imageCover)"
+          [alt]="item.title"
+          class="cart-item-img"
+          onerror="this.src='data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22%3E%3Crect fill=%22%23f0f0f0%22 width=%22100%22 height=%22100%22/%3E%3C/svg%3E'"
+        />
         <div class="cart-item-info">
           <h4 class="cart-item-title">{{ item.title }}</h4>
+          <div class="cart-item-attributes" *ngIf="item.selectedSize || item.selectedColor">
+            <!-- Color Display (like product details) -->
+            <div *ngIf="item.selectedColor" class="cart-color-display">
+              <span class="color-label">اللون:</span>
+              <div class="cart-color-option">
+                <span class="cart-color-bullet" [style.background-color]="getColorValue(item.selectedColor)"></span>
+                <span class="cart-color-name">{{ item.selectedColor }}</span>
+              </div>
+            </div>
+            <!-- Size Display (like product details) -->
+            <div *ngIf="item.selectedSize" class="cart-size-display">
+              <span class="size-label">الحجم:</span>
+              <div class="cart-size-option">
+                <span class="cart-size-name">{{ item.selectedSize.toUpperCase() }}</span>
+              </div>
+            </div>
+          </div>
           <div class="cart-item-controls">
             <div class="quantity-controls">
-              <button class="qty-btn" (click)="decrease(index)" [disabled]="item.quantity <= 1">-</button>
-              <input type="number"
-                     class="qty-input"
-                     [(ngModel)]="item.quantity"
-                     (change)="detectedchange()"
-                     min="1">
+              <button
+                class="qty-btn"
+                (click)="decrease(index)"
+                [disabled]="item.quantity <= 1"
+              >
+                -
+              </button>
+              <input
+                type="number"
+                class="qty-input"
+                [(ngModel)]="item.quantity"
+                (change)="detectedchange()"
+                min="1"
+              />
               <button class="qty-btn" (click)="increase(index)">+</button>
             </div>
             <div class="cart-item-price">
-              <span class="price">{{ (item.price * item.quantity) | currency:'EGP':'symbol':'1.0-0' }}</span>
+              <span class="price">{{
+                item.price * item.quantity
+                  | currency : "EGP" : "symbol" : "1.0-0"
+              }}</span>
             </div>
           </div>
         </div>
-        <button class="remove-btn" (click)="delete(index)" aria-label="Remove item">
+        <button
+          class="remove-btn"
+          (click)="delete(index)"
+          aria-label="Remove item"
+        >
           <i class="fas fa-trash"></i>
         </button>
       </div>
     </div>
   </div>
 
-    <div *ngIf="cartproduct.length > 0" class="sidebar-footer">
-      <div class="cart-total">
-        <span class="total-label">الإجمالي:</span>
-        <span class="total-price">{{ total | currency:'EGP':'symbol':'1.0-0' }}</span>
-      </div>
-      <a routerLink="/checkout" class="btn btn-primary btn-block" (click)="toggleCartItem()">
-        اتمام الشراء
-      </a>
+  <div *ngIf="cartproduct.length > 0" class="sidebar-footer">
+    <div class="cart-total">
+      <span class="total-label">الإجمالي:</span>
+      <span class="total-price">{{
+        total | currency : "EGP" : "symbol" : "1.0-0"
+      }}</span>
     </div>
+    <a
+      routerLink="/checkout"
+      class="btn btn-primary btn-block"
+      (click)="toggleCartItem()"
+    >
+      اتمام الشراء
+    </a>
+  </div>
 </div>

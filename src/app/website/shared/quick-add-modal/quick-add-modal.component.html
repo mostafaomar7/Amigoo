@@ -1,0 +1,139 @@
+<!-- Quick Add Modal -->
+<div
+  class="modal fade"
+  [class.show]="showModal"
+  [style.display]="showModal ? 'block' : 'none'"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="quickAddModalLabel"
+  aria-hidden="true"
+  (click)="onBackdropClick($event)"
+>
+  <div class="modal-dialog modal-dialog-centered" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="quickAddModalLabel">
+          <i class="fas fa-shopping-cart me-2"></i>
+          اختر المواصفات
+        </h5>
+        <button
+          type="button"
+          class="btn-close"
+          (click)="closeModal()"
+          aria-label="Close"
+        ></button>
+      </div>
+      <div class="modal-body" *ngIf="product">
+        <!-- Product Info -->
+        <div class="product-preview mb-4">
+          <div class="product-image">
+            <img
+              [src]="getImageUrl(product.imageCover)"
+              [alt]="product.title"
+              onerror="this.src='assets/img/404/404.png'">
+          </div>
+          <div class="product-info">
+            <h6 class="product-title">{{ product.title }}</h6>
+            <p class="product-price">
+              {{ (product.priceAfterDiscount || product.price) | currency:'EGP':'symbol':'1.0-0' }}
+            </p>
+          </div>
+        </div>
+
+        <!-- Color Selection -->
+        <div class="selection-group mb-4" *ngIf="product && product.colors && product.colors.length > 0">
+          <div class="color-options">
+            <div
+              *ngFor="let color of product.colors"
+              class="color-option"
+              [class.selected]="isColorSelected(color)"
+              (click)="selectColor(color)">
+              <span
+                class="color-bullet"
+                [style.background-color]="getColorValue(getColorName(color))">
+              </span>
+              <span class="color-name">{{ getColorName(color) }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Size Selection -->
+        <div class="selection-group mb-4" *ngIf="availableSizes.length > 0">
+          <label class="selection-label">
+            <i class="fas fa-ruler me-2"></i>
+            اختر المقاس <span class="required">*</span>
+          </label>
+          <div class="size-options">
+            <button
+              *ngFor="let sizeData of availableSizes"
+              type="button"
+              class="size-option"
+              [class.selected]="selectedSize === sizeData.size"
+              [class.out-of-stock]="sizeData.no === 0 && sizeData.quantity === 0"
+              [disabled]="sizeData.no === 0 && sizeData.quantity === 0"
+              (click)="selectedSize = sizeData.size">
+              {{ sizeData.size }}
+              <small *ngIf="sizeData.no !== undefined" class="stock-info">
+                ({{ sizeData.no }} متاح)
+              </small>
+            </button>
+          </div>
+        </div>
+
+        <!-- Quantity Selection -->
+        <div class="selection-group mb-3">
+          <label class="selection-label">
+            <i class="fas fa-sort-numeric-up me-2"></i>
+            الكمية
+          </label>
+          <div class="quantity-controls">
+            <button
+              type="button"
+              class="qty-btn"
+              (click)="decreaseQuantity()"
+              [disabled]="quantity <= 1">
+              <i class="fas fa-minus"></i>
+            </button>
+            <input
+              type="number"
+              class="qty-input"
+              [(ngModel)]="quantity"
+              min="1"
+              [max]="getSelectedSizeStock() || 999"
+              (blur)="onQuantityBlur()">
+            <button
+              type="button"
+              class="qty-btn"
+              (click)="increaseQuantity()"
+              [disabled]="quantity >= (getSelectedSizeStock() || 999)">
+              <i class="fas fa-plus"></i>
+            </button>
+          </div>
+          <small class="stock-info-text" *ngIf="selectedSize && getSelectedSizeStock() > 0">
+            متاح: {{ getSelectedSizeStock() }} قطعة
+          </small>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button
+          type="button"
+          class="btn btn-primary"
+          (click)="confirmAdd()"
+          [disabled]="(product && product.colors && product.colors.length > 0 && !selectedColor) || (availableSizes.length > 0 && !selectedSize)">
+          <i class="fas fa-check me-2"></i>
+          إضافة إلى السلة
+        </button>
+        <button type="button" class="btn btn-secondary" (click)="closeModal()">
+          إلغاء
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Backdrop -->
+<div
+  *ngIf="showModal"
+  class="modal-backdrop fade show"
+  (click)="closeModal()"
+></div>

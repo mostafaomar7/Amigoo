@@ -21,6 +21,7 @@ router.use(authenticate);
 
 // User routes
 router.route('/my-orders').get(getUserOrders);
+router.route('/:id/cancel').put(updateOrderStatus); // User can cancel their own orders
 
 // Admin routes
 router.use(authorize(['Admin']));

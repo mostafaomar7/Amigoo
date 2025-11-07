@@ -10,7 +10,6 @@ const validatorMiddleware = (req, res, next) => {
       errors: errors.array()
     });
   }
-  // console.log('createProductValidator middleware called');
 
   next();
 };

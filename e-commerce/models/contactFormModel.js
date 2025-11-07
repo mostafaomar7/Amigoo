@@ -26,7 +26,7 @@ const contactFormSchema = new mongoose.Schema({
   },
   termsAccepted: {
     type: Boolean,
-    required: [true, 'You must accept the terms and conditions'],
+    default: false,
   },
   isDeleted: {
     type: Boolean,

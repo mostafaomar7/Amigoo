@@ -4,7 +4,7 @@ import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angula
 import { FormsModule } from '@angular/forms';
 import { ApiService, PaginationParams } from '../../services/api.service';
 import { NotificationService } from '../../services/notification.service';
-import { environment } from '../../../environments/environment';
+import { EnvironmentService } from '../../services/environment.service';
 
 export interface OrderItem {
   productId: {
@@ -69,13 +69,13 @@ export class OrdersComponent implements OnInit, OnDestroy {
   statusFilter: string = '';
   searchTerm = '';
   private searchTimeout: any = null;
-  private uploadsBaseUrl = environment.apiUrl.replace('/api/v1', '') + '/uploads';
 
   Math = Math;
 
   constructor(
     private apiService: ApiService,
     private notificationService: NotificationService,
+    private environmentService: EnvironmentService,
     private fb: FormBuilder
   ) {
     this.statusForm = this.fb.group({
@@ -271,9 +271,9 @@ export class OrdersComponent implements OnInit, OnDestroy {
 
   getImageUrl(imagePath: string): string {
     if (!imagePath) return '';
-    if (imagePath.startsWith('http')) {
+    if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
       return imagePath;
     }
-    return `${this.uploadsBaseUrl}/products/${imagePath}`;
+    return `${this.environmentService.imageBaseUrl}uploads/products/${imagePath}`;
   }
 }

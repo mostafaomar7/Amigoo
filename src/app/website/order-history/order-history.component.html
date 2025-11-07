@@ -1,0 +1,181 @@
+<div class="order-history-page">
+  <div class="container">
+    <!-- Page Header -->
+    <div class="order-history-header">
+      <h1 class="page-title">
+        <i class="fas fa-history me-2"></i>
+        سجل الطلبات
+      </h1>
+      <p class="page-subtitle">عرض جميع طلباتك السابقة</p>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!loading && orders.length === 0" class="empty-orders">
+      <div class="empty-orders-container">
+        <i class="fas fa-shopping-bag empty-icon"></i>
+        <h3 class="empty-title">لا توجد طلبات</h3>
+        <p class="empty-text">لم تقم بأي طلبات حتى الآن</p>
+        <a routerLink="/shop" class="btn btn-primary">
+          <i class="fas fa-shopping-cart me-2"></i>
+          ابدأ التسوق
+        </a>
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="loading" class="loading-state">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">جاري التحميل...</span>
+      </div>
+    </div>
+
+    <!-- Orders List -->
+    <div *ngIf="!loading && orders.length > 0" class="orders-list">
+      <!-- Clear All Button (for testing) -->
+      <div class="text-end mb-3">
+        <button class="btn btn-outline-danger btn-sm" (click)="clearAllOrders()">
+          <i class="fas fa-trash me-2"></i>
+          حذف جميع الطلبات
+        </button>
+      </div>
+
+      <!-- Order Cards -->
+      <div *ngFor="let order of orders" class="order-card">
+        <div class="order-header">
+          <div class="order-info">
+            <h3 class="order-id">
+              <i class="fas fa-receipt me-2"></i>
+              رقم الطلب: {{ order.id }}
+            </h3>
+            <p class="order-date">
+              <i class="fas fa-calendar me-2"></i>
+              {{ formatDate(order.createdAt) }}
+            </p>
+          </div>
+          <div class="order-status">
+            <span
+              class="status-badge"
+              [style.background-color]="getStatusColor(order.status)">
+              {{ getStatusLabel(order.status) }}
+            </span>
+          </div>
+        </div>
+
+        <hr class="order-divider">
+
+        <!-- Customer Information -->
+        <div class="order-section">
+          <h4 class="section-title">
+            <i class="fas fa-user me-2"></i>
+            معلومات العميل
+          </h4>
+          <div class="info-grid">
+            <div class="info-item">
+              <span class="info-label">الاسم:</span>
+              <span class="info-value">{{ order.fullName }}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">البريد الإلكتروني:</span>
+              <span class="info-value">{{ order.email }}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">الهاتف الأساسي:</span>
+              <span class="info-value">{{ order.primaryPhone }}</span>
+            </div>
+            <div class="info-item" *ngIf="order.secondaryPhone">
+              <span class="info-label">الهاتف الثانوي:</span>
+              <span class="info-value">{{ order.secondaryPhone }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Delivery Information -->
+        <div class="order-section">
+          <h4 class="section-title">
+            <i class="fas fa-truck me-2"></i>
+            معلومات التوصيل
+          </h4>
+          <div class="info-grid">
+            <div class="info-item">
+              <span class="info-label">العنوان:</span>
+              <span class="info-value">{{ order.detailedAddress }}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">المحافظة:</span>
+              <span class="info-value">{{ order.governorate }}</span>
+            </div>
+            <div class="info-item">
+              <span class="info-label">المدينة:</span>
+              <span class="info-value">{{ order.city }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Order Items -->
+        <div class="order-section">
+          <h4 class="section-title">
+            <i class="fas fa-shopping-bag me-2"></i>
+            المنتجات
+          </h4>
+          <div class="order-items">
+            <div *ngFor="let item of order.items" class="order-item">
+              <div class="item-image" *ngIf="item.imageCover">
+                <img
+                  [src]="getImageUrl(item.imageCover)"
+                  [alt]="item.title || 'منتج'"
+                  (error)="$event.target.src='assets/img/404/404.png'">
+              </div>
+              <div class="item-details">
+                <h5 class="item-title">{{ item.title || 'منتج' }}</h5>
+                <p class="item-meta">
+                  <span *ngIf="item.sizeName">المقاس: {{ item.sizeName }}</span>
+                  <span *ngIf="item.sizeName"> | </span>
+                  <span>الكمية: {{ item.quantity }}</span>
+                </p>
+                <p class="item-price">
+                  {{ item.price | currency:'EGP':'symbol':'1.0-0' }} × {{ item.quantity }} =
+                  {{ item.totalPrice | currency:'EGP':'symbol':'1.0-0' }}
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Order Notes -->
+        <div class="order-section" *ngIf="order.notes">
+          <h4 class="section-title">
+            <i class="fas fa-sticky-note me-2"></i>
+            الملاحظات
+          </h4>
+          <p class="order-notes">{{ order.notes }}</p>
+        </div>
+
+        <!-- Order Totals -->
+        <div class="order-totals">
+          <div class="total-row">
+            <span>المجموع الفرعي:</span>
+            <span>{{ order.subtotal | currency:'EGP':'symbol':'1.0-0' }}</span>
+          </div>
+          <div class="total-row">
+            <span>ضريبة القيمة المضافة:</span>
+            <span>{{ order.vat | currency:'EGP':'symbol':'1.0-0' }}</span>
+          </div>
+          <div class="total-row total-final">
+            <span>الإجمالي:</span>
+            <span class="final-price">{{ order.total | currency:'EGP':'symbol':'1.0-0' }}</span>
+          </div>
+        </div>
+
+        <!-- Order Actions -->
+        <div class="order-actions">
+          <button
+            class="btn btn-outline-danger btn-sm"
+            (click)="deleteOrder(order.id)">
+            <i class="fas fa-trash me-2"></i>
+            حذف من السجل
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

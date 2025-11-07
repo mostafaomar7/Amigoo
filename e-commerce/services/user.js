@@ -36,7 +36,6 @@ exports.registerUser = async (req, res) => {
 
         res.status(201).json({ message: 'تم التسجيل بنجاح', user: newUser,token });
     } catch (error) {
-        console.log(error);
         res.status(500).json({ message: 'خطأ في الخادم', error });
     }
 };
@@ -60,7 +59,6 @@ exports.loginUser = async (req, res) => {
         // مقارنة كلمة المرور
         const isPasswordValid = await bcrypt.compare(password,user.password);
         if (!isPasswordValid) {
-            console.log(password,user.password);
             return res.status(401).json({ message: 'كلمة المرور غير صحيحة' });
         }
 
@@ -70,7 +68,6 @@ exports.loginUser = async (req, res) => {
         res.status(200).json({ message: 'تم تسجيل الدخول بنجاح', token ,user});
 
     } catch (error) {
-        console.log(error);
         res.status(500).json({ message: 'خطأ في الخادم', error });
     }
 };

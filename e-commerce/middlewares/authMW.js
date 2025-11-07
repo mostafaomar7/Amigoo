@@ -11,7 +11,6 @@ if (!jwtSecret) {
 // Middleware للمصادقة
 exports.authenticate = (req, res, next) => {
     const token = req.header('Authorization')?.replace('Bearer ', '');
-    console.log(token);
 
     if (!token) {
 
@@ -26,8 +25,7 @@ exports.authenticate = (req, res, next) => {
         if (error.name === 'TokenExpiredError') {
             return res.status(401).json({ message: 'رمز المصادقة منتهي الصلاحية' });
         }
-        console.log(error);
-        
+
     return res.status(401).json({ message: 'رمز المصادقة غير صالح' });
     }
 };
@@ -42,4 +40,3 @@ exports.authorize = (roles) => (req, res, next) => {
     }
     next();
 };
- 

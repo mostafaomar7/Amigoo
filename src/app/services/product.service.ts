@@ -139,6 +139,7 @@ export class ProductService {
     sort?: string;
     keyword?: string;
     featured?: boolean;
+    category_id?: string;
   }): Observable<PaginatedResponse<Product>> {
     const paginationParams: any = {
       page: params?.page || 1,
@@ -148,6 +149,10 @@ export class ProductService {
 
     if (params?.keyword) {
       paginationParams.keyword = params.keyword;
+    }
+
+    if (params?.category_id) {
+      paginationParams.category_id = params.category_id;
     }
 
     // Note: If API supports featured parameter, it will be passed here

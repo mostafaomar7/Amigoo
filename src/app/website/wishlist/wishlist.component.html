@@ -1,0 +1,62 @@
+<div class="wishlist-page">
+  <div class="container">
+    <!-- Page Header -->
+    <div class="wishlist-header">
+      <div class="d-flex justify-content-between align-items-center mb-4">
+        <div>
+          <h1 class="wishlist-title">قائمة المفضلة</h1>
+          <p class="wishlist-subtitle">المنتجات التي أضفتها إلى المفضلة</p>
+        </div>
+        <button
+          *ngIf="wishlistItems.length > 3"
+          class="btn btn-outline-danger btn-clear-all"
+          (click)="clearAllWishlist()">
+          <i class="fas fa-trash me-2"></i>
+          مسح الكل
+        </button>
+      </div>
+    </div>
+
+    <!-- Loading State -->
+    <div *ngIf="loading" class="wishlist-loading">
+      <div class="row g-4">
+        <div class="col-6 col-md-4 col-lg-3" *ngFor="let i of [1,2,3,4,5,6,7,8]">
+          <div class="skeleton-card">
+            <div class="skeleton-image"></div>
+            <div class="skeleton-text"></div>
+            <div class="skeleton-text short"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty State -->
+    <div *ngIf="!loading && wishlistItems.length === 0" class="wishlist-empty">
+      <div class="empty-container">
+        <div class="empty-icon-wrapper">
+          <i class="fas fa-heart empty-icon"></i>
+        </div>
+        <h2 class="empty-title">قائمة المفضلة فارغة ❤️</h2>
+        <p class="empty-message">
+          لم تقم بإضافة أي منتجات إلى المفضلة بعد.<br>
+          تصفح المنتجات وأضف ما يعجبك!
+        </p>
+        <button class="btn btn-primary btn-back-to-shop" (click)="navigateToShop()">
+          <i class="fas fa-arrow-left me-2"></i>
+          العودة إلى المتجر
+        </button>
+      </div>
+    </div>
+
+    <!-- Wishlist Items Grid -->
+    <div *ngIf="!loading && wishlistItems.length > 0" class="wishlist-content">
+      <div class="wishlist-grid row g-4">
+        <div class="col-6 col-md-4 col-lg-3" *ngFor="let product of wishlistItems; trackBy: trackByProductId">
+          <div class="wishlist-item-card">
+            <app-product-card [product]="product"></app-product-card>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,15 +1,19 @@
-import { Component, OnInit, OnDestroy } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { Subject } from 'rxjs';
-import { takeUntil, finalize } from 'rxjs/operators';
-
-import { ProductService, Product, ProductSize } from '../../services/product.service';
-import { FavoritesService } from '../../services/favorites.service';
+import { ProductService, Product } from '../../services/product.service';
 import { OpencartService } from '../../services/opencart.service';
+import { FavoritesService } from '../../services/favorites.service';
 import { EnvironmentService } from '../../services/environment.service';
 import { NotificationService } from '../../services/notification.service';
+import { Subject } from 'rxjs';
+import { takeUntil } from 'rxjs/operators';
+
+export interface ProductQuantity {
+  size: string;
+  no: number;
+}
 
 @Component({
   selector: 'app-product',
@@ -19,51 +23,62 @@ import { NotificationService } from '../../services/notification.service';
   styleUrls: ['./product.component.css']
 })
 export class ProductComponent implements OnInit, OnDestroy {
-  product: Product | null = null;
+  product: (Product & { quantity?: ProductQuantity[] }) | null = null;
   relatedProducts: Product[] = [];
-  sizes: ProductSize[] = [];
-  reviews: any[] = [];
-
-  // State management
   loading = true;
   error: string | null = null;
-  selectedSize: string | null = null;
-  quantity: number = 1;
+
+  // Image gallery
   selectedImageIndex = 0;
+  allImages: string[] = [];
+
+  // Product options
+  selectedColor: string | null = null;
+  selectedSize: string | null = null;
+  quantity = 1;
+  availableSizes: ProductQuantity[] = [];
+
+  // Stock status
+  isOutOfStock = false;
+  totalStock = 0;
+
+  // Wishlist status
   isFavorite = false;
-  isInCart = false;
-
-  // UI state
-  activeTab: 'description' | 'specifications' | 'reviews' = 'description';
-  showFullDescription = false;
-  descriptionPreviewLines = 4;
-
-  // Image loading
-  imageError = false;
-  mainImageError = false;
 
   private destroy$ = new Subject<void>();
-  private productId: string | null = null;
+  private imageErrors = new Set<string>();
 
   constructor(
     private route: ActivatedRoute,
     private router: Router,
     private productService: ProductService,
-    private favoritesService: FavoritesService,
     private opencartService: OpencartService,
+    private favoritesService: FavoritesService,
     private environmentService: EnvironmentService,
-    private notificationService: NotificationService
+    private notificationService: NotificationService,
+    private cdr: ChangeDetectorRef
   ) {}
 
   ngOnInit(): void {
     this.route.params.pipe(takeUntil(this.destroy$)).subscribe(params => {
-      this.productId = params['_id'];
-      if (this.productId) {
-        this.loadProduct();
+      const productId = params['_id'];
+      if (productId) {
+        this.loadProduct(productId);
       } else {
-        this.router.navigate(['/']);
+        this.error = 'معرف المنتج غير موجود';
+        this.loading = false;
       }
     });
+
+    // Listen for favorites updates
+    this.favoritesService.getFavoritesObservable()
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(() => {
+        if (this.product) {
+          this.isFavorite = this.favoritesService.isFavorite(this.product._id);
+          this.cdr.markForCheck();
+        }
+      });
   }
 
   ngOnDestroy(): void {
@@ -71,61 +86,128 @@ export class ProductComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  loadProduct(): void {
-    if (!this.productId) return;
-
+  /**
+   * Load product data from API
+   */
+  loadProduct(productId: string): void {
     this.loading = true;
     this.error = null;
 
-    this.productService.getProductById(this.productId)
-      .pipe(
-        takeUntil(this.destroy$),
-        finalize(() => {
-          this.loading = false;
-        })
-      )
-      .subscribe({
-        next: (product) => {
-          this.product = product;
-          this.checkFavoriteStatus();
-          this.checkCartStatus();
-          this.loadSizes();
-          this.loadRelatedProducts();
-          this.loadReviews();
-        },
-        error: (error) => {
-          console.error('Error loading product:', error);
-          if (error.status === 404) {
-            this.error = 'Product not found';
-          } else {
-            this.error = 'Failed to load product. Please try again.';
-          }
-        }
-      });
+    this.productService.getProductById(productId).pipe(
+      takeUntil(this.destroy$)
+    ).subscribe({
+      next: (product) => {
+        this.product = product;
+        this.initializeProductData();
+        this.loadRelatedProducts();
+        this.loading = false;
+        this.cdr.markForCheck();
+      },
+      error: (err) => {
+        console.error('Error loading product:', err);
+        this.error = 'حدث خطأ أثناء تحميل المنتج. يرجى المحاولة مرة أخرى.';
+        this.loading = false;
+        this.cdr.markForCheck();
+      }
+    });
   }
 
-  loadSizes(): void {
-    if (!this.productId) return;
+  /**
+   * Initialize product data after loading
+   */
+  initializeProductData(): void {
+    if (!this.product) return;
 
-    this.productService.getProductSizes(this.productId)
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (sizes) => {
-          this.sizes = sizes;
-          // Auto-select first available size
-          if (sizes.length > 0 && !this.selectedSize) {
-            const availableSize = sizes.find(s => s.isAvailable && s.quantity > 0);
-            if (availableSize) {
-              this.selectedSize = availableSize.sizeName;
-            }
-          }
-        },
-        error: (error) => {
-          console.error('Error loading sizes:', error);
-        }
-      });
+    // Initialize images
+    this.allImages = [];
+    if (this.product.imageCover) {
+      this.allImages.push(this.product.imageCover);
+    }
+    if (this.product.images && this.product.images.length > 0) {
+      this.allImages.push(...this.product.images);
+    }
+    this.selectedImageIndex = 0;
+
+    // Initialize sizes from quantity array
+    if (this.product.quantity && Array.isArray(this.product.quantity)) {
+      this.availableSizes = this.product.quantity.filter(q => q.no > 0);
+      this.calculateStockStatus();
+    } else {
+      this.availableSizes = [];
+      this.isOutOfStock = true;
+    }
+
+    // Initialize colors
+    if (this.product.colors && this.product.colors.length > 0) {
+      this.selectedColor = this.product.colors[0];
+    }
+
+    // Check favorite status
+    this.isFavorite = this.favoritesService.isFavorite(this.product._id);
   }
 
+  /**
+   * Calculate stock status
+   */
+  calculateStockStatus(): void {
+    if (!this.product || !this.product.quantity) {
+      this.isOutOfStock = true;
+      this.totalStock = 0;
+      return;
+    }
+
+    this.totalStock = this.product.quantity.reduce((sum, q) => sum + (q.no || 0), 0);
+    this.isOutOfStock = this.totalStock === 0;
+  }
+
+  /**
+   * Get stock status text
+   */
+  getStockStatus(): string {
+    if (this.isOutOfStock) {
+      return 'Out of Stock';
+    }
+    if (this.totalStock <= 3) {
+      return 'Low Stock';
+    }
+    return 'In Stock';
+  }
+
+  /**
+   * Get stock status for a specific size
+   */
+  getSizeStockStatus(sizeData: ProductQuantity): string {
+    if (sizeData.no === 0) {
+      return 'Out of Stock';
+    }
+    if (sizeData.no <= 3) {
+      return 'Low Stock';
+    }
+    return 'In Stock';
+  }
+
+  /**
+   * Get available stock for selected size
+   */
+  getSelectedSizeStock(): number {
+    if (!this.selectedSize || !this.product || !this.product.quantity) {
+      return 0;
+    }
+
+    const sizeData = this.product.quantity.find(q => q.size === this.selectedSize);
+    return sizeData ? sizeData.no : 0;
+  }
+
+  /**
+   * Get max quantity based on selected size
+   */
+  getMaxQuantity(): number {
+    return this.getSelectedSizeStock();
+  }
+
+  /**
+   * Load related products
+   */
   loadRelatedProducts(): void {
     if (!this.product || !this.product.category?._id) return;
 
@@ -133,44 +215,21 @@ export class ProductComponent implements OnInit, OnDestroy {
       this.product.category._id,
       this.product._id,
       4
-    )
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (products) => {
-          this.relatedProducts = products;
-        },
-        error: (error) => {
-          console.error('Error loading related products:', error);
-        }
-      });
+    ).pipe(takeUntil(this.destroy$)).subscribe({
+      next: (products) => {
+        this.relatedProducts = products;
+        this.cdr.markForCheck();
+      },
+      error: (err) => {
+        console.error('Error loading related products:', err);
+        // Don't show error for related products, just log it
+      }
+    });
   }
 
-  loadReviews(): void {
-    if (!this.productId) return;
-
-    this.productService.getProductReviews(this.productId)
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (reviews) => {
-          this.reviews = reviews;
-        },
-        error: (error) => {
-          // Reviews endpoint might not exist, fail silently
-        }
-      });
-  }
-
-  checkFavoriteStatus(): void {
-    if (!this.product) return;
-    this.isFavorite = this.favoritesService.isFavorite(this.product._id);
-  }
-
-  checkCartStatus(): void {
-    if (!this.product) return;
-    const cartItems = this.opencartService.cartproduct || [];
-    this.isInCart = cartItems.some((item: any) => item._id === this.product!._id);
-  }
-
+  /**
+   * Get image URL
+   */
   getImageUrl(imagePath: string): string {
     if (!imagePath) return '';
     if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
@@ -179,170 +238,199 @@ export class ProductComponent implements OnInit, OnDestroy {
     return `${this.environmentService.imageBaseUrl}uploads/products/${imagePath}`;
   }
 
-  getProductImages(): string[] {
-    if (!this.product) return [];
-    const images = [this.product.imageCover];
-    if (this.product.images && this.product.images.length > 0) {
-      images.push(...this.product.images);
-    }
-    return images;
+  /**
+   * Handle image error
+   */
+  onImageError(imageId: string): void {
+    this.imageErrors.add(imageId);
+    this.cdr.markForCheck();
   }
 
+  /**
+   * Check if image has error
+   */
+  hasImageError(imageId: string): boolean {
+    return this.imageErrors.has(imageId);
+  }
+
+  /**
+   * Select image from gallery
+   */
   selectImage(index: number): void {
-    this.selectedImageIndex = index;
-    this.mainImageError = false;
-  }
-
-  onImageError(): void {
-    this.mainImageError = true;
-  }
-
-  onThumbnailError(event: Event): void {
-    const img = event.target as HTMLImageElement;
-    img.style.display = 'none';
-  }
-
-  onQuantityChange(change: number): void {
-    const newQuantity = this.quantity + change;
-    const maxQuantity = this.getMaxQuantity();
-
-    if (newQuantity >= 1 && newQuantity <= maxQuantity) {
-      this.quantity = newQuantity;
+    if (index >= 0 && index < this.allImages.length) {
+      this.selectedImageIndex = index;
     }
   }
 
-  getMaxQuantity(): number {
-    if (!this.selectedSize || !this.sizes.length) return 999;
-    const size = this.sizes.find(s => s.sizeName === this.selectedSize);
-    return size && size.isAvailable ? size.quantity : 0;
+  /**
+   * Select color
+   */
+  selectColor(color: string): void {
+    this.selectedColor = color;
   }
 
-  getStockStatus(): { inStock: boolean; message: string } {
-    if (!this.sizes.length) {
-      return { inStock: true, message: 'In Stock' };
+  /**
+   * Select size
+   */
+  selectSize(size: string): void {
+    this.selectedSize = size;
+    // Reset quantity to 1 when size changes
+    this.quantity = 1;
+    // Update max quantity based on selected size
+    const maxQty = this.getMaxQuantity();
+    if (this.quantity > maxQty) {
+      this.quantity = maxQty;
     }
-
-    const totalAvailable = this.sizes
-      .filter(s => s.isAvailable && s.quantity > 0)
-      .reduce((sum, s) => sum + s.quantity, 0);
-
-    if (totalAvailable === 0) {
-      return { inStock: false, message: 'Out of Stock' };
-    }
-
-    if (this.selectedSize) {
-      const size = this.sizes.find(s => s.sizeName === this.selectedSize);
-      if (size && size.isAvailable && size.quantity > 0) {
-        return { inStock: true, message: `In Stock (${size.quantity} available)` };
-      }
-    }
-
-    return { inStock: totalAvailable > 0, message: 'In Stock' };
   }
 
+  /**
+   * Increase quantity
+   */
+  increaseQuantity(): void {
+    const maxQty = this.getMaxQuantity();
+    if (this.quantity < maxQty) {
+      this.quantity++;
+    } else {
+      this.notificationService.info('الكمية المتاحة', `الكمية المتاحة لهذا الحجم هي ${maxQty}`);
+    }
+  }
+
+  /**
+   * Decrease quantity
+   */
+  decreaseQuantity(): void {
+    if (this.quantity > 1) {
+      this.quantity--;
+    }
+  }
+
+  /**
+   * Validate before adding to cart
+   */
+  canAddToCart(): boolean {
+    if (!this.product || this.isOutOfStock) return false;
+    if (this.product.colors && this.product.colors.length > 0 && !this.selectedColor) return false;
+    if (this.availableSizes.length > 0 && !this.selectedSize) return false;
+    if (this.selectedSize && this.getSelectedSizeStock() < this.quantity) return false;
+    return true;
+  }
+
+  /**
+   * Add product to cart
+   */
   addToCart(): void {
     if (!this.product) return;
 
-    // Check if size is required
-    if (this.sizes.length > 0 && !this.selectedSize) {
-      this.notificationService.warning('Size Required', 'Please select a size before adding to cart');
+    // Validate selections
+    if (this.product.colors && this.product.colors.length > 0 && !this.selectedColor) {
+      this.notificationService.warning('اختر اللون', 'يرجى اختيار لون المنتج');
       return;
     }
 
-    // Check stock
-    const stockStatus = this.getStockStatus();
-    if (!stockStatus.inStock) {
-      this.notificationService.warning('Out of Stock', 'This product is currently out of stock');
+    if (this.availableSizes.length > 0 && !this.selectedSize) {
+      this.notificationService.warning('اختر الحجم', 'يرجى اختيار حجم المنتج');
+      return;
+    }
+
+    if (this.selectedSize && this.getSelectedSizeStock() < this.quantity) {
+      this.notificationService.warning('الكمية غير متاحة', `الكمية المتاحة لهذا الحجم هي ${this.getSelectedSizeStock()}`);
       return;
     }
 
     // Prepare cart item
-    const cartItem = {
+    const cartItem: any = {
       ...this.product,
       quantity: this.quantity,
-      selectedSize: this.selectedSize || undefined,
-      price: this.product.priceAfterDiscount || this.product.price
+      price: this.product.priceAfterDiscount || this.product.price,
+      selectedColor: this.selectedColor,
+      selectedSize: this.selectedSize
     };
 
-    // Check if already in cart
-    const existingItem = this.opencartService.cartproduct.find(
-      (item: any) => item._id === this.product!._id &&
-      (!this.selectedSize || item.selectedSize === this.selectedSize)
-    );
-
-    if (existingItem) {
-      this.notificationService.info('Already in Cart', 'This product is already in your cart');
-      return;
-    }
-
-    // Add to cart
+    // Add to cart using opencart service
     this.opencartService.addToCart(cartItem);
-    this.isInCart = true;
-    this.notificationService.success('Added to Cart', `${this.product.title} has been added to your cart`);
+
+    // Dispatch cart update event
+    document.dispatchEvent(new CustomEvent('cartUpdated'));
   }
 
-  toggleFavorite(): void {
+  /**
+   * Toggle wishlist
+   */
+  toggleWishlist(): void {
     if (!this.product) return;
 
+    const wasFavorite = this.isFavorite;
     this.isFavorite = this.favoritesService.toggleFavorite(this.product);
-    const message = this.isFavorite
-      ? 'Added to favorites'
-      : 'Removed from favorites';
-    this.notificationService.success(message, this.product.title);
-  }
 
-  setActiveTab(tab: 'description' | 'specifications' | 'reviews'): void {
-    this.activeTab = tab;
-  }
-
-  toggleDescription(): void {
-    this.showFullDescription = !this.showFullDescription;
-  }
-
-  getDescriptionPreview(): string {
-    if (!this.product || !this.product.description) return '';
-    if (this.showFullDescription) return this.product.description;
-
-    const lines = this.product.description.split('\n');
-    if (lines.length <= this.descriptionPreviewLines) {
-      return this.product.description;
+    if (this.isFavorite && !wasFavorite) {
+      this.notificationService.success('تمت الإضافة إلى المفضلة', `تمت إضافة ${this.product.title} إلى المفضلة`);
+    } else if (!this.isFavorite && wasFavorite) {
+      this.notificationService.info('تمت الإزالة من المفضلة', `تمت إزالة ${this.product.title} من المفضلة`);
     }
 
-    return lines.slice(0, this.descriptionPreviewLines).join('\n');
+    document.dispatchEvent(new CustomEvent('favoritesUpdated'));
   }
 
-  getFormattedDescription(): string {
-    if (!this.product || !this.product.description) return '';
-    return this.product.description.replace(/\n/g, '<br>');
-  }
-
-  retry(): void {
-    this.loadProduct();
-  }
-
-  trackByProductId(index: number, product: Product): string {
-    return product._id;
-  }
-
-  getPrice(): number {
+  /**
+   * Get product price (with discount if available)
+   */
+  getProductPrice(): number {
     if (!this.product) return 0;
     return this.product.priceAfterDiscount || this.product.price;
   }
 
+  /**
+   * Get original price (if discounted)
+   */
   getOriginalPrice(): number | null {
     if (!this.product || !this.product.priceAfterDiscount) return null;
     return this.product.price;
   }
 
-  getDiscountPercentage(): number | null {
-    if (!this.product || !this.product.priceAfterDiscount) return null;
+  /**
+   * Calculate discount percentage
+   */
+  getDiscountPercentage(): number {
+    if (!this.product || !this.product.priceAfterDiscount) return 0;
     const discount = ((this.product.price - this.product.priceAfterDiscount) / this.product.price) * 100;
     return Math.round(discount);
   }
 
-  calculateDiscountPercentage(product: Product): number {
-    if (!product.priceAfterDiscount) return 0;
-    const discount = ((product.price - product.priceAfterDiscount) / product.price) * 100;
-    return Math.round(discount);
+  /**
+   * Navigate to related product
+   */
+  navigateToProduct(productId: string): void {
+    this.router.navigate(['/product', productId]);
+  }
+
+  /**
+   * Navigate to shop page
+   */
+  navigateToShop(): void {
+    this.router.navigate(['/shop']);
+  }
+
+  /**
+   * Get color value for CSS background
+   */
+  getColorValue(color: string): string {
+    // Map common color names to hex values
+    const colorMap: { [key: string]: string } = {
+      'red': '#dc3545',
+      'green': '#28a745',
+      'blue': '#007bff',
+      'yellow': '#ffc107',
+      'black': '#000000',
+      'white': '#ffffff',
+      'gray': '#6c757d',
+      'grey': '#6c757d',
+      'orange': '#fd7e14',
+      'purple': '#6f42c1',
+      'pink': '#e83e8c',
+      'brown': '#795548'
+    };
+
+    const lowerColor = color.toLowerCase().trim();
+    return colorMap[lowerColor] || '#6c757d';
   }
 }

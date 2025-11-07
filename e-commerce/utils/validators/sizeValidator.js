@@ -1,18 +1,5 @@
 const { body, param, query } = require('express-validator');
-const { validationResult } = require('express-validator');
-
-// Validation middleware
-const handleValidationErrors = (req, res, next) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({
-      success: false,
-      message: 'Validation failed',
-      errors: errors.array(),
-    });
-  }
-  next();
-};
+const { validatorMiddleware } = require('../../middlewares/validatorMiddleware');
 
 // Create size validation
 const createSizeValidator = [
@@ -24,7 +11,7 @@ const createSizeValidator = [
     .matches(/^[A-Za-z0-9]+$/)
     .withMessage('Size name must contain only letters and numbers'),
 
-  handleValidationErrors,
+  validatorMiddleware,
 ];
 
 // Update size validation
@@ -45,7 +32,7 @@ const updateSizeValidator = [
     .isBoolean()
     .withMessage('isActive must be a boolean'),
 
-  handleValidationErrors,
+  validatorMiddleware,
 ];
 
 // Get size by ID validation
@@ -54,7 +41,7 @@ const getSizeValidator = [
     .isMongoId()
     .withMessage('Invalid size ID format'),
 
-  handleValidationErrors,
+  validatorMiddleware,
 ];
 
 // Get sizes by product validation
@@ -63,7 +50,7 @@ const getSizesByProductValidator = [
     .isMongoId()
     .withMessage('Invalid product ID format'),
 
-  handleValidationErrors,
+  validatorMiddleware,
 ];
 
 // Delete size validation
@@ -72,7 +59,7 @@ const deleteSizeValidator = [
     .isMongoId()
     .withMessage('Invalid size ID format'),
 
-  handleValidationErrors,
+  validatorMiddleware,
 ];
 
 // Get all sizes validation (pagination)
@@ -87,7 +74,7 @@ const getAllSizesValidator = [
     .isInt({ min: 1, max: 100 })
     .withMessage('Limit must be between 1 and 100'),
 
-  handleValidationErrors,
+  validatorMiddleware,
 ];
 
 module.exports = {

@@ -1,9 +1,12 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { Subscription } from 'rxjs';
 import { NotificationService, Notification } from '../../../services/notification.service';
 
 @Component({
   selector: 'app-notification-toast',
+  standalone: true,
+  imports: [CommonModule],
   templateUrl: './notification-toast.component.html',
   styleUrls: ['./notification-toast.component.css']
 })
@@ -64,5 +67,13 @@ export class NotificationToastComponent implements OnInit, OnDestroy {
       default:
         return 'bg-blue-50 border-blue-200 text-blue-800 dark:bg-blue-900 dark:border-blue-700 dark:text-blue-200';
     }
+  }
+
+  /**
+   * Get progress duration for animation
+   */
+  getProgressDuration(notification: Notification): string {
+    const duration = notification.duration || 5000;
+    return `${duration}ms`;
   }
 }

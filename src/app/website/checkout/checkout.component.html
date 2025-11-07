@@ -1,87 +1,288 @@
-<div class="container">
-    <form action="" (ngSubmit)="submitForm()">
-    <div class="row checkout-responsive">
-        <div class="col-lg-7 forms"  >
-            <h4>Billing Details</h4>
-            <hr>
-            <label class="fs-4" for="">Full Name*</label>
-            <input class="form-control p-2 mb-2 fs-4" type="text" id="name" [(ngModel)]="orderdata.fullName" palceholder="Your Name" name="name"   minlength="2" #user="ngModel"  required />
-            <div class="alert alert-danger" *ngIf="user.touched && user.invalid">
-                <div *ngIf="user.errors.required">Please Enter Your Name</div>
-                <div *ngIf="user.errors.minlength">Please Your Name Must More Than 1 Char</div>
-            </div>
-            <label class="fs-4" for="">country/region*</label>
-            <input class="form-control p-2 mb-2 fs-4" type="text" id="name" [(ngModel)]="orderdata.country" placeholder="Your Region" name="country" #country="ngModel" required minlength="3"   />
-            <div class="alert alert-danger" *ngIf="country.touched && country.invalid">
-                <div *ngIf="country.errors.required">Please Enter Your Country</div>
-                <div *ngIf="country.errors.minlength">Please Your Name Must More Than 2 Char</div>
-            </div>
-            <label class="fs-4" for="">Street Address*</label>
-            <input type="text" class="form-control p-2 mb-2 fs-4" [(ngModel)]="orderdata.streetAddress" placeholder="Your Street" name="street" #street="ngModel" required minlength="3">
-            <div class="alert alert-danger" *ngIf="street.touched && street.invalid">
-                <div *ngIf="street.errors.required">Please Enter Your streetAddress</div>
-                <div *ngIf="street.errors.minlength">Please Your streetAddress Must More Than 2 Char</div>
-            </div>
-            <label class="fs-4" for="" >State/Country*</label>
-            <input type="text" class="form-control p-2 mb-2 fs-4" required minlength="2" [(ngModel)]="orderdata.state" placeholder="Your Country" #state="ngModel" name="state">
-            <div class="alert alert-danger" *ngIf="state.touched && state.invalid">
-                <div *ngIf="state.errors.required">Please Enter Your State</div>
-                <div *ngIf="state.errors.minlength">Please Your State Must More Than 2 Char</div>
-            </div>
-            <label class="fs-4" for="">Phone*</label>
-            <input type="text" class="form-control p-2 mb-2 fs-4" [(ngModel)]="orderdata.phone" placeholder="Your Phone" #phone="ngModel" required minlength="10" name="phone">
-            <div class="alert alert-danger" *ngIf="phone.touched && phone.invalid">
-                <div *ngIf="phone.errors.required">Please Enter Your Phone</div>
-                <div *ngIf="phone.errors.minlength">Please Your Phone Must More Than 10 Char</div>
-            </div>
-            <label class="fs-4" for="">Email Address*</label>
-            <input type="text" class="form-control mt-2 p-2 mb-2 fs-4" [(ngModel)]="orderdata.email" placeholder="Your Email" #email="ngModel" required minlength="4" name="email">
-            <div class="alert alert-danger" *ngIf="email.touched && email.invalid">
-                <div *ngIf="email.errors.required">Please Enter Your Valid Mail</div>
-                <div *ngIf="email.errors.minlength">Please Your Email Must has format mail</div>
-            </div>
-            <h4>Shipping Details</h4>
-            <hr>
-            <label class="fs-4">Order Notes</label>
-            <textarea type="text" class="form-control p-2 mb-2 fs-4"[(ngModel)]="orderdata.orderNotes" required minlength="1"></textarea>
-        </div>
-        <div class="col-lg-5 checkform" >
-            <div class="card">
-                <h4>Shipping Details</h4>
-            <hr>
-            <ul *ngFor="let item of cartproduct; let index = index ;" >
-                <ul class="d-flex ">
-                    <li><img style="width: 50px; height: 50px;" [src]="'https://amigoapi.mosalam.com/uploads/products/'+item.imageCover" alt=""></li>
-                    <li class="fw-bold  fs-4 mt-3 mx-2 ">{{item.title}}</li>
-                <!-- <li>
-                    <div class="counter d-flex">
-                    <i id="decrease" class="counter-btn btn-success mx-2 p-3" (click)="decrease(index)"  >-</i>
-                    <input  class="form-control w-75"  (change)="detectedchange()" type="number" id="quantity" value="1" min="1" [(ngModel)]="item.quantity"  >
-                    <i id="increase" class="counter-btn btn-success mx-2 p-3" (click)="increase(index)"  >+</i>
-                    </div></li> -->
-                    <li class="mt-3 mx-2 fw-bold  fs-4">Quantity : {{item.quantity}} </li>
-                <li class="mt-3 mx-2 fw-bold  fs-4">Size : {{item.selectedSize}} </li>
-                <li class="mt-3 mx-2 fw-bold  fs-6">Subtotal : {{item.price * item.quantity}} </li>
-                <li><button class="mt-3 mx-2 fas fa-trash  fs-2 mt-3"  (click)="delete(index)"></button></li>
-
-                </ul>
-
-            </ul>
-
-            <hr>
-            <div class="total">
-                <p class="fw-bold fs-3">Total Price : </p>
-                <p class="fw-bold fs-3">{{total}}</p>
-            </div>
-            <div class="d-flex">
-                <input name="radio" type="radio" class="mx-1">
-            <label for="radio" class="fw-bold fs-4">Cash On delivery</label>
-            </div>
-            <button class="btn order fs-4 mt-5 fw-bold" type="submit">Palce Order</button>
-            <p *ngIf="successMessage" style="color: green;" class="alert alert-success fs-3">{{ successMessage }}</p>
-                    <p *ngIf="errorMessage" style="color: red;" class="alert alert-danger fs-3">{{ errorMessage }}</p>
-            </div>
-        </div>
+<div class="checkout-page">
+  <div class="container">
+    <!-- Page Header -->
+    <div class="checkout-header">
+      <h1 class="checkout-title">إتمام الطلب</h1>
+      <p class="checkout-subtitle">راجع طلبك وأكمل عملية الشراء</p>
     </div>
-</form>
+
+    <!-- Empty Cart Message -->
+    <div *ngIf="cartItems.length === 0 && !loading" class="empty-cart-message">
+      <div class="empty-cart-container">
+        <i class="fas fa-shopping-cart empty-cart-icon"></i>
+        <h3 class="empty-cart-title">السلة فارغة</h3>
+        <p class="empty-cart-text">يرجى إضافة منتجات إلى السلة قبل إتمام الطلب.</p>
+        <button class="btn btn-primary btn-back-to-shop" (click)="navigateToShop()">
+          <i class="fas fa-arrow-right me-2"></i>
+          متابعة التسوق
+        </button>
+      </div>
+    </div>
+
+    <!-- Checkout Content -->
+    <div *ngIf="cartItems.length > 0" class="checkout-content">
+      <div class="checkout-grid">
+        <!-- Left Section: Order Summary -->
+        <div class="order-summary-section">
+          <div class="order-summary-card">
+            <h2 class="summary-title">
+              <i class="fas fa-shopping-bag icon"></i>
+              ملخص الطلب
+            </h2>
+            <hr class="divider">
+
+            <!-- Cart Items List -->
+            <div class="cart-items-list">
+              <div
+                *ngFor="let item of cartItems; trackBy: trackByItemId; let i = index"
+                class="cart-item">
+                <div class="cart-item-image">
+                  <img
+                    [src]="getImageUrl(item.imageCover)"
+                    [alt]="item.title"
+                    loading="lazy"
+                    (error)="$event.target.src='assets/img/404/404.png'">
+                </div>
+                <div class="cart-item-info">
+                  <h4 class="cart-item-name">{{ item.title }}</h4>
+                  <p class="cart-item-price">{{ (item.priceAfterDiscount || item.price) | currency:'EGP':'symbol':'1.0-0' }}</p>
+                  <div class="cart-item-attributes" *ngIf="item.selectedSize || item.selectedColor">
+                    <!-- Color Display -->
+                    <div *ngIf="item.selectedColor" class="cart-color-display">
+                      <span class="color-label">اللون:</span>
+                      <div class="cart-color-option">
+                        <span class="cart-color-bullet" [style.background-color]="getColorValue(item.selectedColor)"></span>
+                        <span class="cart-color-name">{{ item.selectedColor }}</span>
+                      </div>
+                    </div>
+                    <!-- Size Display -->
+                    <div *ngIf="item.selectedSize" class="cart-size-display">
+                      <span class="size-label">المقاس:</span>
+                      <div class="cart-size-option">
+                        <span class="cart-size-name">{{ item.selectedSize.toUpperCase() }}</span>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="cart-item-quantity">
+                    <span class="quantity-label">الكمية: {{ item.quantity }}</span>
+                  </div>
+                </div>
+                <div class="cart-item-subtotal">
+                  <strong>{{ (item.priceAfterDiscount || item.price) * item.quantity | currency:'EGP':'symbol':'1.0-0' }}</strong>
+                </div>
+              </div>
+            </div>
+
+            <hr class="divider">
+
+            <!-- Order Totals -->
+            <div class="order-totals">
+              <div class="total-row">
+                <span>المجموع الفرعي:</span>
+                <span>{{ subtotal | currency:'EGP':'symbol':'1.0-0' }}</span>
+              </div>
+              <div class="total-row">
+                <span>الشحن:</span>
+                <span>{{ shippingCost | currency:'EGP':'symbol':'1.0-0' }}</span>
+              </div>
+              <div class="total-row total-final">
+                <span>الإجمالي:</span>
+                <span class="final-price">{{ total | currency:'EGP':'symbol':'1.0-0' }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Section: Delivery Details Form -->
+        <div class="delivery-form-section">
+          <div class="delivery-form-card">
+            <h2 class="form-title">
+              <i class="fas fa-truck icon"></i>
+              بيانات التوصيل
+            </h2>
+            <hr class="divider">
+
+            <form [formGroup]="checkoutForm" (ngSubmit)="onSubmit()">
+              <!-- Full Name -->
+              <div class="form-group">
+                <label class="form-label" for="fullName">
+                  الاسم الكامل <span class="required">*</span>
+                </label>
+                <div class="input-wrapper">
+                  <i class="fas fa-user input-icon"></i>
+                  <input
+                    type="text"
+                    id="fullName"
+                    formControlName="fullName"
+                    class="form-control"
+                    [class.is-invalid]="checkoutForm.get('fullName')?.invalid && checkoutForm.get('fullName')?.touched"
+                    placeholder="أدخل اسمك الكامل">
+                </div>
+                <div class="invalid-feedback" *ngIf="getFieldError('fullName')">
+                  {{ getFieldError('fullName') }}
+                </div>
+              </div>
+
+              <!-- Email -->
+              <div class="form-group">
+                <label class="form-label" for="email">
+                  البريد الإلكتروني <span class="required">*</span>
+                </label>
+                <div class="input-wrapper">
+                  <i class="fas fa-envelope input-icon"></i>
+                  <input
+                    type="email"
+                    id="email"
+                    formControlName="email"
+                    class="form-control"
+                    [class.is-invalid]="checkoutForm.get('email')?.invalid && checkoutForm.get('email')?.touched"
+                    placeholder="example@email.com">
+                </div>
+                <div class="invalid-feedback" *ngIf="getFieldError('email')">
+                  {{ getFieldError('email') }}
+                </div>
+              </div>
+
+              <!-- Primary Phone -->
+              <div class="form-group">
+                <label class="form-label" for="primaryPhone">
+                  رقم الهاتف الأساسي <span class="required">*</span>
+                </label>
+                <div class="input-wrapper">
+                  <i class="fas fa-phone input-icon"></i>
+                  <input
+                    type="tel"
+                    id="primaryPhone"
+                    formControlName="primaryPhone"
+                    class="form-control"
+                    [class.is-invalid]="checkoutForm.get('primaryPhone')?.invalid && checkoutForm.get('primaryPhone')?.touched"
+                    placeholder="01XXXXXXXXX">
+                </div>
+                <div class="invalid-feedback" *ngIf="getFieldError('primaryPhone')">
+                  {{ getFieldError('primaryPhone') }}
+                </div>
+              </div>
+
+              <!-- Secondary Phone (Optional) -->
+              <div class="form-group">
+                <label class="form-label" for="secondaryPhone">
+                  رقم الهاتف الثانوي <span class="optional">(اختياري)</span>
+                </label>
+                <div class="input-wrapper">
+                  <i class="fas fa-phone-alt input-icon"></i>
+                  <input
+                    type="tel"
+                    id="secondaryPhone"
+                    formControlName="secondaryPhone"
+                    class="form-control"
+                    [class.is-invalid]="checkoutForm.get('secondaryPhone')?.invalid && checkoutForm.get('secondaryPhone')?.touched"
+                    placeholder="01XXXXXXXXX">
+                </div>
+                <div class="invalid-feedback" *ngIf="getFieldError('secondaryPhone')">
+                  {{ getFieldError('secondaryPhone') }}
+                </div>
+              </div>
+
+              <!-- Detailed Address -->
+              <div class="form-group">
+                <label class="form-label" for="detailedAddress">
+                  العنوان التفصيلي <span class="required">*</span>
+                </label>
+                <div class="input-wrapper">
+                  <i class="fas fa-map-marker-alt input-icon"></i>
+                  <textarea
+                    id="detailedAddress"
+                    formControlName="detailedAddress"
+                    class="form-control textarea-control"
+                    rows="3"
+                    [class.is-invalid]="checkoutForm.get('detailedAddress')?.invalid && checkoutForm.get('detailedAddress')?.touched"
+                    placeholder="الشارع، المبنى، الشقة، إلخ"></textarea>
+                </div>
+                <div class="invalid-feedback" *ngIf="getFieldError('detailedAddress')">
+                  {{ getFieldError('detailedAddress') }}
+                </div>
+              </div>
+
+              <!-- Governorate -->
+              <div class="form-group">
+                <label class="form-label" for="governorate">
+                  المحافظة <span class="required">*</span>
+                </label>
+                <div class="input-wrapper">
+                  <i class="fas fa-map input-icon"></i>
+                  <input
+                    type="text"
+                    id="governorate"
+                    formControlName="governorate"
+                    class="form-control"
+                    [class.is-invalid]="checkoutForm.get('governorate')?.invalid && checkoutForm.get('governorate')?.touched"
+                    placeholder="أدخل المحافظة">
+                </div>
+                <div class="invalid-feedback" *ngIf="getFieldError('governorate')">
+                  {{ getFieldError('governorate') }}
+                </div>
+              </div>
+
+              <!-- City -->
+              <div class="form-group">
+                <label class="form-label" for="city">
+                  المدينة <span class="required">*</span>
+                </label>
+                <div class="input-wrapper">
+                  <i class="fas fa-city input-icon"></i>
+                  <input
+                    type="text"
+                    id="city"
+                    formControlName="city"
+                    class="form-control"
+                    [class.is-invalid]="checkoutForm.get('city')?.invalid && checkoutForm.get('city')?.touched"
+                    placeholder="أدخل المدينة">
+                </div>
+                <div class="invalid-feedback" *ngIf="getFieldError('city')">
+                  {{ getFieldError('city') }}
+                </div>
+              </div>
+
+              <!-- Notes (Optional) -->
+              <div class="form-group">
+                <label class="form-label" for="notes">
+                  ملاحظات <span class="optional">(اختياري)</span>
+                </label>
+                <div class="input-wrapper">
+                  <i class="fas fa-sticky-note input-icon"></i>
+                  <textarea
+                    id="notes"
+                    formControlName="notes"
+                    class="form-control textarea-control"
+                    rows="3"
+                    placeholder="أي ملاحظات إضافية حول الطلب..."></textarea>
+                </div>
+              </div>
+
+              <!-- Submit Button -->
+              <button
+                type="submit"
+                class="btn btn-primary btn-place-order"
+                [disabled]="submitting || checkoutForm.invalid">
+                <span *ngIf="!submitting">
+                  <i class="fas fa-check-circle me-2"></i>
+                  تأكيد الطلب
+                </span>
+                <span *ngIf="submitting">
+                  <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                  جاري المعالجة...
+                </span>
+              </button>
+
+              <!-- Security Notice -->
+              <div class="security-notice">
+                <i class="fas fa-shield-alt me-2"></i>
+                <small>بياناتك محمية وآمنة</small>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </div>

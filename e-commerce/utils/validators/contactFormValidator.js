@@ -22,9 +22,6 @@ exports.validateContactForm = [
     .withMessage('Message is required')
     .isLength({ max: 1000 })
     .withMessage('Message cannot exceed 1000 characters'),
-  check('termsAccepted')
-    .equals('true')
-    .withMessage('You must accept the terms and conditions'),
 
     validatorMiddleware
 ];

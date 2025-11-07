@@ -1,0 +1,252 @@
+<div class="order-summary-page">
+  <div class="container">
+    <!-- Page Header -->
+    <div class="order-summary-header">
+      <button class="btn-back" (click)="goBackToCart()">
+        <i class="fas fa-arrow-right"></i>
+        العودة إلى السلة
+      </button>
+      <h1 class="page-title">ملخص الطلب</h1>
+      <p class="page-subtitle">يرجى مراجعة طلبك وإدخال بياناتك لإتمام عملية الشراء</p>
+    </div>
+
+    <!-- Empty Cart Message -->
+    <div *ngIf="cartItems.length === 0 && !loading" class="empty-cart-message">
+      <div class="empty-cart-container">
+        <i class="fas fa-shopping-cart empty-cart-icon"></i>
+        <h3 class="empty-cart-title">السلة فارغة</h3>
+        <p class="empty-cart-text">لا توجد منتجات في السلة. يرجى إضافة منتجات أولاً.</p>
+      </div>
+    </div>
+
+    <!-- Order Summary Content -->
+    <div *ngIf="cartItems.length > 0" class="order-summary-content">
+      <div class="row g-4">
+        <!-- Left Column: Order Items Summary -->
+        <div class="col-lg-5">
+          <div class="order-items-card">
+            <h2 class="card-title">
+              <i class="fas fa-shopping-bag me-2"></i>
+              المنتجات المطلوبة
+            </h2>
+            <hr class="section-divider">
+
+            <!-- Cart Items List -->
+            <div class="order-items-list">
+              <div *ngFor="let item of cartItems; let i = index" class="order-item">
+                <div class="order-item-image">
+                  <img
+                    [src]="getImageUrl(item.imageCover)"
+                    [alt]="item.title"
+                    loading="lazy"
+                    (error)="$event.target.src='assets/img/404/404.png'">
+                </div>
+                <div class="order-item-details">
+                  <h4 class="order-item-title">{{ item.title }}</h4>
+                  <p class="order-item-price">
+                    {{ (item.priceAfterDiscount || item.price) | currency:'EGP':'symbol':'1.0-0' }}
+                  </p>
+                  <div class="order-item-meta" *ngIf="item.selectedSize">
+                    <span class="meta-badge">المقاس: {{ item.selectedSize }}</span>
+                  </div>
+                  <div class="order-item-quantity">
+                    <span>الكمية: {{ item.quantity }}</span>
+                  </div>
+                </div>
+                <div class="order-item-total">
+                  <strong>
+                    {{ (item.priceAfterDiscount || item.price) * item.quantity | currency:'EGP':'symbol':'1.0-0' }}
+                  </strong>
+                </div>
+              </div>
+            </div>
+
+            <hr class="section-divider">
+
+            <!-- Order Totals -->
+            <div class="order-totals">
+              <div class="total-row">
+                <span>المجموع الفرعي:</span>
+                <span>{{ subtotal | currency:'EGP':'symbol':'1.0-0' }}</span>
+              </div>
+              <div class="total-row">
+                <span>ضريبة القيمة المضافة (14%):</span>
+                <span>{{ vat | currency:'EGP':'symbol':'1.0-0' }}</span>
+              </div>
+              <div class="total-row total-final">
+                <span>الإجمالي:</span>
+                <span class="final-price">{{ total | currency:'EGP':'symbol':'1.0-0' }}</span>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column: User Information Form -->
+        <div class="col-lg-7">
+          <div class="order-form-card">
+            <h2 class="card-title">
+              <i class="fas fa-user me-2"></i>
+              بيانات العميل والتوصيل
+            </h2>
+            <hr class="section-divider">
+
+            <form [formGroup]="orderForm" (ngSubmit)="onSubmit()">
+              <!-- Full Name -->
+              <div class="form-group mb-3">
+                <label class="form-label" for="fullName">
+                  الاسم الكامل <span class="text-danger">*</span>
+                </label>
+                <input
+                  type="text"
+                  id="fullName"
+                  formControlName="fullName"
+                  class="form-control"
+                  [class.is-invalid]="orderForm.get('fullName')?.invalid && orderForm.get('fullName')?.touched"
+                  placeholder="أدخل الاسم الكامل">
+                <div class="invalid-feedback" *ngIf="getFieldError('fullName')">
+                  {{ getFieldError('fullName') }}
+                </div>
+              </div>
+
+              <!-- Email -->
+              <div class="form-group mb-3">
+                <label class="form-label" for="email">
+                  البريد الإلكتروني <span class="text-danger">*</span>
+                </label>
+                <input
+                  type="email"
+                  id="email"
+                  formControlName="email"
+                  class="form-control"
+                  [class.is-invalid]="orderForm.get('email')?.invalid && orderForm.get('email')?.touched"
+                  placeholder="example@email.com">
+                <div class="invalid-feedback" *ngIf="getFieldError('email')">
+                  {{ getFieldError('email') }}
+                </div>
+              </div>
+
+              <!-- Primary Phone -->
+              <div class="form-group mb-3">
+                <label class="form-label" for="primaryPhone">
+                  رقم الهاتف الأساسي <span class="text-danger">*</span>
+                </label>
+                <input
+                  type="tel"
+                  id="primaryPhone"
+                  formControlName="primaryPhone"
+                  class="form-control"
+                  [class.is-invalid]="orderForm.get('primaryPhone')?.invalid && orderForm.get('primaryPhone')?.touched"
+                  placeholder="01XXXXXXXXX">
+                <div class="invalid-feedback" *ngIf="getFieldError('primaryPhone')">
+                  {{ getFieldError('primaryPhone') }}
+                </div>
+              </div>
+
+              <!-- Secondary Phone (Optional) -->
+              <div class="form-group mb-3">
+                <label class="form-label" for="secondaryPhone">
+                  رقم الهاتف الثانوي (اختياري)
+                </label>
+                <input
+                  type="tel"
+                  id="secondaryPhone"
+                  formControlName="secondaryPhone"
+                  class="form-control"
+                  [class.is-invalid]="orderForm.get('secondaryPhone')?.invalid && orderForm.get('secondaryPhone')?.touched"
+                  placeholder="01XXXXXXXXX">
+                <div class="invalid-feedback" *ngIf="getFieldError('secondaryPhone')">
+                  {{ getFieldError('secondaryPhone') }}
+                </div>
+              </div>
+
+              <!-- Detailed Address -->
+              <div class="form-group mb-3">
+                <label class="form-label" for="detailedAddress">
+                  العنوان التفصيلي <span class="text-danger">*</span>
+                </label>
+                <textarea
+                  id="detailedAddress"
+                  formControlName="detailedAddress"
+                  class="form-control"
+                  rows="3"
+                  [class.is-invalid]="orderForm.get('detailedAddress')?.invalid && orderForm.get('detailedAddress')?.touched"
+                  placeholder="أدخل العنوان بالتفصيل (الشارع، المبنى، الشقة، إلخ)"></textarea>
+                <div class="invalid-feedback" *ngIf="getFieldError('detailedAddress')">
+                  {{ getFieldError('detailedAddress') }}
+                </div>
+              </div>
+
+              <!-- Governorate -->
+              <div class="form-group mb-3">
+                <label class="form-label" for="governorate">
+                  المحافظة <span class="text-danger">*</span>
+                </label>
+                <input
+                  type="text"
+                  id="governorate"
+                  formControlName="governorate"
+                  class="form-control"
+                  [class.is-invalid]="orderForm.get('governorate')?.invalid && orderForm.get('governorate')?.touched"
+                  placeholder="مثال: القاهرة، الجيزة، الإسكندرية">
+                <div class="invalid-feedback" *ngIf="getFieldError('governorate')">
+                  {{ getFieldError('governorate') }}
+                </div>
+              </div>
+
+              <!-- City -->
+              <div class="form-group mb-3">
+                <label class="form-label" for="city">
+                  المدينة <span class="text-danger">*</span>
+                </label>
+                <input
+                  type="text"
+                  id="city"
+                  formControlName="city"
+                  class="form-control"
+                  [class.is-invalid]="orderForm.get('city')?.invalid && orderForm.get('city')?.touched"
+                  placeholder="مثال: مدينة نصر، المعادي، الزمالك">
+                <div class="invalid-feedback" *ngIf="getFieldError('city')">
+                  {{ getFieldError('city') }}
+                </div>
+              </div>
+
+              <!-- Notes (Optional) -->
+              <div class="form-group mb-4">
+                <label class="form-label" for="notes">
+                  ملاحظات (اختياري)
+                </label>
+                <textarea
+                  id="notes"
+                  formControlName="notes"
+                  class="form-control"
+                  rows="3"
+                  placeholder="أي ملاحظات إضافية حول الطلب أو التوصيل..."></textarea>
+              </div>
+
+              <!-- Submit Button -->
+              <button
+                type="submit"
+                class="btn btn-primary btn-submit-order w-100"
+                [disabled]="submitting || orderForm.invalid">
+                <span *ngIf="!submitting">
+                  <i class="fas fa-check-circle me-2"></i>
+                  تأكيد الطلب
+                </span>
+                <span *ngIf="submitting">
+                  <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                  جاري المعالجة...
+                </span>
+              </button>
+
+              <!-- Security Notice -->
+              <div class="security-notice mt-3">
+                <i class="fas fa-shield-alt me-2"></i>
+                <small>بياناتك محمية وآمنة</small>
+              </div>
+            </form>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -40,6 +40,9 @@ const validateOrder = [
     .optional()
     .isString()
     .withMessage("Order Notes must be a string"),
+  check("termsAccepted")
+    .equals('true')
+    .withMessage("You must accept the terms and conditions"),
   validatorMiddleware
 ];
 

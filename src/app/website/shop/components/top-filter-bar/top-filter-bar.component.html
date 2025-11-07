@@ -1,0 +1,60 @@
+<div class="filter-bar-container">
+  <!-- Desktop Filter Bar -->
+  <div class="filter-bar-desktop d-none d-md-flex">
+    <div class="filter-group">
+      <label class="filter-label">ترتيب حسب:</label>
+      <div class="dropdown">
+        <button
+          class="btn btn-filter dropdown-toggle"
+          type="button"
+          [id]="'sortDropdown'"
+          data-toggle="dropdown"
+          aria-expanded="false">
+          <span>{{ getSelectedSortLabel() }}</span>
+          <i class="fas fa-chevron-down ms-2"></i>
+        </button>
+        <ul class="dropdown-menu dropdown-menu-end" [attr.aria-labelledby]="'sortDropdown'">
+          <li *ngFor="let option of sortOptions">
+            <a
+              class="dropdown-item"
+              [class.active]="selectedSort === option.value"
+              (click)="onSortSelect(option.value); $event.preventDefault()"
+              href="#">
+              {{ option.label }}
+            </a>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- Mobile Filter Button -->
+  <div class="filter-bar-mobile d-md-none">
+    <button
+      class="btn btn-filter-mobile"
+      type="button"
+      (click)="toggleFilterPanel()"
+      [attr.aria-expanded]="filterPanelOpen">
+      <i class="fas fa-filter me-2"></i>
+      <span>تصفية</span>
+      <i class="fas fa-chevron-down ms-2" [class.rotated]="filterPanelOpen"></i>
+    </button>
+
+    <!-- Mobile Filter Panel -->
+    <div class="filter-panel" [class.open]="filterPanelOpen">
+      <div class="filter-panel-content">
+        <div class="filter-section">
+          <div class="filter-options">
+            <button
+              *ngFor="let option of sortOptions"
+              class="filter-option-btn"
+              [class.active]="selectedSort === option.value"
+              (click)="onSortSelect(option.value)">
+              {{ option.label }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

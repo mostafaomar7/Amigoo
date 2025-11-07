@@ -1,0 +1,70 @@
+<div class="shop-page">
+  <div class="container">
+    <!-- Filter Bar -->
+    <app-top-filter-bar
+      [categories]="categories"
+      [selectedCategory]="selectedCategory"
+      [selectedSort]="selectedSort"
+      (categoryChange)="onCategoryChange($event)"
+      (sortChange)="onSortChange($event)">
+    </app-top-filter-bar>
+
+    <!-- Loading State (Initial) -->
+    <div *ngIf="loading && products.length === 0" class="products-loading">
+      <div class="spinner-container">
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">جاري التحميل...</span>
+        </div>
+        <p class="loading-text">جاري تحميل المنتجات...</p>
+      </div>
+    </div>
+
+    <!-- Error State -->
+    <div *ngIf="error && products.length === 0" class="products-error">
+      <div class="error-container">
+        <i class="fas fa-exclamation-triangle error-icon"></i>
+        <h3 class="error-title">حدث خطأ</h3>
+        <p class="error-message">{{ error }}</p>
+        <button class="btn btn-primary" (click)="loadProducts(true)">
+          <i class="fas fa-redo me-2"></i>
+          إعادة المحاولة
+        </button>
+      </div>
+    </div>
+
+    <!-- Products Grid -->
+    <div *ngIf="!loading || products.length > 0" class="products-grid-container">
+      <!-- Empty State -->
+      <div *ngIf="products.length === 0 && !loading" class="products-empty">
+        <div class="empty-container">
+          <i class="fas fa-box-open empty-icon"></i>
+          <h3 class="empty-title">{{ getEmptyStateMessage() }}</h3>
+          <p class="empty-message">جرب تغيير الفلاتر أو البحث عن منتجات أخرى</p>
+        </div>
+      </div>
+
+      <!-- Products Grid -->
+      <div *ngIf="products.length > 0" class="row g-4">
+        <div class="col-6 col-md-4 col-lg-3" *ngFor="let product of products; trackBy: trackByProductId">
+          <app-product-card [product]="product"></app-product-card>
+        </div>
+      </div>
+
+      <!-- Load More Loading -->
+      <div *ngIf="loadingMore" class="load-more-loading">
+        <div class="spinner-border spinner-border-sm text-primary" role="status">
+          <span class="visually-hidden">جاري التحميل...</span>
+        </div>
+        <span class="ms-2">جاري تحميل المزيد من المنتجات...</span>
+      </div>
+
+      <!-- Load More Button (Fallback) -->
+      <div *ngIf="hasMore && !loadingMore && products.length > 0" class="load-more-container">
+        <button class="btn btn-outline-primary btn-load-more" (click)="onLoadMoreClick()">
+          <i class="fas fa-arrow-down me-2"></i>
+          تحميل المزيد
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

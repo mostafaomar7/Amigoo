@@ -147,7 +147,7 @@
 
     <!-- Empty State -->
     <div *ngIf="!loadingCategories && categories.length === 0" class="text-center py-5">
-      <p class="text-muted">No categories available at the moment.</p>
+      <p class="text-muted">لا يوجد اقسام متاحة في الوقت الحالي</p>
     </div>
   </div>
 </section>
@@ -205,18 +205,18 @@
               <div class="d-flex gap-2">
                 <button
                   class="btn btn-light"
+                  (click)="addToCart(product, $event)"
+                  [attr.aria-label]="'Add to cart'">
+                  <i class="fas fa-shopping-bag"></i>
+                </button>
+                <button
+                  class="btn btn-light"
                   [class.active]="isFavorite(product._id)"
                   (click)="toggleFavorite(product, $event)"
                   [attr.aria-label]="isFavorite(product._id) ? 'Remove from favorites' : 'Add to favorites'">
                   <i class="fas"
                      [ngClass]="{'fa-heart': isFavorite(product._id), 'far fa-heart': !isFavorite(product._id)}"
                      [style.font-weight]="isFavorite(product._id) ? '900' : '400'"></i>
-                </button>
-                <button
-                  class="btn btn-light"
-                  (click)="addToCart(product, $event)"
-                  aria-label="Add to cart">
-                  <i class="fas fa-shopping-cart"></i>
                 </button>
               </div>
             </div>
@@ -249,9 +249,149 @@
     <div *ngIf="!loadingProducts && featuredProducts.length === 0" class="text-center py-5">
       <i class="fas fa-box-open fa-4x text-muted mb-3"></i>
       <p class="text-muted mb-3">لا توجد منتجات متاحة في الوقت الحالي</p>
-      <button class="btn btn-primary" (click)="navigateToProducts()">
-        <span style="color: var(--text-dark) !important;">تصفح جميع المنتجات</span>
-      </button>
+    </div>
+  </div>
+</section>
+
+<!-- Contact Us Section -->
+<section class="contact-section" style="direction: rtl;">
+  <div class="container">
+    <div class="row align-items-center">
+      <!-- Left: Contact Info -->
+      <div class="col-lg-5 contact-info-wrapper">
+        <div class="contact-info-content">
+          <div class="contact-badge">
+            <i class="fas fa-envelope"></i>
+            <span>تواصل معنا</span>
+          </div>
+          <h2 class="contact-title">نحن هنا لمساعدتك</h2>
+          <p class="contact-description">
+            لديك سؤال أو استفسار؟ نحن هنا لمساعدتك! تواصل معنا وسنرد عليك في أقرب وقت ممكن.
+          </p>
+
+          <div class="contact-features">
+            <div class="contact-feature-item">
+              <div class="feature-icon">
+                <i class="fas fa-clock"></i>
+              </div>
+              <div class="feature-content">
+                <h4 class="feature-title">متاح 24/7</h4>
+                <p class="feature-text">نحن متاحون على مدار الساعة</p>
+              </div>
+            </div>
+            <div class="contact-feature-item">
+              <div class="feature-icon">
+                <i class="fas fa-reply"></i>
+              </div>
+              <div class="feature-content">
+                <h4 class="feature-title">رد سريع</h4>
+                <p class="feature-text">نرد على استفساراتك خلال 24 ساعة</p>
+              </div>
+            </div>
+            <div class="contact-feature-item">
+              <div class="feature-icon">
+                <i class="fas fa-headset"></i>
+              </div>
+              <div class="feature-content">
+                <h4 class="feature-title">دعم ممتاز</h4>
+                <p class="feature-text">فريق خدمة عملاء محترف</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right: Contact Form -->
+      <div class="col-lg-7 contact-form-wrapper">
+        <div class="contact-form-card">
+          <h3 class="form-title">أرسل لنا رسالة</h3>
+          <p class="form-subtitle">املأ النموذج، وسنتواصل معك قريباً</p>
+
+          <form [formGroup]="contactForm" (ngSubmit)="onSubmitContactForm()">
+            <!-- Name -->
+            <div class="form-group mb-3">
+              <label class="form-label" for="contactName">
+                الاسم الكامل <span class="text-danger">*</span>
+              </label>
+              <input
+                type="text"
+                id="contactName"
+                formControlName="name"
+                class="form-control"
+                [class.is-invalid]="contactForm.get('name')?.invalid && contactForm.get('name')?.touched"
+                placeholder="أدخل اسمك الكامل">
+              <div class="invalid-feedback" *ngIf="getContactFieldError('name')">
+                {{ getContactFieldError('name') }}
+              </div>
+            </div>
+
+            <!-- Email -->
+            <div class="form-group mb-3">
+              <label class="form-label" for="contactEmail">
+                البريد الإلكتروني <span class="text-danger">*</span>
+              </label>
+              <input
+                type="email"
+                id="contactEmail"
+                formControlName="email"
+                class="form-control"
+                [class.is-invalid]="contactForm.get('email')?.invalid && contactForm.get('email')?.touched"
+                placeholder="example@email.com">
+              <div class="invalid-feedback" *ngIf="getContactFieldError('email')">
+                {{ getContactFieldError('email') }}
+              </div>
+            </div>
+
+            <!-- Phone -->
+            <div class="form-group mb-3">
+              <label class="form-label" for="contactPhone">
+                رقم الهاتف <span class="text-danger">*</span>
+              </label>
+              <input
+                type="tel"
+                id="contactPhone"
+                formControlName="phone"
+                class="form-control"
+                [class.is-invalid]="contactForm.get('phone')?.invalid && contactForm.get('phone')?.touched"
+                placeholder="رقم الهاتف">
+              <div class="invalid-feedback" *ngIf="getContactFieldError('phone')">
+                {{ getContactFieldError('phone') }}
+              </div>
+            </div>
+
+            <!-- Message -->
+            <div class="form-group mb-3">
+              <label class="form-label" for="contactMessage">
+                الرسالة <span class="text-danger">*</span>
+              </label>
+              <textarea
+                id="contactMessage"
+                formControlName="message"
+                class="form-control"
+                [class.is-invalid]="contactForm.get('message')?.invalid && contactForm.get('message')?.touched"
+                rows="6"
+                placeholder="اكتب رسالتك هنا..."></textarea>
+              <div class="invalid-feedback" *ngIf="getContactFieldError('message')">
+                {{ getContactFieldError('message') }}
+              </div>
+            </div>
+            <!-- Submit Button -->
+            <button
+              type="submit"
+              class="btn btn-primary btn-submit-contact w-100"
+              [disabled]="contactSubmitting || contactForm.invalid">
+              <span *ngIf="!contactSubmitting">
+                <i class="fas fa-paper-plane me-2"></i>
+                إرسال الرسالة
+              </span>
+              <span *ngIf="contactSubmitting">
+                <span class="spinner-border spinner-border-sm me-2" role="status"></span>
+                جاري الإرسال...
+              </span>
+            </button>
+          </form>
+        </div>
+      </div>
     </div>
   </div>
 </section>

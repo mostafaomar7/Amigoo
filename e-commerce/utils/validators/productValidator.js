@@ -5,7 +5,6 @@ const Category = require('../../models/categoryModel');
 
 exports.createProductValidator = [
   (req, res, next) => {
-    console.log('createProductValidator middleware called');
     // Parse quantity if it's a JSON string
     if (req.body.quantity && typeof req.body.quantity === 'string') {
       try {

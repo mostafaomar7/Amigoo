@@ -1,0 +1,247 @@
+:host {
+  display: block;
+  width: 100%;
+  min-height: 100vh;
+  background: #F1F0F0;
+}
+
+.shop-page {
+  padding: var(--spacing-8) 0;
+  min-height: 100vh;
+}
+
+.shop-header {
+  text-align: center;
+  margin-bottom: var(--spacing-8);
+}
+
+.shop-title {
+  font-size: var(--font-size-4xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  margin-bottom: var(--spacing-3);
+  font-family: var(--font-family-display);
+}
+
+.shop-subtitle {
+  font-size: var(--font-size-lg);
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+/* Products Grid */
+.products-grid-container {
+  width: 100%;
+}
+
+.row {
+  margin-bottom: var(--spacing-8);
+}
+
+.row > [class*="col-"] {
+  animation: fadeInUp 0.5s ease-out;
+  animation-fill-mode: both;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Loading States */
+.products-loading {
+  padding: var(--spacing-16) 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.spinner-container {
+  text-align: center;
+}
+
+.spinner-container .spinner-border {
+  width: 3rem;
+  height: 3rem;
+  border-width: 0.25em;
+}
+
+.loading-text {
+  margin-top: var(--spacing-4);
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-base);
+}
+
+/* Error State */
+.products-error {
+  padding: var(--spacing-16) 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.error-container {
+  text-align: center;
+  max-width: 500px;
+  padding: var(--spacing-8);
+  background: var(--color-white);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+}
+
+.error-icon {
+  font-size: 4rem;
+  color: var(--color-warning);
+  margin-bottom: var(--spacing-4);
+}
+
+.error-title {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  margin-bottom: var(--spacing-2);
+}
+
+.error-message {
+  color: var(--color-text-secondary);
+  margin-bottom: var(--spacing-6);
+}
+
+/* Empty State */
+.products-empty {
+  padding: var(--spacing-16) 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.empty-container {
+  text-align: center;
+  max-width: 500px;
+  padding: var(--spacing-8);
+}
+
+.empty-icon {
+  font-size: 5rem;
+  color: var(--color-text-tertiary);
+  margin-bottom: var(--spacing-4);
+  opacity: 0.5;
+}
+
+.empty-title {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  margin-bottom: var(--spacing-2);
+}
+
+.empty-message {
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-base);
+}
+
+/* Load More */
+.load-more-loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: var(--spacing-6) 0;
+  color: var(--color-text-secondary);
+}
+
+.load-more-container {
+  display: flex;
+  justify-content: center;
+  padding: var(--spacing-6) 0;
+}
+
+.btn-load-more {
+  padding: var(--spacing-3) var(--spacing-6);
+  font-size: var(--font-size-base);
+  font-weight: var(--font-weight-medium);
+  border-radius: var(--radius-lg);
+  transition: all 0.3s ease;
+}
+
+.btn-load-more:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.products-end {
+  text-align: center;
+  padding: var(--spacing-8) 0;
+  color: var(--color-text-secondary);
+  font-size: var(--font-size-base);
+}
+
+.end-message {
+  margin: 0;
+  padding: var(--spacing-4);
+  background: var(--color-white);
+  border-radius: var(--radius-lg);
+  display: inline-block;
+}
+
+/* Responsive adjustments handled by Bootstrap grid */
+@media (max-width: 768px) {
+  .shop-page {
+    padding: var(--spacing-6) 0;
+  }
+
+  .shop-title {
+    font-size: var(--font-size-3xl);
+  }
+
+  .shop-subtitle {
+    font-size: var(--font-size-base);
+  }
+}
+
+@media (max-width: 576px) {
+  .shop-page {
+    padding: var(--spacing-4) 0;
+  }
+
+  .shop-header {
+    margin-bottom: var(--spacing-6);
+  }
+
+  .shop-title {
+    font-size: var(--font-size-2xl);
+  }
+
+  .error-container,
+  .empty-container {
+    padding: var(--spacing-4);
+  }
+
+  .error-icon {
+    font-size: 3rem;
+  }
+
+  .empty-icon {
+    font-size: 3rem;
+  }
+}
+
+/* RTL Support */
+.shop-page {
+  direction: rtl;
+}
+
+[dir="rtl"] .shop-header {
+  text-align: center;
+}
+
+[dir="rtl"] .btn-load-more i {
+  transform: rotate(180deg);
+}
+
+/* RTL support handled by Bootstrap */

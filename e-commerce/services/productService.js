@@ -4,6 +4,7 @@ const { v4: uuidv4 } = require('uuid');
 const sharp = require('sharp');
 const path = require('path');
 const fs = require('fs');
+const mongoose = require('mongoose');
 const { uploadMixOfImages } = require('../middlewares/uploadImageMiddleware');
 const product = require('../models/productModel');
 const Size = require('../models/sizeModel');
@@ -63,11 +64,41 @@ exports.resizeProductImages = asyncHandler(async (req, res, next) => {
 
 //get all product
 exports.getProducts = asyncHandler(async(req, res) => {
-    const { page: pageQuery, limit: limitQuery, sort, fields, keyword: keywordQuery, minPrice, maxPrice } = req.query;
+    const { page: pageQuery, limit: limitQuery, sort, fields, keyword: keywordQuery, minPrice, maxPrice, category_id: categoryId } = req.query;
     const page = pageQuery * 1 || 1;
     const limit = limitQuery * 1 || 16;
     const skip = (page - 1) * limit;
-    const sortBy = sort || 'createdAt'; // معيار الفرز الافتراضي
+
+    // Map frontend sort options to backend sort parameters
+    // Supports multiple aliases for better user experience
+    const sortMapping = {
+        // Newest/Latest
+        'newest': '-createdAt',
+        'latest': '-createdAt',
+        'new': '-createdAt',
+        // Price: Low to High
+        'low_price': 'price',
+        'lowest_price': 'price',
+        'price_low': 'price',
+        'price_asc': 'price',
+        // Price: High to Low
+        'high_price': '-price',
+        'highest_price': '-price',
+        'price_high': '-price',
+        'price_desc': '-price',
+        // Sales: Most sold
+        'sales': '-sold',
+        'best_selling': '-sold',
+        'most_sales': '-sold',
+        'popular': '-sold'
+    };
+
+    // If sort is provided, map it; otherwise use default (newest)
+    let sortBy = '-createdAt';
+    if (sort) {
+        const normalizedSort = sort.toLowerCase().trim();
+        sortBy = sortMapping[normalizedSort] || sort; // Use mapping if exists, otherwise use sort as-is
+    }
     const keyword = keywordQuery || ''; // الكلمة المفتاحية للبحث
 
     const priceFilter = {};
@@ -82,6 +113,19 @@ exports.getProducts = asyncHandler(async(req, res) => {
       }
   }
 
+    // Category filter
+    const categoryFilter = {};
+    if (categoryId) {
+        // Validate categoryId
+        if (mongoose.Types.ObjectId.isValid(categoryId)) {
+            // Use ObjectId for proper MongoDB comparison
+            // Mongoose will match this correctly against the category reference field
+            categoryFilter.category = new mongoose.Types.ObjectId(categoryId);
+        } else {
+            // If invalid ObjectId, return empty results
+            categoryFilter.category = new mongoose.Types.ObjectId('000000000000000000000000');
+        }
+    }
 
     const searchQuery = keyword
     ? {
@@ -92,7 +136,9 @@ exports.getProducts = asyncHandler(async(req, res) => {
       }
     : {};
 
-    const filter = Object.assign({}, searchQuery, priceFilter, { isDeleted: false });
+    // Build filter object - ensure category filter is included
+    // eslint-disable-next-line prefer-object-spread
+    const filter = Object.assign({}, searchQuery, priceFilter, categoryFilter, { isDeleted: false });
 
     const selectFields = fields ? fields.split(',').join(' ') : ''; // تحويل الحقول إلى صيغة Mongoose
   //GET /api/products?fields=name,category&sort=-rating&page=2&limit=5 الي هنكتبه ف  url
@@ -101,10 +147,20 @@ exports.getProducts = asyncHandler(async(req, res) => {
     const totalItems = await product.countDocuments(filter);
     const totalPages = Math.ceil(totalItems / limit);
 
-    const AllProducts = await product.find(filter).select(selectFields) // تحديد الحقول
-    .skip(skip).limit(limit).sort(sortBy) // تطبيق البحث بالكلمة المفتاحية
-    // إضافة الفرز
-    ;
+    // Use lean() to get plain objects and manually populate if needed
+    // This ensures the filter works correctly before populate
+    let query = product.find(filter).select(selectFields);
+
+    // Only populate if we need category details
+    query = query.populate({
+        path: 'category',
+        select: 'name _id'
+    });
+
+    const AllProducts = await query
+        .skip(skip)
+        .limit(limit)
+        .sort(sortBy);
 
     res.status(200).json({
       success: true,
@@ -122,7 +178,12 @@ exports.getProducts = asyncHandler(async(req, res) => {
 
 exports.getproduct = asyncHandler(async (req, res) => {
     const { id } = req.params;
-    const Product = await product.findOne({ _id: id, isDeleted: false });
+    const Product = await product.findOne({ _id: id, isDeleted: false })
+        .populate({
+            path: 'category',
+            select: 'name _id'
+        });
+
     if (!Product) {
       return res.status(404).json({
           success: false,
@@ -289,11 +350,66 @@ exports.deleteProduct = asyncHandler(async (req, res) => {
   });
   exports.getProductsByCategory = asyncHandler(async (req, res) => {
         const { categoryId } = req.params;
+        const { page: pageQuery, limit: limitQuery, sort } = req.query;
 
-        const products = await product.find({ category: categoryId, isDeleted: false }).populate("category", "name");
+        const page = pageQuery * 1 || 1;
+        const limit = limitQuery * 1 || 16;
+        const skip = (page - 1) * limit;
+
+        // Map frontend sort options to backend sort parameters
+        // Supports multiple aliases for better user experience
+        const sortMapping = {
+            // Newest/Latest
+            'newest': '-createdAt',
+            'latest': '-createdAt',
+            'new': '-createdAt',
+            // Price: Low to High
+            'low_price': 'price',
+            'lowest_price': 'price',
+            'price_low': 'price',
+            'price_asc': 'price',
+            // Price: High to Low
+            'high_price': '-price',
+            'highest_price': '-price',
+            'price_high': '-price',
+            'price_desc': '-price',
+            // Sales: Most sold
+            'sales': '-sold',
+            'best_selling': '-sold',
+            'most_sales': '-sold',
+            'popular': '-sold'
+        };
+
+        // If sort is provided, map it; otherwise use default (newest)
+        let sortBy = '-createdAt';
+        if (sort) {
+            const normalizedSort = sort.toLowerCase().trim();
+            sortBy = sortMapping[normalizedSort] || sort; // Use mapping if exists, otherwise use sort as-is
+        }
+
+        const filter = { category: categoryId, isDeleted: false };
+
+        // Get total count for pagination
+        const totalItems = await product.countDocuments(filter);
+        const totalPages = Math.ceil(totalItems / limit);
+
+        const products = await product.find(filter)
+            .populate("category", "name")
+            .sort(sortBy)
+            .skip(skip)
+            .limit(limit);
 
         res.status(200).json({
+          success: true,
           result: products.length,
           data: products,
+          pagination: {
+            currentPage: page,
+            itemsPerPage: limit,
+            totalItems: totalItems,
+            totalPages: totalPages,
+            hasNextPage: page < totalPages,
+            hasPrevPage: page > 1,
+          }
         });
       });

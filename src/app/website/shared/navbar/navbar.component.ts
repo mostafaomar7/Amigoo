@@ -4,6 +4,7 @@ import { Component, OnInit, OnDestroy, Input, Output, EventEmitter, ChangeDetect
 import { Router, RouterModule, ActivatedRoute } from "@angular/router";
 import { OpencartService } from '../../../services/opencart.service';
 import { EnvironmentService } from '../../../services/environment.service';
+import { NotificationService } from '../../../services/notification.service';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Subject } from 'rxjs';
@@ -48,7 +49,8 @@ export class NavbarComponent implements OnInit, OnDestroy, AfterViewInit {
     private router: Router,
     private route: ActivatedRoute,
     private cdr: ChangeDetectorRef,
-    private environmentService: EnvironmentService
+    private environmentService: EnvironmentService,
+    private notificationService: NotificationService
   ) {}
 
   /**
@@ -68,6 +70,30 @@ export class NavbarComponent implements OnInit, OnDestroy, AfterViewInit {
   onImageError(item: any): void {
     item.imageError = true;
     this.cdr.markForCheck();
+  }
+
+  /**
+   * Get color value for display
+   */
+  getColorValue(color: string): string {
+    // Map common color names to hex values
+    const colorMap: { [key: string]: string } = {
+      'red': '#dc3545',
+      'green': '#28a745',
+      'blue': '#007bff',
+      'yellow': '#ffc107',
+      'black': '#000000',
+      'white': '#ffffff',
+      'gray': '#6c757d',
+      'grey': '#6c757d',
+      'orange': '#fd7e14',
+      'purple': '#6f42c1',
+      'pink': '#e83e8c',
+      'brown': '#795548'
+    };
+
+    const lowerColor = color.toLowerCase().trim();
+    return colorMap[lowerColor] || '#6c757d';
   }
 
   ngOnInit(): void {
@@ -186,20 +212,30 @@ export class NavbarComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   delete(index: number): void {
-    this.cartproduct.splice(index, 1);
-    localStorage.setItem("cart", JSON.stringify(this.cartproduct));
-    this.gettotalprice();
-    if (this.starproduct[index]) {
-      this.starproduct.splice(index, 1);
-      localStorage.setItem("star", JSON.stringify(this.starproduct));
+    if (index >= 0 && index < this.cartproduct.length) {
+      const product = this.cartproduct[index];
+      this.cartproduct.splice(index, 1);
+      localStorage.setItem("cart", JSON.stringify(this.cartproduct));
+      this.gettotalprice();
+      if (this.starproduct[index]) {
+        this.starproduct.splice(index, 1);
+        localStorage.setItem("star", JSON.stringify(this.starproduct));
+      }
+      this.notificationService.success('تمت الإزالة من السلة', `تمت إزالة ${product.title || 'المنتج'} من السلة`);
+      document.dispatchEvent(new CustomEvent('cartUpdated'));
+      this.cdr.markForCheck();
     }
-    this.cdr.markForCheck();
   }
 
   ClearAllProducts(): void {
-    this.cartproduct.splice(0, this.cartproduct.length);
-    localStorage.setItem("cart", JSON.stringify(this.cartproduct));
-    this.gettotalprice();
+    if (this.cartproduct.length > 0) {
+      this.cartproduct.splice(0, this.cartproduct.length);
+      localStorage.setItem("cart", JSON.stringify(this.cartproduct));
+      this.gettotalprice();
+      this.notificationService.success('تم مسح السلة', 'تمت إزالة جميع المنتجات من السلة');
+      document.dispatchEvent(new CustomEvent('cartUpdated'));
+      this.cdr.markForCheck();
+    }
   }
 
   getdata(): void {
@@ -246,8 +282,18 @@ export class NavbarComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   navigateToCategory(categoryId: string): void {
-    this.router.navigate(['/product'], { queryParams: { category: categoryId } });
+    console.log('Navbar: Navigating to shop with category:', categoryId);
+    this.router.navigate(['/shop'], { queryParams: { category: categoryId } });
     this.cdr.markForCheck();
+  }
+
+  navigateToProducts(): void {
+    this.router.navigate(['/shop']);
+    this.cdr.markForCheck();
+  }
+
+  isProductsActive(): boolean {
+    return !this.route.snapshot.queryParams['category'];
   }
 
   isCategoryActive(categoryId: string): boolean {
@@ -360,12 +406,13 @@ export class NavbarComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   togglestarItem(): void {
-    this.favoritesActive = !this.favoritesActive;
-    if (this.favoritesActive) {
-      this.navbarActive = false;
-      this.searchActive = false;
-      this.cartActive = false;
-    }
-    this.cdr.markForCheck();
+    this.navbarActive = false;
+    this.searchActive = false;
+    this.cartActive = false;
+    this.favoritesActive = false;
+
+    this.router.navigate(['/wishlist']).then(() => {
+      this.cdr.markForCheck();
+    });
   }
 }

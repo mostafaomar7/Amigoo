@@ -4,7 +4,7 @@ import { FormsModule } from '@angular/forms';
 import { CommonModule } from '@angular/common';
 import { ApiService, PaginationParams } from '../../services/api.service';
 import { NotificationService } from '../../services/notification.service';
-import { environment } from '../../../environments/environment';
+import { EnvironmentService } from '../../services/environment.service';
 
 export interface Category {
   _id: string;
@@ -40,7 +40,6 @@ export class CategoriesComponent implements OnInit, OnDestroy {
   editCategoryForm: FormGroup;
   selectedImage: File | null = null;
   selectedEditImage: File | null = null;
-  private uploadsBaseUrl = environment.apiUrl.replace('/api/v1', '') + '/uploads';
   private searchTimeout: any = null;
 
   Math = Math;
@@ -48,6 +47,7 @@ export class CategoriesComponent implements OnInit, OnDestroy {
   constructor(
     private apiService: ApiService,
     private notificationService: NotificationService,
+    private environmentService: EnvironmentService,
     private fb: FormBuilder
   ) {
     this.categoryForm = this.fb.group({
@@ -247,10 +247,11 @@ export class CategoriesComponent implements OnInit, OnDestroy {
   }
 
   getImageUrl(imagePath: string): string {
-    if (imagePath.startsWith('http')) {
+    if (!imagePath) return '';
+    if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
       return imagePath;
     }
-    return `${this.uploadsBaseUrl}/category/${imagePath}`;
+    return `${this.environmentService.imageBaseUrl}uploads/category/${imagePath}`;
   }
 
   getImagePreview(file: File): string {

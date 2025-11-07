@@ -1,0 +1,303 @@
+:host {
+  display: block;
+  height: 100%;
+}
+
+.product-card {
+  background: white !important;
+  border-radius: 16px;
+  overflow: hidden;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  cursor: pointer;
+}
+
+.product-card:hover {
+  transform: translateY(-8px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
+}
+
+.product-image-wrapper {
+  position: relative;
+  width: 100%;
+  padding-top: 100%; /* 1:1 Aspect Ratio */
+  overflow: hidden;
+  background: #f8f9fa;
+}
+
+.product-image {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.product-card:hover .product-image {
+  transform: scale(1.05);
+}
+
+.product-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  z-index: 3;
+  pointer-events: none;
+}
+
+.product-card:hover .product-overlay {
+  opacity: 1;
+  pointer-events: auto;
+}
+
+/* Make sure overlay is visible on touch devices */
+@media (hover: none) and (pointer: coarse) {
+  .product-overlay {
+    opacity: 0.7;
+    pointer-events: auto;
+  }
+}
+
+.product-overlay .btn {
+  border-radius: 50%;
+  width: 45px;
+  height: 45px;
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background-color: white !important;
+  color: #2c3e50 !important;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.2);
+  pointer-events: auto;
+  cursor: pointer;
+  margin: 0 0.25rem;
+}
+
+.product-overlay .btn:hover {
+  transform: scale(1.15);
+  background-color: #f8f9fa !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  color: #1a1a1a !important;
+}
+
+.product-overlay .btn i {
+  font-size: 1.1rem !important;
+  color: inherit !important;
+  display: inline-block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+}
+
+/* Ensure favorite icon is always visible */
+.product-overlay .btn i.fa-heart,
+.product-overlay .btn i.fa-heart-o,
+.product-overlay .btn i.far.fa-heart,
+.product-overlay .btn i.fas.fa-heart {
+  font-size: 1.1rem !important;
+  display: inline-block !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  color: #2c3e50 !important;
+  transition: color 0.3s ease;
+  font-family: "Font Awesome 5 Free" !important;
+  font-weight: 400 !important;
+}
+
+/* Solid heart icon when favorited */
+.product-overlay .btn i.fa-heart:before,
+.product-overlay .btn i.fas.fa-heart:before {
+  content: "\f004" !important;
+  font-family: "Font Awesome 5 Free" !important;
+  font-weight: 900 !important;
+}
+
+/* Outlined heart icon when not favorited */
+.product-overlay .btn i.fa-heart-o:before,
+.product-overlay .btn i.far.fa-heart:before {
+  content: "\f004" !important;
+  font-family: "Font Awesome 5 Free" !important;
+  font-weight: 400 !important;
+}
+
+/* When favorite is active (clicked), make icon red */
+.product-overlay .btn.active i.fa-heart,
+.product-overlay .btn.active i.fas.fa-heart,
+.product-overlay .btn.active i.far.fa-heart,
+.product-overlay .btn.active i {
+  color: #dc3545 !important;
+  font-weight: 900 !important;
+}
+
+/* Ensure heart icon is solid (filled) when active */
+.product-overlay .btn.active i:before {
+  content: "\f004" !important;
+  font-family: "Font Awesome 5 Free" !important;
+  font-weight: 900 !important;
+}
+
+/* Also for the favorite button itself when active */
+.product-overlay .btn.active {
+  background-color: white !important;
+  border-color: #dc3545 !important;
+}
+
+.product-overlay .btn.active:hover {
+  background-color: #fff5f5 !important;
+  border-color: #dc3545 !important;
+}
+
+.product-overlay .btn.active:hover i {
+  color: #dc3545 !important;
+}
+
+/* Discount badge */
+.badge-sale {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: #720a0a !important;
+  color: white !important;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-size: 0.85rem;
+  font-weight: 700;
+  z-index: 2;
+  box-shadow: 0 2px 8px rgba(145, 245, 30, 0.4);
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+/* Product info */
+.product-info {
+  padding: 1.5rem;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  background: white !important;
+}
+
+/* Product title */
+.product-title {
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: #1a1a1a !important;
+  margin-bottom: 0.75rem;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  min-height: 3rem;
+  line-height: 1.4;
+}
+
+.product-price {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: auto;
+}
+
+/* Product prices */
+.current-price {
+  font-size: 1.5rem;
+  font-weight: 700;
+  color: #720a0a !important;
+}
+
+.original-price {
+  font-size: 1.1rem;
+  color: #6c757d !important;
+  text-decoration: line-through;
+  font-weight: 500;
+}
+
+.original-price.has-discount {
+  font-size: 1rem;
+  color: #6c757d !important;
+}
+
+/* Text inside placeholder */
+.product-image .text-muted {
+  color: #495057 !important;
+  font-weight: 500;
+}
+
+.product-image .fa-image {
+  color: #6c757d !important;
+  opacity: 0.8;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .product-info {
+    padding: 1rem;
+  }
+
+  .product-title {
+    font-size: 0.9rem;
+    min-height: 2.5rem;
+  }
+
+  .current-price {
+    font-size: 1.1rem;
+  }
+
+  .original-price {
+    font-size: 0.85rem;
+  }
+
+  .original-price.has-discount {
+    font-size: 0.8rem;
+  }
+
+  .badge-sale {
+    font-size: 0.7rem;
+    padding: 0.35rem 0.7rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .product-info {
+    padding: 0.75rem;
+  }
+
+  .product-title {
+    font-size: 0.85rem;
+    min-height: 2.25rem;
+  }
+
+  .current-price {
+    font-size: 0.95rem;
+  }
+
+  .original-price {
+    font-size: 0.75rem;
+  }
+
+  .original-price.has-discount {
+    font-size: 0.7rem;
+  }
+
+  .badge-sale {
+    font-size: 0.65rem;
+    padding: 0.3rem 0.6rem;
+  }
+}

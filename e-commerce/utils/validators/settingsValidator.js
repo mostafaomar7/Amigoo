@@ -1,18 +1,5 @@
 const { body, param } = require('express-validator');
-const { validationResult } = require('express-validator');
-
-// Validation middleware
-const handleValidationErrors = (req, res, next) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({
-      success: false,
-      message: 'Validation failed',
-      errors: errors.array(),
-    });
-  }
-  next();
-};
+const { validatorMiddleware } = require('../../middlewares/validatorMiddleware');
 
 // Create/Update settings validation
 const createSettingsValidator = [
@@ -79,7 +66,7 @@ const createSettingsValidator = [
     })
     .withMessage('WhatsApp must be exactly 11 digits'),
 
-  handleValidationErrors,
+  validatorMiddleware,
 ];
 
 // Update settings validation
@@ -145,7 +132,7 @@ const updateSettingsValidator = [
     })
     .withMessage('WhatsApp must be exactly 11 digits'),
 
-  handleValidationErrors,
+  validatorMiddleware,
 ];
 
 // Get setting by key validation
@@ -156,7 +143,7 @@ const getSettingByKeyValidator = [
     .isLength({ min: 1, max: 50 })
     .withMessage('Setting key must be between 1 and 50 characters'),
 
-  handleValidationErrors,
+  validatorMiddleware,
 ];
 
 // Update setting by key validation
@@ -171,7 +158,7 @@ const updateSettingByKeyValidator = [
     .notEmpty()
     .withMessage('Setting value is required'),
 
-  handleValidationErrors,
+  validatorMiddleware,
 ];
 
 // Calculate shipping validation
@@ -180,7 +167,7 @@ const calculateShippingValidator = [
     .isFloat({ min: 0 })
     .withMessage('Total amount must be a non-negative number'),
 
-  handleValidationErrors,
+  validatorMiddleware,
 ];
 
 module.exports = {

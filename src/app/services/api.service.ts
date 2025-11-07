@@ -28,6 +28,7 @@ export interface PaginationParams {
   fields?: string;
   keyword?: string;
   status?: string;
+  category_id?: string;
 }
 
 @Injectable({
@@ -67,7 +68,14 @@ export class ApiService {
       if (params.fields) httpParams = httpParams.set('fields', params.fields);
       if (params.keyword) httpParams = httpParams.set('keyword', params.keyword);
       if (params.status) httpParams = httpParams.set('status', params.status);
+      if (params.category_id) {
+        httpParams = httpParams.set('category_id', params.category_id);
+        console.log('API Service: Adding category_id to request:', params.category_id);
+      }
     }
+    const fullUrl = `${this.apiUrl}${endpoint}?${httpParams.toString()}`;
+    console.log('API Service: Full request URL:', fullUrl);
+    console.log('API Service: Final HTTP params:', httpParams.toString());
     return this.http.get<PaginatedResponse<T>>(`${this.apiUrl}${endpoint}`, {
       headers: this.getHeaders(),
       params: httpParams
