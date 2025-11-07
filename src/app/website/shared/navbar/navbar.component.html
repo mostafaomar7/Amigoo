@@ -104,6 +104,14 @@
           }}</span>
         </button>
         <button
+          *ngIf="hasOrderHistory"
+          class="icon-btn order-history-btn"
+          (click)="navigateToOrderHistory()"
+          aria-label="Order History"
+        >
+          <i class="fas fa-history"></i>
+        </button>
+        <button
           class="icon-btn menu-btn"
           id="menu-btn"
           (click)="toggleNavbar()"

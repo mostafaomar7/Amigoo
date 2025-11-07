@@ -70,14 +70,23 @@ export class QuickAddModalComponent implements OnInit, OnDestroy {
 
     // Initialize sizes
     if (this.product && this.product.quantity && Array.isArray(this.product.quantity)) {
-      this.availableSizes = this.product.quantity.filter((q: any) => q && q.size && (q.no > 0 || q.quantity > 0));
+      this.availableSizes = this.product.quantity
+        .filter((q: any) => q && q.size && (q.no > 0 || q.quantity > 0))
+        .map((q: any) => ({
+          size: (q.size || '').toLowerCase().trim(),
+          no: q.no || 0,
+          quantity: q.quantity || 0
+        }));
       if (this.availableSizes.length > 0) {
         this.selectedSize = this.availableSizes[0].size;
       }
     } else if (this.product && this.product.sizes && Array.isArray(this.product.sizes)) {
-      this.availableSizes = this.product.sizes.map((s: any) => ({
-        size: typeof s === 'string' ? s : (s && (s.name || s.size || s))
-      })).filter((s: any) => s.size);
+      this.availableSizes = this.product.sizes
+        .map((s: any) => {
+          const sizeValue = typeof s === 'string' ? s : (s && (s.name || s.size || s));
+          return sizeValue ? { size: (sizeValue + '').toLowerCase().trim() } : null;
+        })
+        .filter((s: any) => s && s.size);
       if (this.availableSizes.length > 0) {
         this.selectedSize = this.availableSizes[0].size;
       }
@@ -115,10 +124,37 @@ export class QuickAddModalComponent implements OnInit, OnDestroy {
   }
 
   /**
+   * Check if size is selected
+   */
+  isSizeSelected(size: string): boolean {
+    if (!size || !this.selectedSize) return false;
+    const normalizedSize = (size + '').toLowerCase().trim();
+    const normalizedSelectedSize = (this.selectedSize + '').toLowerCase().trim();
+    return normalizedSize === normalizedSelectedSize;
+  }
+
+  /**
    * Select color
    */
   selectColor(color: any): void {
     this.selectedColor = this.getColorName(color);
+    this.cdr.markForCheck();
+  }
+
+  /**
+   * Select size
+   */
+  selectSize(size: string): void {
+    if (!size) return;
+    // Normalize size to lowercase for consistent comparison
+    const normalizedSize = (size + '').toLowerCase().trim();
+    this.selectedSize = normalizedSize;
+    // Reset quantity if it exceeds the new size's stock
+    const maxQty = this.getSelectedSizeStock() || 999;
+    if (this.quantity > maxQty) {
+      this.quantity = maxQty;
+    }
+    this.cdr.markForCheck();
   }
 
   getColorValue(color: string): string {
@@ -141,7 +177,11 @@ export class QuickAddModalComponent implements OnInit, OnDestroy {
 
   getSelectedSizeStock(): number {
     if (!this.selectedSize || !this.product || !this.product.quantity) return 0;
-    const sizeData = this.product.quantity.find((q: any) => q.size === this.selectedSize);
+    const normalizedSelectedSize = (this.selectedSize + '').toLowerCase().trim();
+    const sizeData = this.product.quantity.find((q: any) => {
+      const qSize = (q.size || '').toLowerCase().trim();
+      return qSize === normalizedSelectedSize;
+    });
     return sizeData ? (sizeData.no || sizeData.quantity || 0) : 0;
   }
 

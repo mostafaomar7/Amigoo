@@ -1026,7 +1026,11 @@
             <div class="mb-3" *ngIf="selectedProduct.colors && selectedProduct.colors.length > 0">
               <strong>الألوان:</strong>
               <div class="d-flex flex-wrap gap-2 mt-2">
-                <span *ngFor="let color of selectedProduct.colors" class="badge bg-primary">
+                <span
+                  *ngFor="let color of selectedProduct.colors"
+                  class="badge bg-primary fs-6 py-2 px-3"
+                >
+                  <span class="color-bullet-small me-2" [style.background-color]="getColorValue(color)"></span>
                   {{ color }}
                 </span>
               </div>

@@ -36,6 +36,9 @@ export class OrderStorageService {
       // Save back to LocalStorage
       localStorage.setItem(this.STORAGE_KEY, JSON.stringify(existingOrders));
 
+      // Dispatch custom event to notify navbar
+      document.dispatchEvent(new CustomEvent('orderHistoryUpdated'));
+
       return true;
     } catch (error) {
       console.error('Error saving order to LocalStorage:', error);
@@ -89,6 +92,10 @@ export class OrderStorageService {
       orders[orderIndex].updatedAt = new Date().toISOString();
 
       localStorage.setItem(this.STORAGE_KEY, JSON.stringify(orders));
+
+      // Dispatch custom event to notify navbar
+      document.dispatchEvent(new CustomEvent('orderHistoryUpdated'));
+
       return true;
     } catch (error) {
       console.error('Error updating order status:', error);
@@ -106,6 +113,10 @@ export class OrderStorageService {
       const orders = this.getOrders();
       const filteredOrders = orders.filter(order => order.id !== orderId);
       localStorage.setItem(this.STORAGE_KEY, JSON.stringify(filteredOrders));
+
+      // Dispatch custom event to notify navbar
+      document.dispatchEvent(new CustomEvent('orderHistoryUpdated'));
+
       return true;
     } catch (error) {
       console.error('Error deleting order:', error);
@@ -118,6 +129,9 @@ export class OrderStorageService {
    */
   clearAllOrders(): void {
     localStorage.removeItem(this.STORAGE_KEY);
+
+    // Dispatch custom event to notify navbar
+    document.dispatchEvent(new CustomEvent('orderHistoryUpdated'));
   }
 
   /**

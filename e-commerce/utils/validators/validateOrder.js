@@ -34,8 +34,27 @@ const validateOrder = [
     .withMessage("Invalid email address"),
   check("shippingAddress")
     .optional()
-    .isBoolean()
-    .withMessage("Shipping Address must be true or false"),
+    .custom((value) => {
+      // If value is not provided, skip validation (optional field)
+      if (value === null || value === undefined) {
+        return true;
+      }
+      // Accept boolean (true/false)
+      if (typeof value === 'boolean') {
+        return true;
+      }
+      // If it's an object, validate it has required fields with non-empty values
+      if (typeof value === 'object' && !Array.isArray(value)) {
+        const hasFullName = value.fullName && typeof value.fullName === 'string' && value.fullName.trim().length > 0;
+        const hasStreetAddress = value.streetAddress && typeof value.streetAddress === 'string' && value.streetAddress.trim().length > 0;
+        const hasCountry = value.country && typeof value.country === 'string' && value.country.trim().length > 0;
+        const hasState = value.state && typeof value.state === 'string' && value.state.trim().length > 0;
+        return hasFullName && hasStreetAddress && hasCountry && hasState;
+      }
+      // Reject any other type
+      return false;
+    })
+    .withMessage("Shipping Address must be true, false, or an object with fullName, streetAddress, country, and state"),
   check("orderNotes")
     .optional()
     .isString()

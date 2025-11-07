@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, OnDestroy } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
@@ -12,7 +12,7 @@ import { EnvironmentService } from '../../services/environment.service';
   templateUrl: './cart.component.html',
   styleUrls: ['./cart.component.css']
 })
-export class CartComponent implements OnInit {
+export class CartComponent implements OnInit, OnDestroy {
   amount : Number = 1;
   cartproduct :any [] = [];
   total:any = 0;
@@ -22,9 +22,20 @@ export class CartComponent implements OnInit {
   ) { }
   getcartproducts(){
     if("cart" in localStorage){
-    this.cartproduct = JSON.parse(localStorage.getItem("cart")!)
-  }
-  this.gettotalprice()
+      const cartData = localStorage.getItem("cart");
+      if (cartData) {
+        try {
+          this.cartproduct = JSON.parse(cartData);
+        } catch (e) {
+          this.cartproduct = [];
+        }
+      } else {
+        this.cartproduct = [];
+      }
+    } else {
+      this.cartproduct = [];
+    }
+    this.gettotalprice();
   }
   gettotalprice(){
     this.total = 0 ;
@@ -68,7 +79,19 @@ export class CartComponent implements OnInit {
     }
   }
   ngOnInit(): void {
-    this.getcartproducts()
+    this.getcartproducts();
+    // Listen for cart updates
+    document.addEventListener('cartUpdated', this.onCartUpdated.bind(this));
+  }
+
+  ngOnDestroy(): void {
+    // Remove event listener
+    document.removeEventListener('cartUpdated', this.onCartUpdated.bind(this));
+  }
+
+  onCartUpdated(): void {
+    // Update cart immediately when cart is updated
+    this.getcartproducts();
   }
 
   /**

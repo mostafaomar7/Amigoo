@@ -252,7 +252,7 @@ export class OrderSummaryComponent implements OnInit {
   }
 
   /**
-   * Submit order: Save to LocalStorage + Send to API
+   * Submit order: Send to API first, then save to LocalStorage only if successful
    */
   onSubmit(): void {
     // Validate form
@@ -270,16 +270,7 @@ export class OrderSummaryComponent implements OnInit {
     // Prepare order data
     const orderData = this.prepareOrderData();
 
-    // Step 1: Save to LocalStorage (for order history)
-    const saved = this.orderStorageService.saveOrder(orderData);
-    if (!saved) {
-      this.notificationService.error('خطأ', 'فشل حفظ الطلب محلياً. يرجى المحاولة مرة أخرى.');
-      this.submitting = false;
-      this.cdr.markForCheck();
-      return;
-    }
-
-    // Step 2: Format data for backend API (use apiItems which has minimal data)
+    // Format data for backend API (use apiItems which has minimal data)
     // Note: Order interface requires localStorge property (typo in interface, but required for type checking)
     const apiOrderData: any = {
       fullName: orderData.fullName,
@@ -299,24 +290,39 @@ export class OrderSummaryComponent implements OnInit {
       orderNotes: orderData.notes,
       items: orderData.apiItems, // Use API items (minimal data)
       totalAmount: orderData.total,
-      localStorge: this.cartItems // Required by Order interface (even though backend uses 'items')
+      shippingCost: orderData.shippingCost || 0,
+      finalAmount: orderData.total,
+      termsAccepted: 'true'
     };
 
-    // Step 3: Send to backend API
+    // Step 1: Send to backend API first
     this.categoryService.sendorderForm(apiOrderData)
       .subscribe({
         next: (response) => {
-          // Success: Order saved to LocalStorage and sent to API
+          // Only save to LocalStorage if API call succeeded
+          if (response && response.success) {
+            // Save order data with API response info
+            const orderDataWithResponse = {
+              ...orderData,
+              orderId: response.data?._id || response.data?.id,
+              orderNumber: response.data?.orderNumber,
+              apiResponse: response
+            };
+
+            const saved = this.orderStorageService.saveOrder(orderDataWithResponse);
+            if (!saved) {
+              console.warn('Order saved to API but failed to save locally');
+            }
+          }
+
           this.notificationService.success(
             'تم بنجاح!',
             'تم إنشاء الطلب بنجاح. يمكنك متابعة حالة الطلب من سجل الطلبات.'
           );
 
-          // Clear cart
-          localStorage.removeItem('cart');
-          this.opencartService.cartproduct = [];
+          // Clear cart immediately after successful order
+          this.opencartService.clearCart();
           this.cartItems = [];
-          document.dispatchEvent(new CustomEvent('cartUpdated'));
 
           // Reset form
           this.orderForm.reset();
@@ -332,24 +338,17 @@ export class OrderSummaryComponent implements OnInit {
         error: (error) => {
           console.error('Error sending order to API:', error);
 
-          // Even if API fails, order is saved in LocalStorage
-          // Show warning but don't fail completely
-          let errorMessage = 'تم حفظ الطلب محلياً، لكن فشل إرساله للخادم.';
+          // Don't save to LocalStorage if API call failed
+          // Don't clear cart if order failed
+
+          let errorMessage = 'فشل إرسال الطلب للخادم. يرجى المحاولة مرة أخرى.';
           if (error.error && error.error.message) {
-            errorMessage += ` ${error.error.message}`;
+            errorMessage = error.error.message;
+          } else if (error.error && error.error.errors && error.error.errors.length > 0) {
+            errorMessage = error.error.errors.map((e: any) => e.msg || e.message).join(', ');
           }
 
-          this.notificationService.warning('تحذير', errorMessage);
-
-          // Still clear cart and redirect (order is saved locally)
-          localStorage.removeItem('cart');
-          this.opencartService.cartproduct = [];
-          this.cartItems = [];
-          document.dispatchEvent(new CustomEvent('cartUpdated'));
-
-          setTimeout(() => {
-            this.router.navigate(['/order-history']);
-          }, 2000);
+          this.notificationService.error('خطأ', errorMessage);
 
           this.submitting = false;
           this.cdr.markForCheck();

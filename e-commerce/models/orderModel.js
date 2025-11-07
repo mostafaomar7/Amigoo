@@ -5,7 +5,8 @@ const orderSchema = new mongoose.Schema(
     userId: {
       type: mongoose.Schema.ObjectId,
       ref: 'User',
-      required: [true, 'Order must belong to a user'],
+      required: false,
+      default: null,
     },
     orderNumber: {
       type: String,

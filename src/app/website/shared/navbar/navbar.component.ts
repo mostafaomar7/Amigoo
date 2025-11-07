@@ -39,6 +39,7 @@ export class NavbarComponent implements OnInit, OnDestroy, AfterViewInit {
   cartproduct: any[] = [];
   starproduct: any[] = [];
   total: any = 0;
+  hasOrderHistory: boolean = false;
 
   private destroy$ = new Subject<void>();
 
@@ -100,6 +101,7 @@ export class NavbarComponent implements OnInit, OnDestroy, AfterViewInit {
     this.getdata();
     this.getcartproducts();
     this.getstarproducts();
+    this.checkOrderHistory();
 
     // Listen for storage changes (cross-tab updates)
     window.addEventListener('storage', this.onStorageChange.bind(this));
@@ -107,6 +109,7 @@ export class NavbarComponent implements OnInit, OnDestroy, AfterViewInit {
     // Listen for custom events (same-tab updates)
     document.addEventListener('cartUpdated', this.updateCartAndFavoritesCount.bind(this));
     document.addEventListener('favoritesUpdated', this.updateCartAndFavoritesCount.bind(this));
+    document.addEventListener('orderHistoryUpdated', this.checkOrderHistory.bind(this));
 
     // Listen for clicks outside mobile menu
     document.addEventListener('click', this.handleDocumentClick.bind(this));
@@ -119,6 +122,7 @@ export class NavbarComponent implements OnInit, OnDestroy, AfterViewInit {
     // Periodically update counts (as a fallback)
     setInterval(() => {
       this.updateCartAndFavoritesCount();
+      this.checkOrderHistory();
     }, 2000);
   }
 
@@ -145,6 +149,7 @@ export class NavbarComponent implements OnInit, OnDestroy, AfterViewInit {
     window.removeEventListener('resize', this.checkScrollPosition.bind(this));
     document.removeEventListener('cartUpdated', this.updateCartAndFavoritesCount.bind(this));
     document.removeEventListener('favoritesUpdated', this.updateCartAndFavoritesCount.bind(this));
+    document.removeEventListener('orderHistoryUpdated', this.checkOrderHistory.bind(this));
     document.removeEventListener('click', this.handleDocumentClick.bind(this));
     if (this.categoriesContainer) {
       this.categoriesContainer.nativeElement.removeEventListener('scroll', this.checkScrollPosition.bind(this));
@@ -157,9 +162,29 @@ export class NavbarComponent implements OnInit, OnDestroy, AfterViewInit {
     this.cdr.markForCheck();
   }
 
+  checkOrderHistory(): void {
+    try {
+      const orderHistory = localStorage.getItem('orderHistory');
+      this.hasOrderHistory = orderHistory !== null && orderHistory !== '[]' && orderHistory.trim() !== '';
+      this.cdr.markForCheck();
+    } catch (error) {
+      this.hasOrderHistory = false;
+      this.cdr.markForCheck();
+    }
+  }
+
+  navigateToOrderHistory(): void {
+    this.router.navigate(['/order-history']).then(() => {
+      this.cdr.markForCheck();
+    });
+  }
+
   onStorageChange(event: StorageEvent): void {
     if (event.key === 'cart' || event.key === 'star') {
       this.updateCartAndFavoritesCount();
+    }
+    if (event.key === 'orderHistory') {
+      this.checkOrderHistory();
     }
   }
 
@@ -172,13 +197,24 @@ export class NavbarComponent implements OnInit, OnDestroy, AfterViewInit {
 
   getcartproducts(): void {
     if ("cart" in localStorage) {
-      this.cartproduct = JSON.parse(localStorage.getItem("cart")!);
-      // Initialize imageError for each item
-      this.cartproduct.forEach((item: any) => {
-        if (!item.hasOwnProperty('imageError')) {
-          item.imageError = false;
+      const cartData = localStorage.getItem("cart");
+      if (cartData) {
+        try {
+          this.cartproduct = JSON.parse(cartData);
+          // Initialize imageError for each item
+          this.cartproduct.forEach((item: any) => {
+            if (!item.hasOwnProperty('imageError')) {
+              item.imageError = false;
+            }
+          });
+        } catch (e) {
+          this.cartproduct = [];
         }
-      });
+      } else {
+        this.cartproduct = [];
+      }
+    } else {
+      this.cartproduct = [];
     }
     this.gettotalprice();
   }

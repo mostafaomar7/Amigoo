@@ -67,10 +67,10 @@
               *ngFor="let sizeData of availableSizes"
               type="button"
               class="size-option"
-              [class.selected]="selectedSize === sizeData.size"
+              [class.selected]="isSizeSelected(sizeData.size)"
               [class.out-of-stock]="sizeData.no === 0 && sizeData.quantity === 0"
               [disabled]="sizeData.no === 0 && sizeData.quantity === 0"
-              (click)="selectedSize = sizeData.size">
+              (click)="selectSize(sizeData.size)">
               {{ sizeData.size }}
             </button>
           </div>

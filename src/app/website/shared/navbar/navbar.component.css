@@ -257,6 +257,19 @@
   color: #dc3545;
 }
 
+.order-history-btn {
+  position: relative;
+}
+
+.order-history-btn i {
+  color: #2A2A2A;
+  transition: color 0.3s ease;
+}
+
+.order-history-btn:hover i {
+  color: #720a0a;
+}
+
 .cart-badge,
 .favorite-badge {
   position: absolute;

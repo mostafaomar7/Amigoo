@@ -3,175 +3,193 @@
     <!-- Page Header -->
     <div class="order-history-header">
       <h1 class="page-title">
-        <i class="fas fa-history me-2"></i>
+        <i class="fas fa-history"></i>
         سجل الطلبات
       </h1>
-      <p class="page-subtitle">عرض جميع طلباتك السابقة</p>
+      <div *ngIf="syncing" class="sync-indicator">
+        <i class="fas fa-sync-alt fa-spin"></i>
+        <span>جاري تحديث حالة الطلبات...</span>
+      </div>
     </div>
 
     <!-- Empty State -->
-    <div *ngIf="!loading && orders.length === 0" class="empty-orders">
+    <div *ngIf="!loading && !syncing && orders.length === 0" class="empty-orders">
       <div class="empty-orders-container">
-        <i class="fas fa-shopping-bag empty-icon"></i>
+        <div class="empty-icon-wrapper">
+          <i class="fas fa-shopping-bag empty-icon"></i>
+        </div>
         <h3 class="empty-title">لا توجد طلبات</h3>
-        <p class="empty-text">لم تقم بأي طلبات حتى الآن</p>
-        <a routerLink="/shop" class="btn btn-primary">
-          <i class="fas fa-shopping-cart me-2"></i>
+        <p class="empty-text">لم تقم بأي طلبات حتى الآن. ابدأ التسوق الآن!</p>
+        <a routerLink="/shop" class="btn-primary">
+          <i class="fas fa-shopping-cart"></i>
           ابدأ التسوق
         </a>
       </div>
     </div>
 
     <!-- Loading State -->
-    <div *ngIf="loading" class="loading-state">
-      <div class="spinner-border text-primary" role="status">
-        <span class="visually-hidden">جاري التحميل...</span>
+    <div *ngIf="loading && !syncing" class="loading-state">
+      <div class="spinner">
+        <div class="spinner-circle"></div>
       </div>
+      <p class="loading-text">جاري التحميل...</p>
     </div>
 
     <!-- Orders List -->
     <div *ngIf="!loading && orders.length > 0" class="orders-list">
-      <!-- Clear All Button (for testing) -->
-      <div class="text-end mb-3">
-        <button class="btn btn-outline-danger btn-sm" (click)="clearAllOrders()">
-          <i class="fas fa-trash me-2"></i>
-          حذف جميع الطلبات
-        </button>
-      </div>
-
-      <!-- Order Cards -->
-      <div *ngFor="let order of orders" class="order-card">
-        <div class="order-header">
-          <div class="order-info">
-            <h3 class="order-id">
-              <i class="fas fa-receipt me-2"></i>
-              رقم الطلب: {{ order.id }}
-            </h3>
-            <p class="order-date">
-              <i class="fas fa-calendar me-2"></i>
-              {{ formatDate(order.createdAt) }}
-            </p>
+      <div *ngFor="let order of orders; trackBy: trackByOrderId" class="order-card">
+        <!-- Order Header -->
+        <div class="order-card-header">
+          <div class="order-header-left">
+            <div class="order-id-section">
+              <i class="fas fa-receipt"></i>
+              <div class="order-id-info">
+                <span class="order-id-label">رقم الطلب</span>
+                <span class="order-id-value">{{ order.orderNumber || order.id }}</span>
+              </div>
+            </div>
+            <div class="order-date-section">
+              <i class="fas fa-calendar-alt"></i>
+              <span class="order-date">{{ formatDate(order.createdAt) }}</span>
+            </div>
           </div>
-          <div class="order-status">
+          <div class="order-status-wrapper">
             <span
               class="status-badge"
-              [style.background-color]="getStatusColor(order.status)">
+              [style.background-color]="getStatusColor(order.status)"
+              [style.border-color]="getStatusColor(order.status)">
+              <i class="fas" [ngClass]="getStatusIcon(order.status)"></i>
               {{ getStatusLabel(order.status) }}
             </span>
           </div>
         </div>
 
-        <hr class="order-divider">
-
-        <!-- Customer Information -->
-        <div class="order-section">
-          <h4 class="section-title">
-            <i class="fas fa-user me-2"></i>
-            معلومات العميل
-          </h4>
-          <div class="info-grid">
-            <div class="info-item">
-              <span class="info-label">الاسم:</span>
-              <span class="info-value">{{ order.fullName }}</span>
-            </div>
-            <div class="info-item">
-              <span class="info-label">البريد الإلكتروني:</span>
-              <span class="info-value">{{ order.email }}</span>
-            </div>
-            <div class="info-item">
-              <span class="info-label">الهاتف الأساسي:</span>
-              <span class="info-value">{{ order.primaryPhone }}</span>
-            </div>
-            <div class="info-item" *ngIf="order.secondaryPhone">
-              <span class="info-label">الهاتف الثانوي:</span>
-              <span class="info-value">{{ order.secondaryPhone }}</span>
-            </div>
-          </div>
-        </div>
-
-        <!-- Delivery Information -->
-        <div class="order-section">
-          <h4 class="section-title">
-            <i class="fas fa-truck me-2"></i>
-            معلومات التوصيل
-          </h4>
-          <div class="info-grid">
-            <div class="info-item">
-              <span class="info-label">العنوان:</span>
-              <span class="info-value">{{ order.detailedAddress }}</span>
-            </div>
-            <div class="info-item">
-              <span class="info-label">المحافظة:</span>
-              <span class="info-value">{{ order.governorate }}</span>
-            </div>
-            <div class="info-item">
-              <span class="info-label">المدينة:</span>
-              <span class="info-value">{{ order.city }}</span>
-            </div>
-          </div>
-        </div>
-
         <!-- Order Items -->
-        <div class="order-section">
+        <div class="order-items-section">
           <h4 class="section-title">
-            <i class="fas fa-shopping-bag me-2"></i>
+            <i class="fas fa-shopping-bag"></i>
             المنتجات
           </h4>
-          <div class="order-items">
-            <div *ngFor="let item of order.items" class="order-item">
-              <div class="item-image" *ngIf="item.imageCover">
+          <div class="order-items-grid">
+            <div *ngFor="let item of order.items" class="order-item-card">
+              <div class="item-image-wrapper">
                 <img
                   [src]="getImageUrl(item.imageCover)"
                   [alt]="item.title || 'منتج'"
-                  (error)="$event.target.src='assets/img/404/404.png'">
+                  class="item-image"
+                  (error)="$event.target.src='assets/img/404/404.png'"
+                />
               </div>
               <div class="item-details">
                 <h5 class="item-title">{{ item.title || 'منتج' }}</h5>
-                <p class="item-meta">
-                  <span *ngIf="item.sizeName">المقاس: {{ item.sizeName }}</span>
-                  <span *ngIf="item.sizeName"> | </span>
-                  <span>الكمية: {{ item.quantity }}</span>
-                </p>
-                <p class="item-price">
-                  {{ item.price | currency:'EGP':'symbol':'1.0-0' }} × {{ item.quantity }} =
-                  {{ item.totalPrice | currency:'EGP':'symbol':'1.0-0' }}
-                </p>
+                <div class="item-meta">
+                  <span *ngIf="item.sizeName" class="item-size">
+                    <i class="fas fa-ruler"></i>
+                    {{ item.sizeName }}
+                  </span>
+                  <span class="item-quantity">
+                    <i class="fas fa-layer-group"></i>
+                    الكمية: {{ item.quantity }}
+                  </span>
+                </div>
+                <div class="item-price-section">
+                  <span class="item-unit-price">{{ item.price | currency:'EGP':'symbol':'1.0-0' }}</span>
+                  <span class="item-total-price">{{ item.totalPrice | currency:'EGP':'symbol':'1.0-0' }}</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Order Information Grid -->
+        <div class="order-info-grid">
+          <!-- Customer Info -->
+          <div class="info-card">
+            <h4 class="info-card-title">
+              <i class="fas fa-user"></i>
+              معلومات العميل
+            </h4>
+            <div class="info-list">
+              <div class="info-row">
+                <span class="info-label">الاسم:</span>
+                <span class="info-value">{{ order.fullName }}</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">البريد:</span>
+                <span class="info-value">{{ order.email }}</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">الهاتف:</span>
+                <span class="info-value">{{ order.primaryPhone }}</span>
+              </div>
+              <div class="info-row" *ngIf="order.secondaryPhone">
+                <span class="info-label">هاتف إضافي:</span>
+                <span class="info-value">{{ order.secondaryPhone }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Delivery Info -->
+          <div class="info-card">
+            <h4 class="info-card-title">
+              <i class="fas fa-truck"></i>
+              معلومات التوصيل
+            </h4>
+            <div class="info-list">
+              <div class="info-row">
+                <span class="info-label">العنوان:</span>
+                <span class="info-value">{{ order.detailedAddress }}</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">المحافظة:</span>
+                <span class="info-value">{{ order.governorate }}</span>
+              </div>
+              <div class="info-row">
+                <span class="info-label">المدينة:</span>
+                <span class="info-value">{{ order.city }}</span>
               </div>
             </div>
           </div>
         </div>
 
         <!-- Order Notes -->
-        <div class="order-section" *ngIf="order.notes">
+        <div class="order-notes-section" *ngIf="order.notes">
           <h4 class="section-title">
-            <i class="fas fa-sticky-note me-2"></i>
+            <i class="fas fa-sticky-note"></i>
             الملاحظات
           </h4>
           <p class="order-notes">{{ order.notes }}</p>
         </div>
 
         <!-- Order Totals -->
-        <div class="order-totals">
-          <div class="total-row">
-            <span>المجموع الفرعي:</span>
-            <span>{{ order.subtotal | currency:'EGP':'symbol':'1.0-0' }}</span>
-          </div>
-          <div class="total-row">
-            <span>ضريبة القيمة المضافة:</span>
-            <span>{{ order.vat | currency:'EGP':'symbol':'1.0-0' }}</span>
-          </div>
-          <div class="total-row total-final">
-            <span>الإجمالي:</span>
-            <span class="final-price">{{ order.total | currency:'EGP':'symbol':'1.0-0' }}</span>
+        <div class="order-totals-section">
+          <div class="totals-card">
+            <div class="total-row">
+              <span class="total-label">المجموع الفرعي:</span>
+              <span class="total-value">{{ order.subtotal | currency:'EGP':'symbol':'1.0-0' }}</span>
+            </div>
+            <div class="total-row" *ngIf="order.shippingCost > 0">
+              <span class="total-label">تكلفة الشحن:</span>
+              <span class="total-value">{{ order.shippingCost | currency:'EGP':'symbol':'1.0-0' }}</span>
+            </div>
+            <div class="total-row" *ngIf="order.vat > 0">
+              <span class="total-label">ضريبة القيمة المضافة:</span>
+              <span class="total-value">{{ order.vat | currency:'EGP':'symbol':'1.0-0' }}</span>
+            </div>
+            <div class="total-row total-final">
+              <span class="total-label">الإجمالي:</span>
+              <span class="total-value final-price">{{ order.total | currency:'EGP':'symbol':'1.0-0' }}</span>
+            </div>
           </div>
         </div>
 
         <!-- Order Actions -->
         <div class="order-actions">
           <button
-            class="btn btn-outline-danger btn-sm"
-            (click)="deleteOrder(order.id)">
-            <i class="fas fa-trash me-2"></i>
+            class="btn-delete"
+            (click)="deleteOrder(order.id)"
+            aria-label="حذف الطلب">
+            <i class="fas fa-trash"></i>
             حذف من السجل
           </button>
         </div>

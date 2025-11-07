@@ -1,7 +1,6 @@
 const Order = require("../models/orderModel");
 const Product = require("../models/productModel");
 const Size = require("../models/sizeModel");
-const User = require("../models/User");
 const Settings = require("../models/settingsModel");
 const asyncHandler = require('express-async-handler');
 const { v4: uuidv4 } = require('uuid');
@@ -19,7 +18,7 @@ const validateCartItems = (items) => {
   const seen = new Set();
   const uniqueItems = [];
 
-  for (const item of items) {
+  items.forEach((item) => {
     // Create unique key: productId + sizeName
     const key = `${item.productId}-${(item.sizeName || '').toLowerCase()}`;
 
@@ -29,7 +28,7 @@ const validateCartItems = (items) => {
 
     seen.add(key);
     uniqueItems.push(item);
-  }
+  });
 
   return uniqueItems;
 };
@@ -59,8 +58,20 @@ const validateStockFromProduct = (product, sizeName, requestedQuantity) => {
 
 // Create new order with comprehensive validation
 exports.createOrder = asyncHandler(async (req, res) => {
-  const { items, shippingAddress, orderNotes, totalAmount: clientTotalAmount } = req.body;
-  const userId = req.user ? req.user.id : null;
+  const {
+    items,
+    shippingAddress,
+    orderNotes,
+    totalAmount: clientTotalAmount,
+    finalAmount: clientFinalAmount,
+    shippingCost: clientShippingCost,
+    fullName,
+    country,
+    streetAddress,
+    state,
+    phone,
+    email
+  } = req.body;
 
   // Validation 1: Prevent empty cart
   if (!items || !Array.isArray(items) || items.length === 0) {
@@ -81,23 +92,47 @@ exports.createOrder = asyncHandler(async (req, res) => {
     });
   }
 
-  // Validation 3: Validate user exists (if authenticated)
-  if (userId) {
-    const user = await User.findById(userId);
-    if (!user) {
-      return res.status(404).json({
-        success: false,
-        message: 'User not found. Please login again.',
-      });
-    }
+  // Validation 3: Validate shipping address - accept from shippingAddress object or top-level fields
+  let finalShippingAddress;
+  if (shippingAddress && typeof shippingAddress === 'object' && shippingAddress.fullName) {
+    // If shippingAddress is an object with the required fields, use it
+    // But ensure email and phone are included (from object or top-level)
+    finalShippingAddress = {
+      ...shippingAddress,
+      phone: shippingAddress.phone || phone,
+      email: shippingAddress.email || email
+    };
+  } else if (fullName && streetAddress && country && state) {
+    // If shippingAddress is false/boolean but we have top-level fields, construct the object
+    finalShippingAddress = {
+      fullName: fullName,
+      streetAddress: streetAddress,
+      country: country,
+      state: state,
+      phone: phone,
+      email: email
+    };
+  } else {
+    return res.status(400).json({
+      success: false,
+      message: 'Shipping address is required. Please provide fullName, streetAddress, country, and state either in shippingAddress object or as top-level fields.',
+    });
   }
 
-  // Validation 4: Validate shipping address exists
-  if (!shippingAddress || !shippingAddress.fullName || !shippingAddress.streetAddress ||
-      !shippingAddress.country || !shippingAddress.state) {
+  // Validate finalShippingAddress has all required fields
+  if (!finalShippingAddress.fullName || !finalShippingAddress.streetAddress ||
+      !finalShippingAddress.country || !finalShippingAddress.state) {
     return res.status(400).json({
       success: false,
       message: 'Shipping address is required. Please provide fullName, streetAddress, country, and state.',
+    });
+  }
+
+  // Validate email and phone are provided (required for order)
+  if (!finalShippingAddress.email || !finalShippingAddress.phone) {
+    return res.status(400).json({
+      success: false,
+      message: 'Email and phone number are required for order processing.',
     });
   }
 
@@ -106,125 +141,145 @@ exports.createOrder = asyncHandler(async (req, res) => {
   const validatedItems = [];
   const productIds = new Set();
 
-  for (const item of items) {
-    const { productId, sizeName, quantity } = item;
+  // Process items sequentially - using forEach with early return pattern
+  const processItems = async () => {
+    for (let idx = 0; idx < items.length; idx += 1) {
+      const item = items[idx];
+      const { productId, sizeName, quantity } = item;
 
-    // Validation 5: Validate required fields
-    if (!productId || !quantity || quantity < 1) {
-      return res.status(400).json({
-        success: false,
-        message: 'Invalid item: productId and quantity (min 1) are required',
-      });
-    }
-
-    // Validation 6: Check if product exists and is not deleted
-    const product = await Product.findOne({ _id: productId, isDeleted: false });
-    if (!product) {
-      return res.status(404).json({
-        success: false,
-        message: `Product with ID ${productId} not found or has been deleted`,
-      });
-    }
-
-    // Validation 7: Check stock availability
-    // Try Size model first (if it has productId field), otherwise use product.quantity array
-    let stockAvailable = false;
-    let availableStock = 0;
-
-    if (sizeName) {
-      // Try to find size in Size model (if it supports productId)
-      try {
-        const size = await Size.findOne({
-          productId,
-          sizeName: sizeName.toLowerCase(),
-          isActive: true,
+      // Validation 5: Validate required fields
+      if (!productId || !quantity || quantity < 1) {
+        return res.status(400).json({
+          success: false,
+          message: 'Invalid item: productId and quantity (min 1) are required',
         });
+      }
 
-        if (size && size.quantity !== undefined) {
-          availableStock = size.quantity;
-          stockAvailable = size.quantity >= quantity;
-        } else {
-          // Fallback to product's quantity array
+      // Validation 6: Check if product exists and is not deleted
+      const product = await Product.findOne({ _id: productId, isDeleted: false });
+      if (!product) {
+        return res.status(404).json({
+          success: false,
+          message: `Product with ID ${productId} not found or has been deleted`,
+        });
+      }
+
+      // Validation 7: Check stock availability
+      let stockAvailable = false;
+      let availableStock = 0;
+
+      if (sizeName) {
+        try {
+          const size = await Size.findOne({
+            productId,
+            sizeName: sizeName.toLowerCase(),
+            isActive: true,
+          });
+
+          if (size && size.quantity !== undefined) {
+            availableStock = size.quantity;
+            stockAvailable = size.quantity >= quantity;
+          } else {
+            const stockCheck = validateStockFromProduct(product, sizeName, quantity);
+            availableStock = stockCheck.available;
+            stockAvailable = stockCheck.valid;
+          }
+        } catch (error) {
           const stockCheck = validateStockFromProduct(product, sizeName, quantity);
           availableStock = stockCheck.available;
           stockAvailable = stockCheck.valid;
         }
-      } catch (error) {
-        // If Size model doesn't support productId, use product.quantity array
-        const stockCheck = validateStockFromProduct(product, sizeName, quantity);
-        availableStock = stockCheck.available;
-        stockAvailable = stockCheck.valid;
+      } else {
+        const totalStock = (product.quantity || []).reduce((sum, q) => sum + (q.no || 0), 0);
+        availableStock = totalStock;
+        stockAvailable = totalStock >= quantity;
       }
-    } else {
-      // No size specified - check total quantity across all sizes
-      const totalStock = (product.quantity || []).reduce((sum, q) => sum + (q.no || 0), 0);
-      availableStock = totalStock;
-      stockAvailable = totalStock >= quantity;
-    }
 
-    if (!stockAvailable) {
-      return res.status(400).json({
-        success: false,
-        message: `Insufficient stock for ${product.title}${sizeName ? ` - Size ${sizeName}` : ''}. Available: ${availableStock}, Requested: ${quantity}`,
+      if (!stockAvailable) {
+        return res.status(400).json({
+          success: false,
+          message: `Insufficient stock for ${product.title}${sizeName ? ` - Size ${sizeName}` : ''}. Available: ${availableStock}, Requested: ${quantity}`,
+        });
+      }
+
+      // Calculate item price
+      const itemPrice = product.priceAfterDiscount || product.price;
+      const itemTotal = itemPrice * quantity;
+      calculatedTotalAmount += itemTotal;
+
+      validatedItems.push({
+        productId,
+        sizeName: sizeName ? sizeName.toUpperCase() : undefined,
+        quantity,
+        price: itemPrice,
+        totalPrice: itemTotal,
       });
+
+      productIds.add(productId.toString());
     }
+  };
 
-    // Calculate item price (use priceAfterDiscount if available, otherwise regular price)
-    const itemPrice = product.priceAfterDiscount || product.price;
-    const itemTotal = itemPrice * quantity;
-    calculatedTotalAmount += itemTotal;
-
-    validatedItems.push({
-      productId,
-      sizeName: sizeName ? sizeName.toUpperCase() : undefined,
-      quantity,
-      price: itemPrice,
-      totalPrice: itemTotal,
-    });
-
-    productIds.add(productId.toString());
-  }
+  await processItems();
 
   // Validation 8: Validate total price = sum of items × quantity
-  // Get shipping cost from settings
+  // Get shipping cost from settings or use client's shipping cost
   const settings = await Settings.getSettings();
   let shippingCost = 0;
-  if (calculatedTotalAmount < settings.free_shipping_threshold) {
-    shippingCost = settings.shipping_cost || 0;
+
+  // Use client's shipping cost if provided, otherwise calculate from settings
+  if (clientShippingCost !== undefined && clientShippingCost !== null) {
+    shippingCost = parseFloat(clientShippingCost) || 0;
+  } else {
+    // Calculate shipping cost from settings
+    if (calculatedTotalAmount < settings.free_shipping_threshold) {
+      shippingCost = settings.shipping_cost || 0;
+    }
   }
 
   const calculatedFinalAmount = calculatedTotalAmount + shippingCost;
 
-  // If client sent totalAmount, validate it matches calculated amount (allow small rounding differences)
+  // Validate client's totalAmount matches calculated totalAmount (allow small rounding differences)
   if (clientTotalAmount !== undefined) {
-    const difference = Math.abs(clientTotalAmount - calculatedFinalAmount);
+    const difference = Math.abs(clientTotalAmount - calculatedTotalAmount);
     if (difference > 0.01) { // Allow 1 cent difference for rounding
       return res.status(400).json({
         success: false,
-        message: `Price mismatch: Calculated total (${calculatedFinalAmount.toFixed(2)}) does not match provided total (${clientTotalAmount.toFixed(2)})`,
-        calculatedTotal: calculatedFinalAmount,
-        providedTotal: clientTotalAmount,
+        message: `Price mismatch: Calculated subtotal (${calculatedTotalAmount.toFixed(2)}) does not match provided subtotal (${clientTotalAmount.toFixed(2)})`,
+        calculatedSubtotal: calculatedTotalAmount,
+        providedSubtotal: clientTotalAmount,
+      });
+    }
+  }
+
+  // Validate client's finalAmount matches calculated finalAmount (allow small rounding differences)
+  if (clientFinalAmount !== undefined) {
+    const difference = Math.abs(clientFinalAmount - calculatedFinalAmount);
+    if (difference > 0.01) { // Allow 1 cent difference for rounding
+      return res.status(400).json({
+        success: false,
+        message: `Price mismatch: Calculated final amount (${calculatedFinalAmount.toFixed(2)}) does not match provided final amount (${clientFinalAmount.toFixed(2)})`,
+        calculatedFinal: calculatedFinalAmount,
+        providedFinal: clientFinalAmount,
       });
     }
   }
 
   // Create order
   const orderData = {
-    userId,
     orderNumber: generateOrderNumber(),
     status: 'pending',
     items: validatedItems,
     totalAmount: calculatedTotalAmount,
     shippingCost,
     finalAmount: calculatedFinalAmount,
-    ...shippingAddress,
+    ...finalShippingAddress,
     orderNotes,
   };
 
   const order = await Order.create(orderData);
 
   // Update stock quantities - try Size model first, then product.quantity array
-  for (const item of validatedItems) {
+  await Promise.all(validatedItems.map(async (item) => {
     if (item.sizeName) {
       try {
         // Try Size model update
@@ -265,16 +320,14 @@ exports.createOrder = asyncHandler(async (req, res) => {
       const product = await Product.findById(item.productId);
       if (product && product.quantity && product.quantity.length > 0) {
         // Deduct from first available size
-        for (const qty of product.quantity) {
-          if (qty.no >= item.quantity) {
-            qty.no -= item.quantity;
-            break;
-          }
+        const qtyToUpdate = product.quantity.find(qty => qty.no >= item.quantity);
+        if (qtyToUpdate) {
+          qtyToUpdate.no -= item.quantity;
         }
         await product.save();
       }
     }
-  }
+  }));
 
   res.status(201).json({
     success: true,
@@ -355,7 +408,7 @@ exports.getOrderById = asyncHandler(async (req, res) => {
  * Restore stock when order is cancelled
  */
 const restoreStock = async (items) => {
-  for (const item of items) {
+  await Promise.all(items.map(async (item) => {
     if (item.sizeName) {
       try {
         // Try Size model first
@@ -400,7 +453,7 @@ const restoreStock = async (items) => {
         await product.save();
       }
     }
-  }
+  }));
 };
 
 // Update order status with cancellation validation
@@ -522,12 +575,12 @@ exports.deleteOrder = asyncHandler(async (req, res) => {
 
   // Restore stock if order was not cancelled
   if (order.status !== 'cancelled') {
-    for (const item of order.items) {
+    await Promise.all(order.items.map(async (item) => {
       await Size.findOneAndUpdate(
         { productId: item.productId, sizeName: item.sizeName },
         { $inc: { quantity: item.quantity } }
       );
-    }
+    }));
   }
 
   res.status(200).json({

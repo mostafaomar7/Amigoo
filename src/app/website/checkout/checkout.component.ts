@@ -82,10 +82,22 @@ export class CheckoutComponent implements OnInit, OnDestroy {
 
   loadCartItems(): void {
     if ('cart' in localStorage) {
-      this.cartItems = JSON.parse(localStorage.getItem('cart') || '[]');
+      const cartData = localStorage.getItem('cart');
+      if (cartData) {
+        try {
+          this.cartItems = JSON.parse(cartData);
+        } catch (e) {
+          this.cartItems = [];
+        }
+      } else {
+        this.cartItems = [];
+      }
     } else {
       this.cartItems = [];
     }
+
+    // Update service cart
+    this.opencartService.cartproduct = this.cartItems;
 
     if (this.cartItems.length === 0) {
       this.notificationService.warning('السلة فارغة', 'يرجى إضافة منتجات إلى السلة أولاً');
@@ -107,6 +119,7 @@ export class CheckoutComponent implements OnInit, OnDestroy {
   onCartUpdated(): void {
     this.loadCartItems();
     this.calculateTotals();
+    this.cdr.markForCheck();
   }
 
   getImageUrl(imagePath: string): string {
@@ -155,6 +168,31 @@ export class CheckoutComponent implements OnInit, OnDestroy {
     this.opencartService.cartproduct = this.cartItems;
     this.calculateTotals();
     document.dispatchEvent(new CustomEvent('cartUpdated'));
+    this.cdr.markForCheck();
+  }
+
+  /**
+   * Clear cart completely
+   */
+  clearCart(): void {
+    // Clear from localStorage
+    localStorage.removeItem('cart');
+
+    // Clear from service
+    this.opencartService.cartproduct = [];
+
+    // Clear local array
+    this.cartItems = [];
+
+    // Reset totals
+    this.subtotal = 0;
+    this.shippingCost = 0;
+    this.total = 0;
+
+    // Dispatch event to update other components
+    document.dispatchEvent(new CustomEvent('cartUpdated'));
+
+    // Update view
     this.cdr.markForCheck();
   }
 
@@ -345,7 +383,7 @@ export class CheckoutComponent implements OnInit, OnDestroy {
   }
 
   /**
-   * Submit order: Save to LocalStorage + Send to API
+   * Submit order: Send to API first, then save to LocalStorage only if successful
    */
   onSubmit(): void {
     // Validate form
@@ -372,16 +410,7 @@ export class CheckoutComponent implements OnInit, OnDestroy {
     // Prepare order data
     const orderData = this.prepareOrderData();
 
-    // Step 1: Save to LocalStorage
-    const saved = this.orderStorageService.saveOrder(orderData);
-    if (!saved) {
-      this.notificationService.error('خطأ', 'فشل حفظ الطلب محلياً. يرجى المحاولة مرة أخرى.');
-      this.submitting = false;
-      this.cdr.markForCheck();
-      return;
-    }
-
-    // Step 2: Format data for backend API
+    // Format data for backend API
     const apiOrderData: any = {
       fullName: orderData.fullName,
       email: orderData.email,
@@ -389,7 +418,14 @@ export class CheckoutComponent implements OnInit, OnDestroy {
       country: 'Egypt',
       streetAddress: orderData.detailedAddress,
       state: `${orderData.governorate}, ${orderData.city}`,
-      shippingAddress: false, // Must be boolean, not object
+      shippingAddress: {
+        fullName: orderData.fullName,
+        country: 'Egypt',
+        streetAddress: orderData.detailedAddress,
+        state: `${orderData.governorate}, ${orderData.city}`,
+        email: orderData.email,
+        phone: orderData.primaryPhone,
+      },
       orderNotes: orderData.notes || '',
       termsAccepted: 'true', // Required: must be string 'true'
       items: orderData.apiItems,
@@ -398,20 +434,35 @@ export class CheckoutComponent implements OnInit, OnDestroy {
       finalAmount: this.total
     };
 
-    // Step 3: Send to backend API
+    // Step 1: Send to backend API first
     this.categoryService.sendorderForm(apiOrderData)
       .subscribe({
         next: (response) => {
+          // Check if order was created successfully (handle different response structures)
+          const isSuccess = response && (response.success === true || response.data || response._id);
+
+          if (isSuccess) {
+            // Save order data with API response info
+            const orderDataWithResponse = {
+              ...orderData,
+              orderId: response.data?._id || response.data?.id || response._id,
+              orderNumber: response.data?.orderNumber || response.orderNumber,
+              apiResponse: response
+            };
+
+            const saved = this.orderStorageService.saveOrder(orderDataWithResponse);
+            if (!saved) {
+              console.warn('Order saved to API but failed to save locally');
+            }
+          }
+
           this.notificationService.success(
             'تم بنجاح!',
             'تم إنشاء الطلب بنجاح. يمكنك متابعة حالة الطلب من سجل الطلبات.'
           );
 
-          // Clear cart
-          localStorage.removeItem('cart');
-          this.opencartService.cartproduct = [];
-          this.cartItems = [];
-          document.dispatchEvent(new CustomEvent('cartUpdated'));
+          // Clear cart after successful order (always clear if we reach here without error)
+          this.clearCart();
 
           // Reset form
           this.checkoutForm.reset();
@@ -427,23 +478,17 @@ export class CheckoutComponent implements OnInit, OnDestroy {
         error: (error) => {
           console.error('Error sending order to API:', error);
 
-          // Order is saved locally, show warning
-          let errorMessage = 'تم حفظ الطلب محلياً، لكن فشل إرساله للخادم.';
+          // Don't save to LocalStorage if API call failed
+          // Don't clear cart if order failed
+
+          let errorMessage = 'فشل إرسال الطلب للخادم. يرجى المحاولة مرة أخرى.';
           if (error.error && error.error.message) {
-            errorMessage += ` ${error.error.message}`;
+            errorMessage = error.error.message;
+          } else if (error.error && error.error.errors && error.error.errors.length > 0) {
+            errorMessage = error.error.errors.map((e: any) => e.msg || e.message).join(', ');
           }
 
-          this.notificationService.warning('تحذير', errorMessage);
-
-          // Still clear cart and redirect
-          localStorage.removeItem('cart');
-          this.opencartService.cartproduct = [];
-          this.cartItems = [];
-          document.dispatchEvent(new CustomEvent('cartUpdated'));
-
-          setTimeout(() => {
-            this.router.navigate(['/order-history']);
-          }, 2000);
+          this.notificationService.error('خطأ', errorMessage);
 
           this.submitting = false;
           this.cdr.markForCheck();

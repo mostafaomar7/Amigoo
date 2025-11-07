@@ -247,6 +247,21 @@ export class OpencartService {
     }
   }
 
+  /**
+   * Clear cart completely
+   * This method clears the cart from both the service and localStorage
+   */
+  clearCart(): void {
+    // Clear from localStorage immediately
+    localStorage.removeItem('cart');
+
+    // Clear from service
+    this.cartproduct = [];
+
+    // Dispatch event to update all components immediately
+    document.dispatchEvent(new CustomEvent('cartUpdated'));
+  }
+
   toggleCart() {
     this.cartToggleSubject.next(true);  // جعل القائمة تفتح
   }
