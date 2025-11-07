@@ -1,6 +1,5 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable } from 'rxjs';
 import { environment } from '../../environments/environment';
 
 @Injectable({
@@ -28,8 +27,5 @@ export class ApifunctionService {
   }
   postcategory(object){
     return this.http.post(`${environment.apiUrl}/categories/`, object)
-  }
-  seedDatabase(): Observable<any> {
-    return this.http.post(`${environment.apiUrl}/seed/`, {});
   }
 }

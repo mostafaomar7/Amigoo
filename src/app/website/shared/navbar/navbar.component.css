@@ -248,20 +248,6 @@
   position: relative;
 }
 
-.seed-btn {
-  position: relative;
-  color: #b8865a;
-}
-
-.seed-btn:hover {
-  color: #8b6a42;
-}
-
-.seed-btn:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
-}
-
 .favorite-btn i {
   color: #2A2A2A;
   transition: color 0.3s ease;

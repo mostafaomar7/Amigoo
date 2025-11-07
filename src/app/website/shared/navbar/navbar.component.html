@@ -84,23 +84,6 @@
       <!-- Right: Action Icons -->
       <div class="navbar-right">
         <button
-          class="icon-btn seed-btn"
-          (click)="seedDatabase()"
-          aria-label="ملء البيانات"
-          title="ملء قاعدة البيانات ببيانات وهمية"
-          *ngIf="!isSeeding"
-        >
-          <i class="fas fa-database"></i>
-        </button>
-        <button
-          class="icon-btn seed-btn"
-          disabled
-          *ngIf="isSeeding"
-          title="جاري ملء البيانات..."
-        >
-          <i class="fas fa-spinner fa-spin"></i>
-        </button>
-        <button
           class="icon-btn favorite-btn"
           (click)="togglestarItem()"
           aria-label="Favorites"
