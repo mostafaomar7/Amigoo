@@ -39,6 +39,8 @@ export class MasterSizesComponent implements OnInit, OnDestroy {
   sizeForm: FormGroup;
   editSizeForm: FormGroup;
   private searchTimeout: any = null;
+  isAddingSize = false;
+  isUpdatingSize = false;
 
   Math = Math;
 
@@ -184,6 +186,7 @@ export class MasterSizesComponent implements OnInit, OnDestroy {
 
   addSize(): void {
     if (this.sizeForm.valid) {
+      this.isAddingSize = true;
       const formData = {
         sizeName: this.sizeForm.value.sizeName.toLowerCase()
       };
@@ -193,10 +196,12 @@ export class MasterSizesComponent implements OnInit, OnDestroy {
           this.notificationService.success('نجاح', 'تمت إضافة المقاس بنجاح');
           this.closeModals();
           this.loadSizes();
+          this.isAddingSize = false;
         },
         error: (error) => {
           console.error('Error adding size:', error);
           this.notificationService.error('خطأ', error.error?.message || 'فشل في إضافة المقاس');
+          this.isAddingSize = false;
         }
       });
     }
@@ -204,6 +209,7 @@ export class MasterSizesComponent implements OnInit, OnDestroy {
 
   updateSize(): void {
     if (this.editSizeForm.valid && this.selectedSize) {
+      this.isUpdatingSize = true;
       const formData = {
         sizeName: this.editSizeForm.value.sizeName.toLowerCase()
       };
@@ -213,10 +219,12 @@ export class MasterSizesComponent implements OnInit, OnDestroy {
           this.notificationService.success('نجاح', 'تم تحديث المقاس بنجاح');
           this.closeModals();
           this.loadSizes();
+          this.isUpdatingSize = false;
         },
         error: (error) => {
           console.error('Error updating size:', error);
           this.notificationService.error('خطأ', error.error?.message || 'فشل في تحديث المقاس');
+          this.isUpdatingSize = false;
         }
       });
     }

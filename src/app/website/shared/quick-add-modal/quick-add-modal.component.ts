@@ -132,6 +132,12 @@ export class QuickAddModalComponent implements OnInit, OnDestroy {
       'red': '#dc3545', 'green': '#28a745', 'blue': '#007bff', 'yellow': '#ffc107',
       'black': '#000000', 'white': '#ffffff', 'gray': '#6c757d', 'grey': '#6c757d',
       'orange': '#fd7e14', 'purple': '#6f42c1', 'pink': '#e83e8c', 'brown': '#795548',
+      'navy': '#001f3f', 'teal': '#20c997', 'cyan': '#17a2b8', 'lime': '#32cd32',
+      'indigo': '#6610f2', 'maroon': '#800000', 'olive': '#808000', 'silver': '#c0c0c0',
+      'gold': '#ffd700', 'beige': '#f5f5dc', 'coral': '#ff7f50', 'salmon': '#fa8072',
+      'turquoise': '#40e0d0', 'lavender': '#e6e6fa', 'mint': '#98fb98', 'burgundy': '#800020',
+      'khaki': '#f0e68c', 'ivory': '#fffff0', 'cream': '#fffdd0', 'tan': '#d2b48c',
+      'charcoal': '#36454f', 'violet': '#8a2be2', 'magenta': '#ff00ff',
       'أحمر': '#dc3545', 'أخضر': '#28a745', 'أزرق': '#007bff', 'أصفر': '#ffc107',
       'أسود': '#000000', 'أبيض': '#ffffff', 'رمادي': '#6c757d',
       'برتقالي': '#fd7e14', 'بنفسجي': '#6f42c1', 'وردي': '#e83e8c', 'بني': '#795548'

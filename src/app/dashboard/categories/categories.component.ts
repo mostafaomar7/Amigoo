@@ -41,6 +41,8 @@ export class CategoriesComponent implements OnInit, OnDestroy {
   selectedImage: File | null = null;
   selectedEditImage: File | null = null;
   private searchTimeout: any = null;
+  isAddingCategory = false;
+  isUpdatingCategory = false;
 
   Math = Math;
 
@@ -169,6 +171,7 @@ export class CategoriesComponent implements OnInit, OnDestroy {
 
   addCategory(): void {
     if (this.categoryForm.valid && this.selectedImage) {
+      this.isAddingCategory = true;
       const formData = new FormData();
       formData.append('name', this.categoryForm.value.name);
       formData.append('image', this.selectedImage);
@@ -178,10 +181,12 @@ export class CategoriesComponent implements OnInit, OnDestroy {
           this.notificationService.success('نجاح', 'تمت إضافة القسم بنجاح');
           this.closeModals();
           this.loadCategories();
+          this.isAddingCategory = false;
         },
         error: (error) => {
           console.error('Error adding category:', error);
           this.notificationService.error('خطأ', error.error?.message || 'فشل في إضافة القسم');
+          this.isAddingCategory = false;
         }
       });
     }
@@ -189,6 +194,7 @@ export class CategoriesComponent implements OnInit, OnDestroy {
 
   updateCategory(): void {
     if (this.editCategoryForm.valid && this.selectedCategory) {
+      this.isUpdatingCategory = true;
       const formData = new FormData();
       formData.append('name', this.editCategoryForm.value.name);
       if (this.selectedEditImage) {
@@ -200,10 +206,12 @@ export class CategoriesComponent implements OnInit, OnDestroy {
           this.notificationService.success('نجاح', 'تم تحديث القسم بنجاح');
           this.closeModals();
           this.loadCategories();
+          this.isUpdatingCategory = false;
         },
         error: (error) => {
           console.error('Error updating category:', error);
           this.notificationService.error('خطأ', error.error?.message || 'فشل في تحديث القسم');
+          this.isUpdatingCategory = false;
         }
       });
     }

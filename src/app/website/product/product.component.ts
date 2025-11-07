@@ -427,7 +427,30 @@ export class ProductComponent implements OnInit, OnDestroy {
       'orange': '#fd7e14',
       'purple': '#6f42c1',
       'pink': '#e83e8c',
-      'brown': '#795548'
+      'brown': '#795548',
+      'navy': '#001f3f',
+      'teal': '#20c997',
+      'cyan': '#17a2b8',
+      'lime': '#32cd32',
+      'indigo': '#6610f2',
+      'maroon': '#800000',
+      'olive': '#808000',
+      'silver': '#c0c0c0',
+      'gold': '#ffd700',
+      'beige': '#f5f5dc',
+      'coral': '#ff7f50',
+      'salmon': '#fa8072',
+      'turquoise': '#40e0d0',
+      'lavender': '#e6e6fa',
+      'mint': '#98fb98',
+      'burgundy': '#800020',
+      'khaki': '#f0e68c',
+      'ivory': '#fffff0',
+      'cream': '#fffdd0',
+      'tan': '#d2b48c',
+      'charcoal': '#36454f',
+      'violet': '#8a2be2',
+      'magenta': '#ff00ff'
     };
 
     const lowerColor = color.toLowerCase().trim();

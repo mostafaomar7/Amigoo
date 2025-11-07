@@ -76,6 +76,13 @@ export class ProductsComponent implements OnInit, OnDestroy {
   editProductColors: string[] = [];
   newColor = '';
   editNewColor = '';
+  availableColors: string[] = [
+    'red', 'green', 'blue', 'yellow', 'black', 'white', 'gray',
+    'orange', 'purple', 'pink', 'brown', 'navy', 'teal', 'cyan',
+    'lime', 'indigo', 'maroon', 'olive', 'silver', 'gold', 'beige',
+    'coral', 'salmon', 'turquoise', 'lavender', 'mint', 'burgundy',
+    'khaki', 'ivory', 'cream', 'tan', 'charcoal', 'violet', 'magenta'
+  ];
   productQuantity: Array<{ size: string; no: number }> = [];
   editProductQuantity: Array<{ size: string; no: number }> = [];
   sizeForm: FormGroup;
@@ -83,6 +90,9 @@ export class ProductsComponent implements OnInit, OnDestroy {
   selectedEditSizeToAdd = '';
   currentImageIndex = 0;
   private searchTimeout: any = null;
+  isAddingProduct = false;
+  isUpdatingProduct = false;
+  isAddingSize = false;
 
   Math = Math;
 
@@ -484,11 +494,13 @@ export class ProductsComponent implements OnInit, OnDestroy {
         }
       }
 
+      this.isAddingProduct = true;
       this.apiService.postFormData<Product>('/product', formData).subscribe({
         next: (response) => {
           this.notificationService.success('نجاح', 'تمت إضافة المنتج بنجاح');
           this.closeModals();
           this.loadProducts();
+          this.isAddingProduct = false;
         },
         error: (error) => {
           console.error('Error adding product:', error);
@@ -499,6 +511,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
             errorMessage = error.error.errors.map((e: any) => e.msg).join('. ');
           }
           this.notificationService.error('Error', errorMessage);
+          this.isAddingProduct = false;
         }
       });
     }
@@ -561,11 +574,13 @@ export class ProductsComponent implements OnInit, OnDestroy {
         }
       }
 
+      this.isUpdatingProduct = true;
       this.apiService.putFormData<Product>('/product', this.selectedProduct._id, formData).subscribe({
         next: (response) => {
           this.notificationService.success('نجاح', 'تم تحديث المنتج بنجاح');
           this.closeModals();
           this.loadProducts();
+          this.isUpdatingProduct = false;
         },
         error: (error) => {
           console.error('Error updating product:', error);
@@ -576,6 +591,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
             errorMessage = error.error.errors.map((e: any) => e.msg).join('. ');
           }
           this.notificationService.error('Error', errorMessage);
+          this.isUpdatingProduct = false;
         }
       });
     }
@@ -599,6 +615,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
 
   addSize(): void {
     if (this.sizeForm.valid) {
+      this.isAddingSize = true;
       const formData = {
         sizeName: this.sizeForm.value.sizeName.toLowerCase()
       };
@@ -612,10 +629,12 @@ export class ProductsComponent implements OnInit, OnDestroy {
           if (this.selectedProduct) {
             this.loadProductDetails(this.selectedProduct._id);
           }
+          this.isAddingSize = false;
         },
         error: (error) => {
           console.error('Error adding size:', error);
           this.notificationService.error('خطأ', error.error?.message || 'فشل في إضافة المقاس');
+          this.isAddingSize = false;
         }
       });
     }
@@ -687,6 +706,76 @@ export class ProductsComponent implements OnInit, OnDestroy {
     } else {
       this.productColors = this.productColors.filter(c => c !== color);
     }
+  }
+
+  toggleColor(color: string, isEdit = false): void {
+    if (isEdit) {
+      const index = this.editProductColors.indexOf(color);
+      if (index > -1) {
+        this.editProductColors.splice(index, 1);
+      } else {
+        this.editProductColors.push(color);
+      }
+    } else {
+      const index = this.productColors.indexOf(color);
+      if (index > -1) {
+        this.productColors.splice(index, 1);
+      } else {
+        this.productColors.push(color);
+      }
+    }
+  }
+
+  isColorSelected(color: string, isEdit = false): boolean {
+    if (isEdit) {
+      return this.editProductColors.includes(color);
+    } else {
+      return this.productColors.includes(color);
+    }
+  }
+
+  getColorValue(color: string): string {
+    // Map common color names to hex values
+    const colorMap: { [key: string]: string } = {
+      'red': '#dc3545',
+      'green': '#28a745',
+      'blue': '#007bff',
+      'yellow': '#ffc107',
+      'black': '#000000',
+      'white': '#ffffff',
+      'gray': '#6c757d',
+      'grey': '#6c757d',
+      'orange': '#fd7e14',
+      'purple': '#6f42c1',
+      'pink': '#e83e8c',
+      'brown': '#795548',
+      'navy': '#001f3f',
+      'teal': '#20c997',
+      'cyan': '#17a2b8',
+      'lime': '#32cd32',
+      'indigo': '#6610f2',
+      'maroon': '#800000',
+      'olive': '#808000',
+      'silver': '#c0c0c0',
+      'gold': '#ffd700',
+      'beige': '#f5f5dc',
+      'coral': '#ff7f50',
+      'salmon': '#fa8072',
+      'turquoise': '#40e0d0',
+      'lavender': '#e6e6fa',
+      'mint': '#98fb98',
+      'burgundy': '#800020',
+      'khaki': '#f0e68c',
+      'ivory': '#fffff0',
+      'cream': '#fffdd0',
+      'tan': '#d2b48c',
+      'charcoal': '#36454f',
+      'violet': '#8a2be2',
+      'magenta': '#ff00ff'
+    };
+
+    const lowerColor = color.toLowerCase().trim();
+    return colorMap[lowerColor] || '#6c757d';
   }
 
   addSizeToQuantity(selectedSizeId: string | null = null, isEdit = false): void {

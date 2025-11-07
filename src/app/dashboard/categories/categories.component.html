@@ -171,7 +171,7 @@
   aria-labelledby="addCategoryModalLabel"
   aria-hidden="true"
 >
-  <div class="modal-dialog modal-dialog-centered" role="document">
+  <div class="modal-dialog modal-dialog-centered" role="document" dir="rtl">
     <div class="modal-content">
       <form [formGroup]="categoryForm" (ngSubmit)="addCategory()">
         <div class="modal-header">
@@ -245,9 +245,13 @@
           <button
             type="submit"
             class="btn btn-primary"
-            [disabled]="!categoryForm.valid || !selectedImage"
+            [disabled]="!categoryForm.valid || !selectedImage || isAddingCategory"
           >
-            <i class="fas fa-save me-2"></i>إضافة القسم
+            <span *ngIf="isAddingCategory" class="spinner-border spinner-border-sm me-2" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </span>
+            <i *ngIf="!isAddingCategory" class="fas fa-save me-2"></i>
+            {{ isAddingCategory ? 'جاري الإضافة...' : 'إضافة القسم' }}
           </button>
         </div>
       </form>
@@ -265,7 +269,7 @@
   aria-labelledby="editCategoryModalLabel"
   aria-hidden="true"
 >
-  <div class="modal-dialog modal-dialog-centered" role="document">
+  <div class="modal-dialog modal-dialog-centered" role="document" dir="rtl">
     <div class="modal-content">
       <form [formGroup]="editCategoryForm" (ngSubmit)="updateCategory()">
         <div class="modal-header">
@@ -351,9 +355,13 @@
           <button
             type="submit"
             class="btn btn-primary"
-            [disabled]="!editCategoryForm.valid"
+            [disabled]="!editCategoryForm.valid || isUpdatingCategory"
           >
-            <i class="fas fa-save me-2"></i>تحديث القسم
+            <span *ngIf="isUpdatingCategory" class="spinner-border spinner-border-sm me-2" role="status">
+              <span class="visually-hidden">Loading...</span>
+            </span>
+            <i *ngIf="!isUpdatingCategory" class="fas fa-save me-2"></i>
+            {{ isUpdatingCategory ? 'جاري التحديث...' : 'تحديث القسم' }}
           </button>
         </div>
       </form>
@@ -371,7 +379,7 @@
   aria-labelledby="deleteCategoryModalLabel"
   aria-hidden="true"
 >
-  <div class="modal-dialog modal-dialog-centered" role="document">
+  <div class="modal-dialog modal-dialog-centered" role="document" dir="rtl">
     <div class="modal-content">
       <div class="modal-header border-0">
         <h5 class="modal-title text-danger" id="deleteCategoryModalLabel">

@@ -206,7 +206,7 @@
   aria-labelledby="orderDetailsModalLabel"
   aria-hidden="true"
 >
-  <div class="modal-dialog modal-dialog-centered modal-lg" role="document">
+  <div class="modal-dialog modal-dialog-centered modal-lg" role="document" dir="rtl">
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="orderDetailsModalLabel">
@@ -247,11 +247,6 @@
           <div class="col-md-6">
             <h6 class="text-muted mb-3 border-bottom pb-2 fw-semibold">معلومات العميل</h6>
             <div class="mb-2" *ngIf="selectedOrder.userId">
-              <strong>حساب المستخدم:</strong>
-              <div class="ms-2">
-                <small class="d-block">{{ selectedOrder.userId.name }}</small>
-                <small class="text-muted">{{ selectedOrder.userId.email }}</small>
-              </div>
             </div>
             <div class="mb-2">
               <strong>الاسم:</strong> {{ selectedOrder.fullName }}
