@@ -230,11 +230,13 @@ export class ShopComponent implements OnInit, OnDestroy {
       queryParamsHandling: 'merge'
     });
 
+    // Loading will be handled automatically by HTTP interceptor
     this.loadProducts(true);
   }
 
   onSortChange(sort: SortOption): void {
     this.selectedSort = sort;
+    // Loading will be handled automatically by HTTP interceptor
     this.loadProducts(true);
   }
 

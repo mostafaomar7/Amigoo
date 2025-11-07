@@ -1,1 +1,9 @@
 <router-outlet></router-outlet>
+
+<!-- Global Loading Overlay -->
+<div *ngIf="isLoading" class="global-loading-overlay">
+  <div class="loading-content">
+    <app-spinner></app-spinner>
+    <p class="loading-text">جاري التحميل...</p>
+  </div>
+</div>

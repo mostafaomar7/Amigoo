@@ -8,6 +8,7 @@ import { routes } from './app/app.routes';
 import { environment } from './environments/environment';
 import { CategoryService } from './app/services/category.service';
 import { AuthInterceptor } from './app/services/auth.service';
+import { LoadingInterceptor } from './app/interceptors/loading.interceptor';
 
 if (environment.production) {
   enableProdMode();
@@ -18,6 +19,7 @@ bootstrapApplication(AppComponent, {
     provideRouter(routes),
     provideHttpClient(withInterceptorsFromDi()),
     CategoryService,
-    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true }
+    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
+    { provide: HTTP_INTERCEPTORS, useClass: LoadingInterceptor, multi: true }
   ]
 }).catch(err => console.error(err));
