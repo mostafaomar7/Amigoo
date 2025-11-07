@@ -34,21 +34,21 @@ export class OpencartService {
   private validateProductForCart(product: any): { valid: boolean; message?: string } {
     // Validation 1: Check if product is valid
     if (!product || !product._id) {
-      return { valid: false, message: 'Invalid product: Product ID is required' };
+      return { valid: false, message: 'منتج غير صالح: معرف المنتج مطلوب' };
     }
 
     if (!product.title) {
-      return { valid: false, message: 'Invalid product: Product title is required' };
+      return { valid: false, message: 'منتج غير صالح: عنوان المنتج مطلوب' };
     }
 
     if (!product.price && product.price !== 0) {
-      return { valid: false, message: 'Invalid product: Product price is required' };
+      return { valid: false, message: 'منتج غير صالح: سعر المنتج مطلوب' };
     }
 
     // Validation 2: Validate quantity
     const quantity = product.quantity || 1;
     if (quantity < 1 || !Number.isInteger(quantity)) {
-      return { valid: false, message: 'Invalid quantity: Must be a positive integer' };
+      return { valid: false, message: 'كمية غير صالحة: يجب أن تكون عدداً صحيحاً موجباً' };
     }
 
     return { valid: true };
@@ -164,7 +164,6 @@ export class OpencartService {
         `تم تحديث كمية ${product.title || 'المنتج'} في السلة. الكمية الحالية: ${newQuantity}`
       );
       document.dispatchEvent(new CustomEvent('cartUpdated'));
-      console.log("Product quantity updated in cart:", product);
       return true;
     }
 
@@ -174,7 +173,6 @@ export class OpencartService {
 
     this.notificationService.success('تمت الإضافة إلى السلة', `تمت إضافة ${product.title || 'المنتج'} إلى السلة`);
     document.dispatchEvent(new CustomEvent('cartUpdated'));
-    console.log("Product added to cart:", product);
     return true;
   }
 
@@ -247,7 +245,6 @@ export class OpencartService {
       localStorage.setItem("favorites", JSON.stringify(this.favoriteProducts));
       this.notificationService.success('تمت الإضافة إلى المفضلة', `تمت إضافة ${product.title || 'المنتج'} إلى المفضلة`);
       document.dispatchEvent(new CustomEvent('favoritesUpdated'));
-      console.log("Product added to favorites:", product);
     }
   }
 

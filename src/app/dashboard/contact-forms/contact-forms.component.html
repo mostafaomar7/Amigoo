@@ -2,8 +2,8 @@
 <div class="container-fluid py-4">
   <!-- Header -->
   <div class="mb-4">
-    <h1 class="h2 mb-1 text-white">Contact Messages Inbox</h1>
-    <p class="text-white mb-0">Manage and reply to contact messages</p>
+    <h1 class="h2 mb-1 text-white">صندوق رسائل الاتصال</h1>
+    <p class="text-white mb-0">إدارة والرد على رسائل الاتصال</p>
   </div>
 
   <!-- Search and Filter -->
@@ -20,7 +20,7 @@
         class="form-control"
         [(ngModel)]="searchTerm"
         (input)="onSearchInput()"
-        placeholder="Search by name, email, phone..."
+        placeholder="البحث بالاسم، البريد الإلكتروني، الهاتف..."
       />
     </div>
   </div>
@@ -40,16 +40,16 @@
         <table class="table table-hover align-middle messages-table">
           <thead class="table-light">
             <tr>
-              <th scope="col">Name</th>
-              <th scope="col">Email</th>
-              <th scope="col">Phone</th>
-              <th scope="col">Message Preview</th>
+              <th scope="col">الاسم</th>
+              <th scope="col">البريد الإلكتروني</th>
+              <th scope="col">الهاتف</th>
+              <th scope="col">معاينة الرسالة</th>
               <th scope="col" (click)="onSort('createdAt')" style="cursor: pointer;">
-                Date
+                التاريخ
                 <i *ngIf="sortBy === 'createdAt'" class="fas fa-sort-{{sortOrder === 'asc' ? 'up' : 'down'}} ms-1"></i>
                 <i *ngIf="sortBy !== 'createdAt'" class="fas fa-sort ms-1 text-muted"></i>
               </th>
-              <th scope="col" class="text-end">view</th>
+              <th scope="col" class="text-end">عرض</th>
             </tr>
           </thead>
           <tbody>
@@ -83,9 +83,9 @@
                   type="button"
                   class="btn btn-sm btn-action btn-info"
                   (click)="showViewMessageModal(message)"
-                  title="View Message"
+                  title="عرض الرسالة"
                 >
-                  <i class="fas fa-eye me-1"></i>View
+                  <i class="fas fa-eye me-1"></i>عرض
                 </button>
               </td>
             </tr>
@@ -99,8 +99,8 @@
         class="text-center py-5"
       >
         <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
-        <h5 class="text-muted">No messages found</h5>
-        <p class="text-muted">No contact messages match your search criteria.</p>
+        <h5 class="text-muted">لم يتم العثور على رسائل</h5>
+        <p class="text-muted">لا توجد رسائل اتصال تطابق معايير البحث.</p>
       </div>
     </div>
   </div>
@@ -150,11 +150,11 @@
     </nav>
     <div class="text-center text-muted">
       <small>
-        Showing <strong>{{ (currentPage - 1) * itemsPerPage + 1 }}</strong> to
-        <strong>{{ Math.min(currentPage * itemsPerPage, totalItems) }}</strong> of
+        عرض <strong>{{ (currentPage - 1) * itemsPerPage + 1 }}</strong> إلى
+        <strong>{{ Math.min(currentPage * itemsPerPage, totalItems) }}</strong> من
         <strong>{{ totalItems }}</strong>
-        {{ totalItems === 1 ? 'result' : 'results' }}
-        <span *ngIf="totalPages > 1"> | Page <strong>{{ currentPage }}</strong> of <strong>{{ totalPages }}</strong></span>
+        {{ totalItems === 1 ? 'نتيجة' : 'نتائج' }}
+        <span *ngIf="totalPages > 1"> | صفحة <strong>{{ currentPage }}</strong> من <strong>{{ totalPages }}</strong></span>
       </small>
     </div>
   </div>
@@ -174,7 +174,7 @@
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="viewMessageModalLabel">
-          <i class="fas fa-envelope me-2"></i>Message Details
+          <i class="fas fa-envelope me-2"></i>تفاصيل الرسالة
         </h5>
         <button
           type="button"
@@ -186,14 +186,14 @@
       <div class="modal-body" *ngIf="selectedForm">
         <!-- Sender Information -->
         <div class="mb-4">
-          <h6 class="text-muted mb-3 border-bottom pb-2 fw-semibold">Sender Information</h6>
+          <h6 class="text-muted mb-3 border-bottom pb-2 fw-semibold">معلومات المرسل</h6>
           <div class="row g-3">
             <div class="col-md-6">
-              <strong>Name:</strong>
+              <strong>الاسم:</strong>
               <p class="mb-0">{{ selectedForm.name }}</p>
             </div>
             <div class="col-md-6">
-              <strong>Email:</strong>
+              <strong>البريد الإلكتروني:</strong>
               <p class="mb-0">
                 <a href="mailto:{{ selectedForm.email }}" class="text-primary text-decoration-none">
                   {{ selectedForm.email }}
@@ -201,7 +201,7 @@
               </p>
             </div>
             <div class="col-md-6">
-              <strong>Phone:</strong>
+              <strong>الهاتف:</strong>
               <p class="mb-0">
                 <a href="tel:{{ selectedForm.phone }}" class="text-primary text-decoration-none">
                   {{ selectedForm.phone }}
@@ -209,7 +209,7 @@
               </p>
             </div>
             <div class="col-md-6">
-              <strong>Date:</strong>
+              <strong>التاريخ:</strong>
               <p class="mb-0 text-muted">
                 <span *ngIf="selectedForm.createdAt">{{ selectedForm.createdAt | date : "dd-MM-yyyy h:mm a" }}</span>
               </p>
@@ -219,7 +219,7 @@
 
         <!-- Message Content -->
         <div class="mb-4">
-          <h6 class="text-muted mb-3 border-bottom pb-2 fw-semibold">Message</h6>
+          <h6 class="text-muted mb-3 border-bottom pb-2 fw-semibold">الرسالة</h6>
           <div class="bg-light p-3 rounded">
             <p class="mb-0" style="white-space: pre-wrap;">{{ selectedForm.message }}</p>
           </div>
@@ -227,14 +227,14 @@
 
         <!-- Admin Reply -->
         <div class="mb-0" *ngIf="selectedForm.isReplied && selectedForm.adminReply">
-          <h6 class="text-muted mb-3 border-bottom pb-2 fw-semibold">Admin Reply</h6>
+          <h6 class="text-muted mb-3 border-bottom pb-2 fw-semibold">رد المدير</h6>
           <div class="bg-primary bg-opacity-10 p-3 rounded border-start border-primary border-3">
             <p class="mb-0" style="white-space: pre-wrap;">{{ selectedForm.adminReply }}</p>
           </div>
         </div>
         <div class="mb-0" *ngIf="selectedForm.isReplied && !selectedForm.adminReply">
-          <h6 class="text-muted mb-3 border-bottom pb-2 fw-semibold">Admin Reply</h6>
-          <p class="text-muted mb-0">No reply message available.</p>
+          <h6 class="text-muted mb-3 border-bottom pb-2 fw-semibold">رد المدير</h6>
+          <p class="text-muted mb-0">لا توجد رسالة رد متاحة.</p>
         </div>
       </div>
       <div class="modal-footer">
@@ -243,7 +243,7 @@
           class="btn btn-secondary"
           (click)="closeModals()"
         >
-          Close
+          إغلاق
         </button>
       </div>
     </div>

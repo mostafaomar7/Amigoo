@@ -121,7 +121,7 @@ export class MasterSizesComponent implements OnInit, OnDestroy {
         this.isLoading = false;
         this.totalPages = 0;
         this.totalItems = 0;
-        this.notificationService.error('Error', 'Failed to load sizes');
+        this.notificationService.error('خطأ', 'فشل في تحميل المقاسات');
       }
     });
   }
@@ -190,13 +190,13 @@ export class MasterSizesComponent implements OnInit, OnDestroy {
 
       this.apiService.post<MasterSize>('/sizes', formData).subscribe({
         next: (response) => {
-          this.notificationService.success('Success', 'Size added successfully');
+          this.notificationService.success('نجاح', 'تمت إضافة المقاس بنجاح');
           this.closeModals();
           this.loadSizes();
         },
         error: (error) => {
           console.error('Error adding size:', error);
-          this.notificationService.error('Error', error.error?.message || 'Failed to add size');
+          this.notificationService.error('خطأ', error.error?.message || 'فشل في إضافة المقاس');
         }
       });
     }
@@ -210,13 +210,13 @@ export class MasterSizesComponent implements OnInit, OnDestroy {
 
       this.apiService.put<MasterSize>('/sizes', this.selectedSize._id, formData).subscribe({
         next: (response) => {
-          this.notificationService.success('Success', 'Size updated successfully');
+          this.notificationService.success('نجاح', 'تم تحديث المقاس بنجاح');
           this.closeModals();
           this.loadSizes();
         },
         error: (error) => {
           console.error('Error updating size:', error);
-          this.notificationService.error('Error', error.error?.message || 'Failed to update size');
+          this.notificationService.error('خطأ', error.error?.message || 'فشل في تحديث المقاس');
         }
       });
     }
@@ -229,12 +229,12 @@ export class MasterSizesComponent implements OnInit, OnDestroy {
 
     this.apiService.put<MasterSize>('/sizes', size._id, formData).subscribe({
       next: (response) => {
-        this.notificationService.success('Success', `Size ${formData.isActive ? 'activated' : 'deactivated'} successfully`);
+        this.notificationService.success('نجاح', `تم ${formData.isActive ? 'تفعيل' : 'إلغاء تفعيل'} المقاس بنجاح`);
         this.loadSizes();
       },
       error: (error) => {
         console.error('Error toggling size status:', error);
-        this.notificationService.error('Error', error.error?.message || 'Failed to update size status');
+        this.notificationService.error('خطأ', error.error?.message || 'فشل في تحديث حالة المقاس');
         // Reload to revert UI state
         this.loadSizes();
       }
@@ -245,13 +245,13 @@ export class MasterSizesComponent implements OnInit, OnDestroy {
     if (this.selectedSize) {
       this.apiService.delete('/sizes', this.selectedSize._id).subscribe({
         next: (response) => {
-          this.notificationService.success('Success', 'Size deleted successfully');
+          this.notificationService.success('نجاح', 'تم حذف المقاس بنجاح');
           this.closeModals();
           this.loadSizes();
         },
         error: (error) => {
           console.error('Error deleting size:', error);
-          this.notificationService.error('Error', error.error?.message || 'Failed to delete size');
+          this.notificationService.error('خطأ', error.error?.message || 'فشل في حذف المقاس');
         }
       });
     }
@@ -280,15 +280,15 @@ export class MasterSizesComponent implements OnInit, OnDestroy {
     const control = formGroup.get(fieldName);
     if (control && control.invalid && (control.dirty || control.touched)) {
       if (control.errors?.['required']) {
-        return `${this.getFieldLabel(fieldName)} is required`;
+        return `${this.getFieldLabel(fieldName)} مطلوب`;
       }
       if (control.errors?.['minlength']) {
         const minLength = control.errors['minlength'].requiredLength;
-        return `${this.getFieldLabel(fieldName)} must be at least ${minLength} characters`;
+        return `${this.getFieldLabel(fieldName)} يجب أن يكون على الأقل ${minLength} أحرف`;
       }
       if (control.errors?.['maxlength']) {
         const maxLength = control.errors['maxlength'].requiredLength;
-        return `${this.getFieldLabel(fieldName)} must be at most ${maxLength} characters`;
+        return `${this.getFieldLabel(fieldName)} يجب أن يكون على الأكثر ${maxLength} أحرف`;
       }
     }
     return '';
@@ -301,7 +301,7 @@ export class MasterSizesComponent implements OnInit, OnDestroy {
 
   private getFieldLabel(fieldName: string): string {
     const labels: { [key: string]: string } = {
-      sizeName: 'Size Name'
+      sizeName: 'اسم المقاس'
     };
     return labels[fieldName] || fieldName;
   }

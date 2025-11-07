@@ -2,8 +2,8 @@
 <div class="container-fluid py-4">
   <!-- Header -->
   <div class="mb-4">
-    <h1 class="h2 mb-1 text-white">Settings Management</h1>
-    <p class="text-white mb-0">Manage your site settings and configuration</p>
+    <h1 class="h2 mb-1 text-white">إدارة الإعدادات</h1>
+    <p class="text-white mb-0">إدارة إعدادات الموقع والتكوين</p>
   </div>
 
   <!-- Settings Form Card -->
@@ -14,7 +14,7 @@
         <div class="spinner-border text-primary" role="status">
           <span class="visually-hidden">Loading...</span>
         </div>
-        <p class="text-muted mt-3">Loading settings...</p>
+        <p class="text-muted mt-3">جاري تحميل الإعدادات...</p>
       </div>
 
       <!-- Settings Form -->
@@ -28,14 +28,14 @@
           <!-- Contact Information Section -->
           <div class="col-12 mb-4">
             <h4 class="text-dark mb-3">
-              <i class="fas fa-envelope me-2"></i>Contact Information
+              <i class="fas fa-envelope me-2"></i>معلومات الاتصال
             </h4>
           </div>
 
           <!-- Contact Email -->
           <div class="col-md-6 mb-3">
             <label for="contact_email" class="form-label">
-              Contact Email <span class="text-danger">*</span>
+              البريد الإلكتروني للاتصال <span class="text-danger">*</span>
             </label>
             <input
               type="email"
@@ -43,7 +43,7 @@
               class="form-control"
               [class.is-invalid]="hasFieldError('contact_email')"
               formControlName="contact_email"
-              placeholder="Enter contact email"
+              placeholder="أدخل البريد الإلكتروني للاتصال"
             />
             <div *ngIf="hasFieldError('contact_email')" class="invalid-feedback">
               {{ getFieldError("contact_email") }}
@@ -53,7 +53,7 @@
           <!-- Contact Phone -->
           <div class="col-md-6 mb-3">
             <label for="contact_phone" class="form-label">
-              Contact Phone <span class="text-danger">*</span>
+              هاتف الاتصال <span class="text-danger">*</span>
             </label>
             <input
               type="text"
@@ -61,19 +61,19 @@
               class="form-control"
               [class.is-invalid]="hasFieldError('contact_phone')"
               formControlName="contact_phone"
-              placeholder="Enter 11-digit phone number"
+              placeholder="أدخل رقم الهاتف المكون من 11 رقم"
               maxlength="11"
             />
             <div *ngIf="hasFieldError('contact_phone')" class="invalid-feedback">
               {{ getFieldError("contact_phone") }}
             </div>
-            <small class="form-text text-muted">Phone number must be exactly 11 digits</small>
+            <small class="form-text text-muted">يجب أن يكون رقم الهاتف مكوناً من 11 رقم بالضبط</small>
           </div>
 
           <!-- Address -->
           <div class="col-12 mb-3">
             <label for="address" class="form-label">
-              <i class="fas fa-map-marker-alt me-2"></i>Address
+              <i class="fas fa-map-marker-alt me-2"></i>العنوان
             </label>
             <input
               type="text"
@@ -81,13 +81,13 @@
               class="form-control"
               [class.is-invalid]="hasFieldError('address')"
               formControlName="address"
-              placeholder="Enter address"
+              placeholder="أدخل العنوان"
               maxlength="500"
             />
             <div *ngIf="hasFieldError('address')" class="invalid-feedback">
               {{ getFieldError("address") }}
             </div>
-            <small class="form-text text-muted">Maximum 500 characters</small>
+            <small class="form-text text-muted">حد أقصى 500 حرف</small>
           </div>
         </div>
 
@@ -95,14 +95,14 @@
         <div class="row mt-4">
           <div class="col-12 mb-4">
             <h4 class="text-dark mb-3">
-              <i class="fas fa-shipping-fast me-2"></i>Shipping Configuration
+              <i class="fas fa-shipping-fast me-2"></i>إعدادات الشحن
             </h4>
           </div>
 
           <!-- Shipping Cost -->
           <div class="col-md-6 mb-3">
             <label for="shipping_cost" class="form-label">
-              Shipping Cost <span class="text-danger">*</span>
+              تكلفة الشحن <span class="text-danger">*</span>
             </label>
             <input
               type="number"
@@ -124,7 +124,7 @@
         <div class="row mt-4">
           <div class="col-12 mb-4">
             <h4 class="text-dark mb-3">
-              <i class="fas fa-share-alt me-2"></i>Social Media Links
+              <i class="fas fa-share-alt me-2"></i>روابط وسائل التواصل الاجتماعي
             </h4>
           </div>
 
@@ -175,13 +175,13 @@
               class="form-control"
               [class.is-invalid]="hasFieldError('whatsapp')"
               formControlName="whatsapp"
-              placeholder="Enter 11-digit WhatsApp number"
+              placeholder="أدخل رقم WhatsApp المكون من 11 رقم"
               maxlength="11"
             />
             <div *ngIf="hasFieldError('whatsapp')" class="invalid-feedback">
               {{ getFieldError("whatsapp") }}
             </div>
-            <small class="form-text text-muted">WhatsApp number must be exactly 11 digits</small>
+            <small class="form-text text-muted">يجب أن يكون رقم WhatsApp مكوناً من 11 رقم بالضبط</small>
           </div>
 
           <!-- TikTok -->
@@ -217,7 +217,7 @@
                 <span *ngIf="isResetting" class="spinner-border spinner-border-sm me-2" role="status">
                   <span class="visually-hidden">Loading...</span>
                 </span>
-                {{ isResetting ? 'Resetting...' : 'Reset to Default' }}
+                {{ isResetting ? 'جاري إعادة التعيين...' : 'إعادة التعيين إلى الافتراضي' }}
               </button>
               <button
                 type="submit"
@@ -228,7 +228,7 @@
                 <span *ngIf="isSaving" class="spinner-border spinner-border-sm me-2" role="status">
                   <span class="visually-hidden">Loading...</span>
                 </span>
-                {{ isSaving ? 'Saving...' : 'Save Settings' }}
+                {{ isSaving ? 'جاري الحفظ...' : 'حفظ الإعدادات' }}
               </button>
             </div>
           </div>

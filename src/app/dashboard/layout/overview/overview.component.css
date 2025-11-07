@@ -44,13 +44,12 @@
   display: flex;
   align-items: center;
   gap: var(--spacing-4);
-  transition: var(--transition-all);
+  transition: transform var(--transition-base);
   box-shadow: var(--shadow-sm);
 }
 
 .stat-card:hover {
-  box-shadow: var(--shadow-md);
-  border-color: var(--color-primary);
+  transform: scale(1.02);
 }
 
 .stat-icon {
@@ -83,6 +82,11 @@
   color: var(--color-primary);
 }
 
+.stat-icon-orange {
+  background: var(--color-warning-light);
+  color: var(--color-warning);
+}
+
 .stat-content {
   flex: 1;
 }
@@ -95,11 +99,12 @@
 }
 
 .stat-value {
-  font-size: 1.75rem;
-  font-weight: var(--font-weight-semibold);
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-bold);
   color: var(--color-text-primary);
   margin: 0;
   line-height: var(--line-height-tight);
+  letter-spacing: var(--letter-spacing-tight);
 }
 
 .quick-actions {
@@ -129,16 +134,14 @@
   align-items: center;
   gap: var(--spacing-4);
   cursor: pointer;
-  transition: var(--transition-all);
+  transition: transform var(--transition-base);
   text-align: center;
   box-shadow: var(--shadow-sm);
   min-height: 120px;
 }
 
 .action-card:hover {
-  box-shadow: var(--shadow-md);
-  border-color: var(--color-primary);
-  background: var(--color-white);
+  transform: scale(1.02);
 }
 
 .action-card:active {

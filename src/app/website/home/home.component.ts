@@ -165,7 +165,7 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
 
           // Update expected count for future loads
           this.expectedCategoriesCount = Math.max(categoriesData.length, 8);
-          this.categories = categoriesData.slice(0, 8); // Limit to 8 categories
+          this.categories = categoriesData; // Load all categories
           this.cdr.markForCheck();
         },
         error: (error) => {
@@ -329,7 +329,6 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
    * Navigate to category products
    */
   navigateToCategory(categoryId: string): void {
-    console.log('Navigating to shop with category:', categoryId);
     this.router.navigate(['/shop'], { queryParams: { category: categoryId } });
   }
 
@@ -454,7 +453,6 @@ export class HomeComponent implements OnInit, OnDestroy, AfterViewInit {
         },
         error: (error) => {
           // If endpoint doesn't exist, show success anyway (mock behavior)
-          console.log('Newsletter endpoint not available, showing success message');
           this.newsletterSuccess = true;
           this.newsletterForm.reset();
           this.notificationService.success('Successfully Subscribed', 'Thank you for subscribing to our newsletter!');

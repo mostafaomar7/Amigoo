@@ -60,10 +60,8 @@ export class ShopComponent implements OnInit, OnDestroy {
     const snapshotParams = this.route.snapshot.queryParams;
     if (snapshotParams['category']) {
       this.selectedCategory = snapshotParams['category'];
-      console.log('Initial category from snapshot:', this.selectedCategory);
     } else {
       this.selectedCategory = null;
-      console.log('No category in snapshot');
     }
 
     // Load categories first
@@ -77,10 +75,8 @@ export class ShopComponent implements OnInit, OnDestroy {
     ).subscribe(params => {
       if (params['category']) {
         this.selectedCategory = params['category'];
-        console.log('Category changed from query params:', this.selectedCategory);
       } else {
         this.selectedCategory = null;
-        console.log('Category cleared from query params');
       }
       this.loadProducts(true);
     });
@@ -130,7 +126,7 @@ export class ShopComponent implements OnInit, OnDestroy {
       error: (error) => {
         console.error('Error loading categories:', error);
         this.categories = [];
-        this.notificationService.error('خطأ', 'فشل تحميل الفئات');
+        this.notificationService.error('خطأ', 'فشل تحميل الأقسام');
       }
     });
   }
@@ -155,15 +151,13 @@ export class ShopComponent implements OnInit, OnDestroy {
     const params: any = {
       page: this.currentPage,
       limit: 16,
-      sort: sortParam
+      sort: sortParam,
+      // Skip global loading for pagination (page > 1)
+      skipGlobalLoading: !reset && this.currentPage > 1
     };
 
     if (this.selectedCategory) {
       params.category_id = this.selectedCategory;
-      console.log('Loading products with category filter:', this.selectedCategory);
-      console.log('Params object:', JSON.stringify(params));
-    } else {
-      console.log('Loading products without category filter');
     }
 
     this.productService.getProducts(params).pipe(
@@ -250,7 +244,7 @@ export class ShopComponent implements OnInit, OnDestroy {
 
   getEmptyStateMessage(): string {
     if (this.selectedCategory) {
-      return 'لا توجد منتجات في هذه الفئة';
+      return 'لا توجد منتجات في هذا القسم';
     }
     return 'لا توجد منتجات متاحة حالياً';
   }

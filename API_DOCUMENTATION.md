@@ -609,11 +609,15 @@ Get order statistics (Admin only).
 **Response (200):**
 ```json
 {
-  "totalOrders": 100,
-  "pendingOrders": 20,
-  "completedOrders": 70,
-  "cancelledOrders": 10,
-  "totalRevenue": 50000.00
+  "success": true,
+  "message": "Order statistics retrieved successfully",
+  "data": {
+    "totalOrders": 100,
+    "pendingOrders": 20,
+    "completedOrders": 70,
+    "cancelledOrders": 10,
+    "totalRevenue": 50000.00
+  }
 }
 ```
 

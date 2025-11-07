@@ -16,7 +16,7 @@ const productSchema = new mongoose.Schema(
     },
     description: {
       type: String,
-      required: [true, 'Product description is required'],
+      required: [true, 'وصف المنتج مطلوب'],
       minlength: [5, 'Too short product description'],
     },
     sold: {

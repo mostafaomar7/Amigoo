@@ -183,7 +183,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
         this.isLoading = false;
         this.totalPages = 0;
         this.totalItems = 0;
-        this.notificationService.error('Error', 'Failed to load products');
+        this.notificationService.error('خطأ', 'فشل في تحميل المنتجات');
       }
     });
   }
@@ -228,7 +228,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
       },
       error: (error) => {
         console.error('Error loading product details:', error);
-        this.notificationService.error('Error', 'Failed to load product details');
+        this.notificationService.error('خطأ', 'فشل في تحميل تفاصيل المنتج');
       }
     });
   }
@@ -387,7 +387,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
           populateFormData(product);
           this.showEditModal = true;
           document.body.classList.add('modal-open');
-          this.notificationService.error('Warning', 'Could not load full product details. Some data may be incomplete.');
+          this.notificationService.error('تحذير', 'تعذر تحميل تفاصيل المنتج الكاملة. قد تكون بعض البيانات غير مكتملة.');
         }
       });
     } catch (error) {
@@ -486,13 +486,13 @@ export class ProductsComponent implements OnInit, OnDestroy {
 
       this.apiService.postFormData<Product>('/product', formData).subscribe({
         next: (response) => {
-          this.notificationService.success('Success', 'Product added successfully');
+          this.notificationService.success('نجاح', 'تمت إضافة المنتج بنجاح');
           this.closeModals();
           this.loadProducts();
         },
         error: (error) => {
           console.error('Error adding product:', error);
-          let errorMessage = 'Failed to add product';
+          let errorMessage = 'فشل في إضافة المنتج';
           if (error.error?.message) {
             errorMessage = error.error.message;
           } else if (error.error?.errors && Array.isArray(error.error.errors)) {
@@ -563,13 +563,13 @@ export class ProductsComponent implements OnInit, OnDestroy {
 
       this.apiService.putFormData<Product>('/product', this.selectedProduct._id, formData).subscribe({
         next: (response) => {
-          this.notificationService.success('Success', 'Product updated successfully');
+          this.notificationService.success('نجاح', 'تم تحديث المنتج بنجاح');
           this.closeModals();
           this.loadProducts();
         },
         error: (error) => {
           console.error('Error updating product:', error);
-          let errorMessage = 'Failed to update product';
+          let errorMessage = 'فشل في تحديث المنتج';
           if (error.error?.message) {
             errorMessage = error.error.message;
           } else if (error.error?.errors && Array.isArray(error.error.errors)) {
@@ -585,13 +585,13 @@ export class ProductsComponent implements OnInit, OnDestroy {
     if (this.selectedProduct) {
       this.apiService.delete('/product', this.selectedProduct._id).subscribe({
         next: (response) => {
-          this.notificationService.success('Success', 'Product deleted successfully');
+          this.notificationService.success('نجاح', 'تم حذف المنتج بنجاح');
           this.closeModals();
           this.loadProducts();
         },
         error: (error) => {
           console.error('Error deleting product:', error);
-          this.notificationService.error('Error', error.error?.message || 'Failed to delete product');
+          this.notificationService.error('خطأ', error.error?.message || 'فشل في حذف المنتج');
         }
       });
     }
@@ -605,7 +605,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
 
       this.apiService.post<MasterSize>('/sizes', formData).subscribe({
         next: (response: any) => {
-          this.notificationService.success('Success', 'Size added successfully');
+          this.notificationService.success('نجاح', 'تمت إضافة المقاس بنجاح');
           this.closeModals();
           this.loadMasterSizes();
           // Reload product details if open
@@ -615,7 +615,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
         },
         error: (error) => {
           console.error('Error adding size:', error);
-          this.notificationService.error('Error', error.error?.message || 'Failed to add size');
+          this.notificationService.error('خطأ', error.error?.message || 'فشل في إضافة المقاس');
         }
       });
     }
@@ -640,7 +640,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
       const totalCount = existingImages.length + files.length;
 
       if (totalCount > 5) {
-        this.notificationService.error('Warning', `You can only add ${5 - existingImages.length} more image(s). Maximum 5 images allowed.`);
+        this.notificationService.error('تحذير', `يمكنك إضافة ${5 - existingImages.length} صورة فقط. الحد الأقصى 5 صور.`);
         return;
       }
 
@@ -698,7 +698,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
       // Add specific size
       sizeToAdd = this.masterSizes.find(size => size._id === selectedSizeId);
       if (sizeToAdd && quantityArray.some(q => q.size.toLowerCase() === sizeToAdd!.sizeName.toLowerCase())) {
-        this.notificationService.error('Error', 'This size is already added');
+        this.notificationService.error('خطأ', 'هذا المقاس مضاف بالفعل');
         return;
       }
     } else {
@@ -714,7 +714,7 @@ export class ProductsComponent implements OnInit, OnDestroy {
         no: 0
       });
     } else {
-      this.notificationService.error('Info', 'No available sizes to add');
+      this.notificationService.error('معلومات', 'لا توجد مقاسات متاحة للإضافة');
     }
   }
 
@@ -809,11 +809,11 @@ export class ProductsComponent implements OnInit, OnDestroy {
 
   getSizeStatusClass(quantity: number): string {
     if (quantity === 0) {
-      return 'bg-danger'; // Red badge for out of stock
+      return 'bg-danger';
     } else if (quantity >= 1 && quantity <= 3) {
-      return 'bg-warning'; // Yellow/orange badge for low stock
+      return 'bg-warning';
     } else {
-      return 'bg-success'; // Green badge for in stock
+      return 'bg-success';
     }
   }
 
@@ -832,18 +832,18 @@ export class ProductsComponent implements OnInit, OnDestroy {
     const control = formGroup.get(fieldName);
     if (control && control.invalid && (control.dirty || control.touched)) {
       if (control.errors?.['required']) {
-        return `${this.getFieldLabel(fieldName)} is required`;
+        return `${this.getFieldLabel(fieldName)} مطلوب`;
       }
       if (control.errors?.['minlength']) {
         const minLength = control.errors['minlength'].requiredLength;
-        return `${this.getFieldLabel(fieldName)} must be at least ${minLength} characters`;
+        return `${this.getFieldLabel(fieldName)} يجب أن يكون على الأقل ${minLength} أحرف`;
       }
       if (control.errors?.['min']) {
         const min = control.errors['min'].min;
-        return `${this.getFieldLabel(fieldName)} must be at least ${min}`;
+        return `${this.getFieldLabel(fieldName)} يجب أن يكون على الأقل ${min}`;
       }
       if (control.errors?.['discountGreaterThanPrice']) {
-        return 'Discount price must be less than regular price';
+        return 'سعر الخصم يجب أن يكون أقل من السعر العادي';
       }
     }
     return '';
@@ -861,12 +861,12 @@ export class ProductsComponent implements OnInit, OnDestroy {
 
   private getFieldLabel(fieldName: string): string {
     const labels: { [key: string]: string } = {
-      title: 'Title',
-      description: 'Description',
-      price: 'Price',
-      priceAfterDiscount: 'Price After Discount',
-      category: 'Category',
-      sizeName: 'Size Name'
+      title: 'العنوان',
+      description: 'الوصف',
+      price: 'السعر',
+      priceAfterDiscount: 'السعر بعد الخصم',
+      category: 'القسم',
+      sizeName: 'اسم المقاس'
     };
     return labels[fieldName] || fieldName;
   }

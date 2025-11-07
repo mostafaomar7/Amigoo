@@ -124,7 +124,6 @@ export class ProductService {
       }),
       catchError((error) => {
         // Silently fail if reviews endpoint doesn't exist
-        console.log('Reviews endpoint not available');
         return of([]);
       })
     );
@@ -140,6 +139,7 @@ export class ProductService {
     keyword?: string;
     featured?: boolean;
     category_id?: string;
+    skipGlobalLoading?: boolean;
   }): Observable<PaginatedResponse<Product>> {
     const paginationParams: any = {
       page: params?.page || 1,
@@ -155,9 +155,12 @@ export class ProductService {
       paginationParams.category_id = params.category_id;
     }
 
+    // Skip global loading for pagination requests (page > 1)
+    const skipGlobalLoading = params?.skipGlobalLoading || (params?.page && params.page > 1);
+
     // Note: If API supports featured parameter, it will be passed here
     // Otherwise, we'll get latest products and can filter client-side if needed
-    return this.apiService.getPaginated<Product>('/product', paginationParams).pipe(
+    return this.apiService.getPaginated<Product>('/product', paginationParams, skipGlobalLoading).pipe(
       map((response: PaginatedResponse<Product>) => {
         // If featured filter is requested but API doesn't support it,
         // we can filter by products with priceAfterDiscount (on sale) or most sold

@@ -2,8 +2,8 @@
 <div class="container-fluid py-4">
   <!-- Header -->
   <div class="mb-4">
-    <h1 class="h2 mb-1 text-white">Products Management</h1>
-    <p class="text-white mb-0">Manage your products</p>
+    <h1 class="h2 mb-1 text-white">إدارة المنتجات</h1>
+    <p class="text-white mb-0">إدارة منتجاتك</p>
   </div>
 
   <!-- Search and Add Button -->
@@ -20,7 +20,7 @@
         class="form-control"
         [(ngModel)]="searchTerm"
         (input)="onSearchInput()"
-        placeholder="Search products..."
+        placeholder="البحث في المنتجات..."
       />
     </div>
     <button
@@ -28,7 +28,7 @@
       class="btn btn-primary"
       (click)="showAddProductModal()"
     >
-      <i class="fas fa-plus me-2"></i>Add Product
+      <i class="fas fa-plus me-2"></i>إضافة منتج
     </button>
   </div>
 
@@ -47,12 +47,12 @@
         <table class="table table-hover align-middle products-table">
           <thead class="table-light">
             <tr>
-              <th scope="col">Image</th>
-              <th scope="col">Title</th>
-              <th scope="col">Price</th>
-              <th scope="col">Category</th>
-              <th scope="col">Created At</th>
-              <th scope="col" class="text-end">Actions</th>
+              <th scope="col">الصورة</th>
+              <th scope="col">العنوان</th>
+              <th scope="col">السعر</th>
+              <th scope="col">القسم</th>
+              <th scope="col">تاريخ الإنشاء</th>
+              <th scope="col" class="text-end">الإجراءات</th>
             </tr>
           </thead>
           <tbody>
@@ -86,7 +86,7 @@
                     type="button"
                     class="btn btn-sm btn-action btn-info"
                     (click)="showDetailsProductModal(product)"
-                    title="View Details"
+                    title="عرض التفاصيل"
                   >
                     <i class="fas fa-eye"></i>
                   </button>
@@ -94,7 +94,7 @@
                     type="button"
                     class="btn btn-sm btn-action btn-edit"
                     (click)="showEditProductModal(product)"
-                    title="Edit Product"
+                    title="تعديل المنتج"
                   >
                     <i class="fas fa-pencil-alt"></i>
                   </button>
@@ -102,7 +102,7 @@
                     type="button"
                     class="btn btn-sm btn-action btn-delete"
                     (click)="showDeleteProductModal(product)"
-                    title="Delete Product"
+                    title="حذف المنتج"
                   >
                     <i class="fas fa-trash-alt"></i>
                   </button>
@@ -119,8 +119,8 @@
         class="text-center py-5"
       >
         <i class="fas fa-box-open fa-3x text-muted mb-3"></i>
-        <h5 class="text-muted">No products found</h5>
-        <p class="text-muted">Get started by adding a new product.</p>
+        <h5 class="text-muted">لم يتم العثور على منتجات</h5>
+        <p class="text-muted">ابدأ بإضافة منتج جديد.</p>
       </div>
     </div>
   </div>
@@ -170,11 +170,11 @@
     </nav>
     <div class="text-center text-muted">
       <small>
-        Showing <strong>{{ (currentPage - 1) * itemsPerPage + 1 }}</strong> to
-        <strong>{{ Math.min(currentPage * itemsPerPage, totalItems) }}</strong> of
+        عرض <strong>{{ (currentPage - 1) * itemsPerPage + 1 }}</strong> إلى
+        <strong>{{ Math.min(currentPage * itemsPerPage, totalItems) }}</strong> من
         <strong>{{ totalItems }}</strong>
-        {{ totalItems === 1 ? 'result' : 'results' }}
-        <span *ngIf="totalPages > 1"> | Page <strong>{{ currentPage }}</strong> of <strong>{{ totalPages }}</strong></span>
+        {{ totalItems === 1 ? 'نتيجة' : 'نتائج' }}
+        <span *ngIf="totalPages > 1"> | صفحة <strong>{{ currentPage }}</strong> من <strong>{{ totalPages }}</strong></span>
       </small>
     </div>
   </div>
@@ -195,7 +195,7 @@
       <form [formGroup]="productForm" (ngSubmit)="addProduct()">
         <div class="modal-header">
           <h5 class="modal-title" id="addProductModalLabel">
-            <i class="fas fa-plus-circle me-2"></i>Add New Product
+            <i class="fas fa-plus-circle me-2"></i>إضافة منتج جديد
           </h5>
           <button
             type="button"
@@ -207,10 +207,10 @@
         <div class="modal-body">
           <!-- Basic Information -->
           <div class="mb-4">
-            <h6 class="text-muted mb-3 border-bottom pb-2 fw-semibold">Basic Information</h6>
+            <h6 class="text-muted mb-3 border-bottom pb-2 fw-semibold">المعلومات الأساسية</h6>
             <div class="mb-3">
               <label for="productTitle" class="form-label fw-medium">
-                Title <span class="text-danger">*</span>
+                العنوان <span class="text-danger">*</span>
               </label>
               <input
                 type="text"
@@ -218,7 +218,7 @@
                 class="form-control"
                 [class.is-invalid]="hasFieldError(productForm, 'title')"
                 formControlName="title"
-                placeholder="Enter product title"
+                placeholder="أدخل عنوان المنتج"
               />
               <div
                 *ngIf="hasFieldError(productForm, 'title')"
@@ -229,7 +229,7 @@
             </div>
             <div class="mb-0">
               <label for="productDescription" class="form-label fw-medium">
-                Description <span class="text-danger">*</span>
+                الوصف <span class="text-danger">*</span>
               </label>
               <textarea
                 id="productDescription"
@@ -237,7 +237,7 @@
                 [class.is-invalid]="hasFieldError(productForm, 'description')"
                 formControlName="description"
                 rows="3"
-                placeholder="Enter product description"
+                placeholder="أدخل وصف المنتج"
               ></textarea>
               <div
                 *ngIf="hasFieldError(productForm, 'description')"
@@ -250,11 +250,11 @@
 
           <!-- Pricing -->
           <div class="mb-4">
-            <h6 class="text-muted mb-3 border-bottom pb-2 fw-semibold">Pricing</h6>
+            <h6 class="text-muted mb-3 border-bottom pb-2 fw-semibold">التسعير</h6>
             <div class="row g-3">
               <div class="col-12 col-md-6">
                 <label for="productPrice" class="form-label fw-medium">
-                  Price <span class="text-danger">*</span>
+                  السعر <span class="text-danger">*</span>
                 </label>
                 <input
                   type="number"
@@ -295,7 +295,7 @@
                 </div>
                 <div class="form-text mt-1">
                   <i class="fas fa-info-circle me-1"></i>
-                  Must be less than the regular price
+                  يجب أن يكون أقل من السعر العادي
                 </div>
               </div>
             </div>
@@ -303,10 +303,10 @@
 
           <!-- Category -->
           <div class="mb-4">
-            <h6 class="text-muted mb-3 border-bottom pb-2 fw-semibold">Category</h6>
+            <h6 class="text-muted mb-3 border-bottom pb-2 fw-semibold">القسم</h6>
             <div class="mb-0">
               <label for="productCategory" class="form-label fw-medium">
-                <i class="fas fa-folder me-1"></i>Category <span class="text-danger">*</span>
+                <i class="fas fa-folder me-1"></i>القسم <span class="text-danger">*</span>
               </label>
               <div class="position-relative category-select-wrapper">
                 <select
@@ -315,7 +315,7 @@
                   [class.is-invalid]="hasFieldError(productForm, 'category')"
                   formControlName="category"
                 >
-                  <option [value]="null" disabled>Select a category</option>
+                  <option [value]="null" disabled>اختر قسم</option>
                   <option *ngFor="let category of categories" [value]="category._id">
                     {{ category.name }}
                   </option>
@@ -329,23 +329,23 @@
               </div>
               <div *ngIf="!hasFieldError(productForm, 'category') && productForm.get('category')?.value" class="form-text mt-2">
                 <i class="fas fa-check-circle text-success me-1"></i>
-                <span class="text-muted">Selected: <strong>{{ getSelectedCategoryName(productForm.get('category')?.value) }}</strong></span>
+                <span class="text-muted">المحدد: <strong>{{ getSelectedCategoryName(productForm.get('category')?.value) }}</strong></span>
               </div>
             </div>
           </div>
 
           <!-- Colors -->
           <div class="mb-4">
-            <h6 class="text-muted mb-3 border-bottom pb-2 fw-semibold">Colors</h6>
+            <h6 class="text-muted mb-3 border-bottom pb-2 fw-semibold">الألوان</h6>
             <div class="mb-0">
-              <label class="form-label fw-medium">Product Colors</label>
+              <label class="form-label fw-medium">ألوان المنتج</label>
               <div class="input-group">
                 <input
                   type="text"
                   class="form-control"
                   [(ngModel)]="newColor"
                   [ngModelOptions]="{standalone: true}"
-                  placeholder="Enter color name"
+                  placeholder="أدخل اسم اللون"
                   (keyup.enter)="addColor(false)"
                 />
                 <button
@@ -353,7 +353,7 @@
                   class="btn btn-outline-secondary"
                   (click)="addColor(false)"
                 >
-                  <i class="fas fa-plus me-1"></i>Add
+                  <i class="fas fa-plus me-1"></i>إضافة
                 </button>
               </div>
               <div *ngIf="productColors.length > 0" class="d-flex flex-wrap gap-2 mt-2">
@@ -375,10 +375,10 @@
 
           <!-- Images -->
           <div class="mb-4">
-            <h6 class="text-muted mb-3 border-bottom pb-2 fw-semibold">Images</h6>
+            <h6 class="text-muted mb-3 border-bottom pb-2 fw-semibold">الصور</h6>
             <div class="mb-4">
               <label for="productCoverImage" class="form-label fw-medium">
-                Cover Image <span class="text-danger">*</span>
+                صورة الغلاف <span class="text-danger">*</span>
               </label>
               <div class="input-group">
                 <input
@@ -392,7 +392,7 @@
               </div>
               <div class="form-text mt-1">
                 <i class="fas fa-info-circle me-1"></i>
-                This will be the main product image
+                ستكون هذه الصورة الرئيسية للمنتج
               </div>
               <div *ngIf="selectedCoverImage" class="mt-3">
                 <img
@@ -404,7 +404,7 @@
             </div>
             <div class="mb-0">
               <label for="productImages" class="form-label fw-medium">
-                Additional Images
+                صور إضافية
               </label>
               <div class="input-group">
                 <input
@@ -419,7 +419,7 @@
               </div>
               <div class="form-text mt-1 mb-3">
                 <i class="fas fa-info-circle me-1"></i>
-                You can select multiple images (max 5)
+                يمكنك اختيار عدة صور (حد أقصى 5)
               </div>
               <div *ngIf="selectedImages.length > 0" class="mt-3">
                 <div class="d-flex flex-wrap gap-3">
@@ -433,7 +433,7 @@
                       type="button"
                       class="btn btn-sm btn-danger position-absolute top-0 end-0 rounded-circle"
                       (click)="removeImage(i, false)"
-                      title="Remove image"
+                      title="إزالة الصورة"
                     >
                       <i class="fas fa-times"></i>
                     </button>
@@ -441,7 +441,7 @@
                 </div>
                 <small class="text-muted d-block mt-2">
                   <i class="fas fa-check-circle text-success me-1"></i>
-                  {{ selectedImages.length }} image(s) selected
+                  تم اختيار {{ selectedImages.length }} صورة
                 </small>
               </div>
             </div>
@@ -450,17 +450,17 @@
           <!-- Sizes & Quantity -->
           <div class="mb-4">
             <h6 class="text-muted mb-3 border-bottom pb-2 fw-semibold">
-              Sizes & Quantity <span class="text-danger">*</span>
+              المقاسات والكمية <span class="text-danger">*</span>
             </h6>
             <div class="mb-3">
-              <label class="form-label fw-medium">Add Size and Quantity <span class="text-danger">*</span></label>
+              <label class="form-label fw-medium">إضافة مقاس وكمية <span class="text-danger">*</span></label>
               <div class="input-group">
                 <select
                   class="form-select"
                   [(ngModel)]="selectedSizeToAdd"
                   [ngModelOptions]="{standalone: true}"
                 >
-                  <option value="">Select a size to add</option>
+                  <option value="">اختر مقاساً للإضافة</option>
                   <option *ngFor="let size of getAvailableSizesForQuantity(false)" [value]="size._id">
                     {{ size.sizeName.toUpperCase() }}
                   </option>
@@ -471,7 +471,7 @@
                   (click)="addSizeToQuantity(selectedSizeToAdd, false); selectedSizeToAdd = ''"
                   [disabled]="!selectedSizeToAdd || getAvailableSizesForQuantity(false).length === 0"
                 >
-                  <i class="fas fa-plus me-1"></i>Add Size
+                  <i class="fas fa-plus me-1"></i>إضافة مقاس
                 </button>
               </div>
             </div>
@@ -480,9 +480,9 @@
                 <table class="table table-sm table-bordered mb-0">
                   <thead class="table-light">
                     <tr>
-                      <th>Size</th>
-                      <th>Quantity</th>
-                      <th class="text-center">Action</th>
+                      <th>المقاس</th>
+                      <th>الكمية</th>
+                      <th class="text-center">الإجراء</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -504,7 +504,7 @@
                           type="button"
                           class="btn btn-sm btn-danger"
                           (click)="removeSizeFromQuantity(i, false)"
-                          title="Remove size"
+                          title="إزالة المقاس"
                         >
                           <i class="fas fa-trash"></i>
                         </button>
@@ -523,14 +523,14 @@
               class="btn btn-secondary"
               (click)="closeModals()"
             >
-              <i class="fas fa-times me-1"></i>Cancel
+              <i class="fas fa-times me-1"></i>إلغاء
             </button>
             <button
               type="submit"
               class="btn btn-primary"
               [disabled]="!productForm.valid || !selectedCoverImage || productQuantity.length === 0"
             >
-              <i class="fas fa-save me-2"></i>Add Product
+              <i class="fas fa-save me-2"></i>إضافة المنتج
             </button>
           </div>
         </div>
@@ -554,7 +554,7 @@
       <form [formGroup]="editProductForm" (ngSubmit)="updateProduct()">
         <div class="modal-header">
           <h5 class="modal-title" id="editProductModalLabel">
-            <i class="fas fa-edit me-2"></i>Edit Product
+            <i class="fas fa-edit me-2"></i>تعديل المنتج
           </h5>
           <button
             type="button"
@@ -566,10 +566,10 @@
         <div class="modal-body" style="max-height: 70vh; overflow-y: auto;">
           <!-- Basic Information -->
           <div class="mb-4">
-            <h6 class="text-muted mb-3 border-bottom pb-2 fw-semibold">Basic Information</h6>
+            <h6 class="text-muted mb-3 border-bottom pb-2 fw-semibold">المعلومات الأساسية</h6>
             <div class="mb-3">
               <label for="editProductTitle" class="form-label fw-medium">
-                Title <span class="text-danger">*</span>
+                العنوان <span class="text-danger">*</span>
               </label>
               <input
                 type="text"
@@ -577,7 +577,7 @@
                 class="form-control"
                 [class.is-invalid]="hasFieldError(editProductForm, 'title')"
                 formControlName="title"
-                placeholder="Enter product title"
+                placeholder="أدخل عنوان المنتج"
               />
               <div
                 *ngIf="hasFieldError(editProductForm, 'title')"
@@ -588,7 +588,7 @@
             </div>
             <div class="mb-0">
               <label for="editProductDescription" class="form-label fw-medium">
-                Description <span class="text-danger">*</span>
+                الوصف <span class="text-danger">*</span>
               </label>
               <textarea
                 id="editProductDescription"
@@ -596,7 +596,7 @@
                 [class.is-invalid]="hasFieldError(editProductForm, 'description')"
                 formControlName="description"
                 rows="3"
-                placeholder="Enter product description"
+                placeholder="أدخل وصف المنتج"
               ></textarea>
               <div
                 *ngIf="hasFieldError(editProductForm, 'description')"
@@ -609,11 +609,11 @@
 
           <!-- Pricing -->
           <div class="mb-4">
-            <h6 class="text-muted mb-3 border-bottom pb-2 fw-semibold">Pricing</h6>
+            <h6 class="text-muted mb-3 border-bottom pb-2 fw-semibold">التسعير</h6>
             <div class="row g-3">
               <div class="col-12 col-md-6">
                 <label for="editProductPrice" class="form-label fw-medium">
-                  Price <span class="text-danger">*</span>
+                  السعر <span class="text-danger">*</span>
                 </label>
                 <input
                   type="number"
@@ -634,7 +634,7 @@
               </div>
               <div class="col-12 col-md-6">
                 <label for="editProductDiscount" class="form-label fw-medium">
-                  Price After Discount <small class="text-muted">(Optional)</small>
+                  السعر بعد الخصم <small class="text-muted">(اختياري)</small>
                 </label>
                 <input
                   type="number"
@@ -654,7 +654,7 @@
                 </div>
                 <div class="form-text mt-1">
                   <i class="fas fa-info-circle me-1"></i>
-                  Must be less than the regular price
+                  يجب أن يكون أقل من السعر العادي
                 </div>
               </div>
             </div>
@@ -662,10 +662,10 @@
 
           <!-- Category -->
           <div class="mb-4">
-            <h6 class="text-muted mb-3 border-bottom pb-2 fw-semibold">Category</h6>
+            <h6 class="text-muted mb-3 border-bottom pb-2 fw-semibold">القسم</h6>
             <div class="mb-0">
               <label for="editProductCategory" class="form-label fw-medium">
-                <i class="fas fa-folder me-1"></i>Category <span class="text-danger">*</span>
+                <i class="fas fa-folder me-1"></i>القسم <span class="text-danger">*</span>
               </label>
               <div class="position-relative category-select-wrapper">
                 <select
@@ -674,7 +674,7 @@
                   [class.is-invalid]="hasFieldError(editProductForm, 'category')"
                   formControlName="category"
                 >
-                  <option [value]="null" disabled>Select a category</option>
+                  <option [value]="null" disabled>اختر قسم</option>
                   <option *ngFor="let category of categories" [value]="category._id">
                     {{ category.name }}
                   </option>
@@ -688,27 +688,27 @@
               </div>
               <div *ngIf="!hasFieldError(editProductForm, 'category') && editProductForm.get('category')?.value" class="form-text mt-2">
                 <i class="fas fa-check-circle text-success me-1"></i>
-                <span class="text-muted">Selected: <strong>{{ getSelectedCategoryName(editProductForm.get('category')?.value) || (selectedProduct?.category?.name || '') }}</strong></span>
+                <span class="text-muted">المحدد: <strong>{{ getSelectedCategoryName(editProductForm.get('category')?.value) || (selectedProduct?.category?.name || '') }}</strong></span>
               </div>
               <div *ngIf="!hasFieldError(editProductForm, 'category') && !editProductForm.get('category')?.value && selectedProduct?.category?.name" class="form-text mt-2">
                 <i class="fas fa-info-circle text-info me-1"></i>
-                <span class="text-muted">Current category: <strong>{{ selectedProduct.category.name }}</strong></span>
+                <span class="text-muted">القسم الحالي: <strong>{{ selectedProduct.category.name }}</strong></span>
               </div>
             </div>
           </div>
 
           <!-- Colors -->
           <div class="mb-4">
-            <h6 class="text-muted mb-3 border-bottom pb-2 fw-semibold">Colors</h6>
+            <h6 class="text-muted mb-3 border-bottom pb-2 fw-semibold">الألوان</h6>
             <div class="mb-0">
-              <label class="form-label fw-medium">Product Colors</label>
+              <label class="form-label fw-medium">ألوان المنتج</label>
               <div class="input-group">
                 <input
                   type="text"
                   class="form-control"
                   [(ngModel)]="editNewColor"
                   [ngModelOptions]="{standalone: true}"
-                  placeholder="Enter color name"
+                  placeholder="أدخل اسم اللون"
                   (keyup.enter)="addColor(true)"
                 />
                 <button
@@ -716,7 +716,7 @@
                   class="btn btn-outline-secondary"
                   (click)="addColor(true)"
                 >
-                  <i class="fas fa-plus me-1"></i>Add
+                  <i class="fas fa-plus me-1"></i>إضافة
                 </button>
               </div>
               <div *ngIf="editProductColors.length > 0" class="d-flex flex-wrap gap-2 mt-2">
@@ -738,7 +738,7 @@
 
           <!-- Images -->
           <div class="mb-4">
-            <h6 class="text-muted mb-3 border-bottom pb-2 fw-semibold">Images</h6>
+            <h6 class="text-muted mb-3 border-bottom pb-2 fw-semibold">الصور</h6>
             <div class="mb-4">
               <label class="form-label fw-medium">Current Cover Image</label>
               <div *ngIf="selectedProduct" class="mb-2">
@@ -750,7 +750,7 @@
                 />
               </div>
               <label for="editProductCoverImage" class="form-label fw-medium">
-                Update Cover Image <small class="text-muted">(Optional)</small>
+                تحديث صورة الغلاف <small class="text-muted">(اختياري)</small>
               </label>
               <div class="input-group">
                 <input
@@ -763,7 +763,7 @@
               </div>
               <div class="form-text mt-1">
                 <i class="fas fa-info-circle me-1"></i>
-                Leave empty to keep current cover image
+                اتركه فارغاً للاحتفاظ بصورة الغلاف الحالية
               </div>
               <div *ngIf="selectedEditCoverImage" class="mt-3">
                 <img
@@ -774,7 +774,7 @@
               </div>
             </div>
             <div class="mb-0">
-              <label class="form-label fw-medium">Current Additional Images</label>
+              <label class="form-label fw-medium">الصور الإضافية الحالية</label>
               <div *ngIf="selectedProduct && selectedProduct.images && selectedProduct.images.length > 0" class="mb-3">
                 <div class="d-flex flex-wrap gap-3">
                   <div *ngFor="let image of selectedProduct.images; let i = index" class="position-relative">
@@ -783,22 +783,22 @@
                       [alt]="'Existing image ' + (i + 1)"
                       class="img-thumbnail"
                     />
-                    <small class="badge bg-info position-absolute top-0 start-0 m-1">Existing</small>
+                    <small class="badge bg-info position-absolute top-0 start-0 m-1">موجود</small>
                   </div>
                 </div>
                 <small class="text-muted d-block mt-2">
                   <i class="fas fa-info-circle me-1"></i>
-                  {{ selectedProduct.images.length }} existing image(s) - New images will be added to these
+                  {{ selectedProduct.images.length }} صورة موجودة - سيتم إضافة الصور الجديدة إليها
                 </small>
               </div>
               <div *ngIf="!selectedProduct || !selectedProduct.images || selectedProduct.images.length === 0" class="mb-3">
                 <small class="text-muted">
                   <i class="fas fa-info-circle me-1"></i>
-                  No additional images currently
+                  لا توجد صور إضافية حالياً
                 </small>
               </div>
               <label for="editProductImages" class="form-label fw-medium">
-                Add More Images <small class="text-muted">(Optional)</small>
+                إضافة المزيد من الصور <small class="text-muted">(اختياري)</small>
               </label>
               <div class="input-group">
                 <input
@@ -813,7 +813,7 @@
               </div>
               <div class="form-text mt-1 mb-3">
                 <i class="fas fa-info-circle me-1"></i>
-                You can select multiple images (max 5)
+                يمكنك اختيار عدة صور (حد أقصى 5)
               </div>
               <div *ngIf="selectedEditImages.length > 0" class="mt-3">
                 <div class="d-flex flex-wrap gap-3">
@@ -827,7 +827,7 @@
                       type="button"
                       class="btn btn-sm btn-danger position-absolute top-0 end-0 rounded-circle"
                       (click)="removeImage(i, true)"
-                      title="Remove image"
+                      title="إزالة الصورة"
                     >
                       <i class="fas fa-times"></i>
                     </button>
@@ -835,7 +835,7 @@
                 </div>
                 <small class="text-muted d-block mt-2">
                   <i class="fas fa-check-circle text-success me-1"></i>
-                  {{ selectedEditImages.length }} new image(s) selected
+                  تم اختيار {{ selectedEditImages.length }} صورة جديدة
                 </small>
               </div>
             </div>
@@ -844,17 +844,17 @@
           <!-- Sizes & Quantity -->
           <div class="mb-4">
             <h6 class="text-muted mb-3 border-bottom pb-2 fw-semibold">
-              Sizes & Quantity <span class="text-danger">*</span>
+              المقاسات والكمية <span class="text-danger">*</span>
             </h6>
             <div class="mb-3">
-              <label class="form-label fw-medium">Add Size and Quantity <span class="text-danger">*</span></label>
+              <label class="form-label fw-medium">إضافة مقاس وكمية <span class="text-danger">*</span></label>
               <div class="input-group">
                 <select
                   class="form-select"
                   [(ngModel)]="selectedEditSizeToAdd"
                   [ngModelOptions]="{standalone: true}"
                 >
-                  <option value="">Select a size to add</option>
+                  <option value="">اختر مقاساً للإضافة</option>
                   <option *ngFor="let size of getAvailableSizesForQuantity(true)" [value]="size._id">
                     {{ size.sizeName.toUpperCase() }}
                   </option>
@@ -865,7 +865,7 @@
                   (click)="addSizeToQuantity(selectedEditSizeToAdd, true); selectedEditSizeToAdd = ''"
                   [disabled]="!selectedEditSizeToAdd || getAvailableSizesForQuantity(true).length === 0"
                 >
-                  <i class="fas fa-plus me-1"></i>Add Size
+                  <i class="fas fa-plus me-1"></i>إضافة مقاس
                 </button>
               </div>
             </div>
@@ -874,9 +874,9 @@
                 <table class="table table-sm table-bordered mb-0">
                   <thead class="table-light">
                     <tr>
-                      <th>Size</th>
-                      <th>Quantity</th>
-                      <th class="text-center">Action</th>
+                      <th>المقاس</th>
+                      <th>الكمية</th>
+                      <th class="text-center">الإجراء</th>
                     </tr>
                   </thead>
                   <tbody>
@@ -898,7 +898,7 @@
                           type="button"
                           class="btn btn-sm btn-danger"
                           (click)="removeSizeFromQuantity(i, true)"
-                          title="Remove size"
+                          title="إزالة المقاس"
                         >
                           <i class="fas fa-trash"></i>
                         </button>
@@ -910,7 +910,7 @@
             </div>
             <div *ngIf="editProductQuantity.length === 0" class="alert alert-danger mb-0">
               <i class="fas fa-exclamation-circle me-2"></i>
-              <small>At least one size with quantity is required.</small>
+              <small>مطلوب مقاس واحد على الأقل مع الكمية.</small>
             </div>
           </div>
         </div>
@@ -921,14 +921,14 @@
               class="btn btn-secondary"
               (click)="closeModals()"
             >
-              <i class="fas fa-times me-1"></i>Cancel
+              <i class="fas fa-times me-1"></i>إلغاء
             </button>
             <button
               type="submit"
               class="btn btn-primary"
               [disabled]="!editProductForm.valid || editProductQuantity.length === 0"
             >
-              <i class="fas fa-save me-2"></i>Update Product
+              <i class="fas fa-save me-2"></i>تحديث المنتج
             </button>
           </div>
         </div>
@@ -951,7 +951,7 @@
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="productDetailsModalLabel">
-          <i class="fas fa-info-circle me-2"></i>Product Details
+          <i class="fas fa-info-circle me-2"></i>تفاصيل المنتج
         </h5>
         <button
           type="button"
@@ -978,7 +978,7 @@
                 class="btn btn-light position-absolute top-50 start-0 translate-middle-y"
                 style="left: 10px; z-index: 10; "
                 (click)="prevImage()"
-                title="Previous"
+                title="السابق"
               >
                 <i class="fas fa-chevron-left" style="color: #212529 !important;"></i>
               </button>
@@ -987,14 +987,14 @@
                 class="btn btn-light position-absolute top-50 end-0 translate-middle-y"
                 style="right: 10px; z-index: 10; "
                 (click)="nextImage()"
-                title="Next"
+                title="التالي"
               >
                 <i class="fas fa-chevron-right" style="color: #212529 !important;"></i>
               </button>
             </div>
             <div *ngIf="selectedProduct.images && selectedProduct.images.length > 0" class="mt-2 text-center">
               <small class="text-muted">
-                Image {{ currentImageIndex === 0 ? 1 : currentImageIndex }} of {{ (selectedProduct.images.length || 0) + 1 }}
+                صورة {{ currentImageIndex === 0 ? 1 : currentImageIndex }} من {{ (selectedProduct.images.length || 0) + 1 }}
               </small>
             </div>
           </div>
@@ -1009,14 +1009,14 @@
               </span>
             </div>
             <div class="mb-3">
-              <strong>Category:</strong> {{ selectedProduct.category.name }}
+              <strong>القسم:</strong> {{ selectedProduct.category.name }}
             </div>
             <div class="mb-3">
-              <strong>Description:</strong>
+              <strong>الوصف:</strong>
               <p class="mt-2">{{ selectedProduct.description }}</p>
             </div>
             <div class="mb-3" *ngIf="selectedProduct.colors && selectedProduct.colors.length > 0">
-              <strong>Colors:</strong>
+              <strong>الألوان:</strong>
               <div class="d-flex flex-wrap gap-2 mt-2">
                 <span *ngFor="let color of selectedProduct.colors" class="badge bg-primary">
                   {{ color }}
@@ -1029,15 +1029,15 @@
         <!-- Sizes Table -->
         <div class="mt-4">
           <div class="d-flex justify-content-between align-items-center mb-3">
-            <h5>Sizes & Stock</h5>
+            <h5>المقاسات والمخزون</h5>
           </div>
           <div class="table-responsive">
             <table class="table table-bordered table-hover">
               <thead class="table-light">
                 <tr>
-                  <th>Size</th>
-                  <th>Quantity</th>
-                  <th>Status</th>
+                  <th>المقاس</th>
+                  <th>الكمية</th>
+                  <th>الحالة</th>
                 </tr>
               </thead>
               <tbody>
@@ -1054,7 +1054,7 @@
                 </tr>
                 <tr *ngIf="!selectedProduct.quantity || selectedProduct.quantity.length === 0">
                   <td colspan="3" class="text-center text-muted">
-                    No sizes configured for this product
+                    لم يتم تكوين مقاسات لهذا المنتج
                   </td>
                 </tr>
               </tbody>
@@ -1068,7 +1068,7 @@
           class="btn btn-secondary"
           (click)="closeModals()"
         >
-          Close
+          إغلاق
         </button>
 
       </div>
@@ -1090,7 +1090,7 @@
     <div class="modal-content">
       <div class="modal-header border-0">
         <h5 class="modal-title text-danger" id="deleteProductModalLabel">
-          <i class="fas fa-exclamation-triangle me-2"></i>Delete Product
+          <i class="fas fa-exclamation-triangle me-2"></i>حذف المنتج
         </h5>
         <button
           type="button"
@@ -1102,11 +1102,10 @@
       <div class="modal-body">
         <div class="text-center mb-4">
           <i class="fas fa-exclamation-circle fa-3x text-danger mb-3"></i>
-          <h5>Are you sure?</h5>
+          <h5>هل أنت متأكد؟</h5>
           <p class="text-muted">
-            You are about to delete the product
-            <strong>"{{ selectedProduct?.title }}"</strong>. This action cannot
-            be undone.
+            أنت على وشك حذف المنتج
+            <strong>"{{ selectedProduct?.title }}"</strong>. لا يمكن التراجع عن هذا الإجراء.
           </p>
           <div *ngIf="selectedProduct" class="mt-3">
             <img
@@ -1119,11 +1118,11 @@
         </div>
       </div>
       <div class="modal-footer border-0">
-        <button type="button" class="btn btn-secondary" (click)="closeModals()">
-          Cancel
+          <button type="button" class="btn btn-secondary" (click)="closeModals()">
+          إلغاء
         </button>
         <button type="button" class="btn btn-danger" (click)="deleteProduct()">
-          <i class="fas fa-trash me-2"></i>Delete Product
+          <i class="fas fa-trash me-2"></i>حذف المنتج
         </button>
       </div>
     </div>

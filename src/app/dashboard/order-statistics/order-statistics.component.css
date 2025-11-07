@@ -1,0 +1,254 @@
+/* ============================================
+   Order Statistics Component Styles
+   Using Design System CSS Variables
+   ============================================ */
+
+.order-statistics-section {
+  margin-bottom: var(--spacing-6);
+  animation: fadeInUpSmall 0.3s ease-in;
+}
+
+.order-statistics-section h2 {
+  font-size: var(--font-size-2xl);
+  font-weight: var(--font-weight-semibold);
+  color: var(--color-text-primary);
+  margin: 0 0 var(--spacing-2) 0;
+}
+
+.order-statistics-section p {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  margin: 0;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: var(--spacing-4);
+  margin-top: var(--spacing-6);
+}
+
+.stat-card {
+  background: var(--color-bg-primary);
+  border: 1px solid var(--color-border-light);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-5);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-4);
+  transition: transform var(--transition-base);
+  box-shadow: var(--shadow-sm);
+  min-height: 120px;
+}
+
+.stat-card:hover {
+  transform: scale(1.02);
+}
+
+.stat-card-primary {
+  border-left: 4px solid var(--color-primary);
+}
+
+.stat-card-warning {
+  border-left: 4px solid var(--color-warning);
+}
+
+.stat-card-success {
+  border-left: 4px solid var(--color-success);
+}
+
+.stat-card-danger {
+  border-left: 4px solid var(--color-danger);
+}
+
+.stat-card-revenue {
+  border-left: 4px solid var(--color-info);
+}
+
+.stat-card-body {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-4);
+  width: 100%;
+}
+
+.stat-icon-wrapper {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-md);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+
+.stat-card-primary .stat-icon-wrapper {
+  background: var(--color-bg-tertiary);
+  color: var(--color-primary);
+}
+
+.stat-card-warning .stat-icon-wrapper {
+  background: var(--color-warning-light);
+  color: var(--color-warning);
+}
+
+.stat-card-success .stat-icon-wrapper {
+  background: var(--color-success-light);
+  color: var(--color-success);
+}
+
+.stat-card-danger .stat-icon-wrapper {
+  background: var(--color-error-light);
+  color: var(--color-danger);
+}
+
+.stat-card-revenue .stat-icon-wrapper {
+  background: var(--color-info-bg);
+  color: var(--color-info);
+}
+
+.stat-icon-wrapper svg {
+  width: 24px;
+  height: 24px;
+}
+
+.stat-content {
+  flex: 1;
+}
+
+.stat-label {
+  font-size: var(--font-size-sm);
+  color: var(--color-text-secondary);
+  margin: 0 0 var(--spacing-2) 0;
+  font-weight: var(--font-weight-medium);
+}
+
+.stat-value {
+  font-size: var(--font-size-3xl);
+  font-weight: var(--font-weight-bold);
+  color: var(--color-text-primary);
+  margin: 0;
+  line-height: var(--line-height-tight);
+  display: flex;
+  align-items: baseline;
+  gap: var(--spacing-2);
+  letter-spacing: var(--letter-spacing-tight);
+}
+
+.stat-badge {
+  font-size: var(--font-size-xs);
+  font-weight: var(--font-weight-medium);
+  padding: var(--spacing-1) var(--spacing-2);
+  border-radius: var(--radius-base);
+  display: inline-block;
+}
+
+.stat-badge-warning {
+  background: var(--color-warning-light);
+  color: var(--color-warning);
+}
+
+.stat-badge-success {
+  background: var(--color-success-light);
+  color: var(--color-success);
+}
+
+.stat-badge-danger {
+  background: var(--color-error-light);
+  color: var(--color-danger);
+}
+
+/* Error State */
+.error-state {
+  background: var(--color-error-light);
+  border: 1px solid var(--color-error-border);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-5);
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-3);
+  color: var(--color-error-text);
+}
+
+.error-state svg {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
+.error-state p {
+  margin: 0;
+  font-size: var(--font-size-sm);
+  font-weight: var(--font-weight-medium);
+}
+
+/* Skeleton Loaders */
+.stat-card-skeleton {
+  animation: skeleton-pulse 1.5s ease-in-out infinite;
+}
+
+.skeleton-icon {
+  width: 56px;
+  height: 56px;
+  border-radius: var(--radius-md);
+  background: var(--color-gray-200);
+  flex-shrink: 0;
+}
+
+.skeleton-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spacing-2);
+}
+
+.skeleton-line {
+  height: 12px;
+  background: var(--color-gray-200);
+  border-radius: var(--radius-base);
+}
+
+.skeleton-label {
+  width: 60%;
+}
+
+.skeleton-value {
+  width: 40%;
+  height: 24px;
+}
+
+@keyframes skeleton-pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+/* Responsive */
+@media (min-width: 640px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (min-width: 1024px) {
+  .stats-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+
+  .stat-card-revenue {
+    grid-column: span 2;
+  }
+}
+
+@media (min-width: 1280px) {
+  .stats-grid {
+    grid-template-columns: repeat(5, 1fr);
+  }
+
+  .stat-card-revenue {
+    grid-column: span 1;
+  }
+}

@@ -11,7 +11,8 @@ export class ApifunctionService {
     return this.http.get(`${environment.apiUrl}/product/`)
   }
   getcatgory(){
-    return this.http.get(`${environment.apiUrl}/categories/`)
+    // Pass a large limit to get all categories
+    return this.http.get(`${environment.apiUrl}/categories/?limit=1000`)
   }
   getproductybycatgory(id:any){
     return this.http.get(`${environment.apiUrl}/product/category/${id}`)

@@ -26,7 +26,7 @@ exports.createProductValidator = [
     }),
   check('description')
     .notEmpty()
-    .withMessage('Product description is required')
+    .withMessage('وصف المنتج مطلوب')
     .isLength({ max: 2000 })
     .withMessage('Too long description'),
   check('sold')

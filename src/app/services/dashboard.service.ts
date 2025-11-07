@@ -114,16 +114,6 @@ export class DashboardService {
       .pipe(map(response => response.results || 0));
   }
 
-  private getOrdersStats(): Observable<{total: number, pending: number, revenue: number}> {
-    // Use the dedicated stats endpoint from API documentation
-    return this.http.get<any>(`${this.apiUrl}/Order/stats`, { headers: this.getHeaders() })
-      .pipe(map(response => ({
-        total: response.totalOrders || 0,
-        pending: response.pendingOrders || 0,
-        revenue: response.totalRevenue || 0
-      })));
-  }
-
   private getUnreadMessagesCount(): Observable<number> {
     // Fetch all contact forms and count unread (isReplied: false)
     return this.http.get<any>(`${this.apiUrl}/submit`, { headers: this.getHeaders() })
@@ -181,7 +171,7 @@ export class DashboardService {
           return {
             totalOrders: stats.totalOrders || 0,
             pendingOrders: stats.pendingOrders || 0,
-            completedOrders: stats.completedOrders || stats.deliveredOrders || 0,
+            completedOrders: stats.completedOrders || 0,
             cancelledOrders: stats.cancelledOrders || 0,
             totalRevenue: stats.totalRevenue || 0
           };

@@ -93,7 +93,7 @@ export class ContactFormsComponent implements OnInit, OnDestroy {
         this.isLoading = false;
         this.totalPages = 0;
         this.totalItems = 0;
-        this.notificationService.error('Error', 'Failed to load contact messages');
+        this.notificationService.error('خطأ', 'فشل في تحميل رسائل الاتصال');
       }
     });
   }

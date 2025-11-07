@@ -51,7 +51,6 @@ export class ConnectComponent implements OnInit {
   // دالة إرسال البيانات
   onsubmit(data) {
     this.http.post(`${environment.apiUrl}/submit/` , data).subscribe((res)=>{
-      console.log("result" , res);
     })
   }
 }

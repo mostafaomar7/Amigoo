@@ -2,8 +2,8 @@
 <div class="container-fluid py-4">
   <!-- Header -->
   <div class="mb-4">
-    <h1 class="h2 mb-1 text-white">Categories Management</h1>
-    <p class="text-white mb-0">Manage your product categories</p>
+    <h1 class="h2 mb-1 text-white">إدارة الأقسام</h1>
+    <p class="text-white mb-0">إدارة أقسام المنتجات</p>
   </div>
 
   <!-- Search and Add Button -->
@@ -20,7 +20,7 @@
         class="form-control"
         [(ngModel)]="searchTerm"
         (input)="onSearchInput()"
-        placeholder="Search categories by name..."
+        placeholder="البحث في الأقسام بالاسم..."
       />
     </div>
     <button
@@ -28,7 +28,7 @@
       class="btn btn-primary"
       (click)="showAddCategoryModal()"
     >
-      <i class="fas fa-plus me-2"></i>Add Category
+      <i class="fas fa-plus me-2"></i>إضافة قسم
     </button>
   </div>
 
@@ -47,10 +47,10 @@
         <table class="table table-hover align-middle categories-table">
           <thead class="table-light">
             <tr>
-              <th scope="col">Image</th>
-              <th scope="col">Name</th>
-              <th scope="col">Created At</th>
-              <th scope="col" class="text-end">Actions</th>
+              <th scope="col">الصورة</th>
+              <th scope="col">الاسم</th>
+              <th scope="col">تاريخ الإنشاء</th>
+              <th scope="col" class="text-end">الإجراءات</th>
             </tr>
           </thead>
           <tbody>
@@ -75,7 +75,7 @@
                     type="button"
                     class="btn btn-sm btn-action btn-edit"
                     (click)="showEditCategoryModal(category)"
-                    title="Edit Category"
+                    title="تعديل القسم"
                   >
                     <i class="fas fa-pencil-alt"></i>
                   </button>
@@ -83,7 +83,7 @@
                     type="button"
                     class="btn btn-sm btn-action btn-delete"
                     (click)="showDeleteCategoryModal(category)"
-                    title="Delete Category"
+                    title="حذف القسم"
                   >
                     <i class="fas fa-trash-alt"></i>
                   </button>
@@ -100,8 +100,8 @@
         class="text-center py-5"
       >
         <i class="fas fa-folder-open fa-3x text-muted mb-3"></i>
-        <h5 class="text-muted">No categories found</h5>
-        <p class="text-muted">Get started by adding a new category.</p>
+        <h5 class="text-muted">لم يتم العثور على أقسام</h5>
+        <p class="text-muted">ابدأ بإضافة قسم جديد.</p>
       </div>
     </div>
   </div>
@@ -151,11 +151,11 @@
     </nav>
     <div class="text-center text-muted">
       <small>
-        Showing <strong>{{ (currentPage - 1) * itemsPerPage + 1 }}</strong> to
-        <strong>{{ Math.min(currentPage * itemsPerPage, totalItems) }}</strong> of
+        عرض <strong>{{ (currentPage - 1) * itemsPerPage + 1 }}</strong> إلى
+        <strong>{{ Math.min(currentPage * itemsPerPage, totalItems) }}</strong> من
         <strong>{{ totalItems }}</strong>
-        {{ totalItems === 1 ? 'result' : 'results' }}
-        <span *ngIf="totalPages > 1"> | Page <strong>{{ currentPage }}</strong> of <strong>{{ totalPages }}</strong></span>
+        {{ totalItems === 1 ? 'نتيجة' : 'نتائج' }}
+        <span *ngIf="totalPages > 1"> | صفحة <strong>{{ currentPage }}</strong> من <strong>{{ totalPages }}</strong></span>
       </small>
     </div>
   </div>
@@ -176,7 +176,7 @@
       <form [formGroup]="categoryForm" (ngSubmit)="addCategory()">
         <div class="modal-header">
           <h5 class="modal-title" id="addCategoryModalLabel">
-            <i class="fas fa-plus-circle me-2"></i>Add New Category
+            <i class="fas fa-plus-circle me-2"></i>إضافة قسم جديد
           </h5>
           <button
             type="button"
@@ -189,7 +189,7 @@
           <!-- Category Name -->
           <div class="mb-3">
             <label for="categoryName" class="form-label">
-              Category Name <span class="text-danger">*</span>
+              اسم القسم <span class="text-danger">*</span>
             </label>
             <input
               type="text"
@@ -197,7 +197,7 @@
               class="form-control"
               [class.is-invalid]="hasFieldError(categoryForm, 'name')"
               formControlName="name"
-              placeholder="Enter category name"
+              placeholder="أدخل اسم القسم"
             />
             <div
               *ngIf="hasFieldError(categoryForm, 'name')"
@@ -210,7 +210,7 @@
           <!-- Image Upload -->
           <div class="mb-3">
             <label for="categoryImage" class="form-label">
-              Category Image <span class="text-danger">*</span>
+              صورة القسم <span class="text-danger">*</span>
             </label>
             <input
               type="file"
@@ -222,7 +222,7 @@
             />
             <div class="form-text">
               <i class="fas fa-info-circle me-1"></i>
-              Please select an image file (JPG, PNG, etc.)
+              يرجى اختيار ملف صورة (JPG، PNG، إلخ)
             </div>
             <div *ngIf="selectedImage" class="mt-2">
               <img
@@ -240,14 +240,14 @@
             class="btn btn-secondary"
             (click)="closeModals()"
           >
-            Cancel
+            إلغاء
           </button>
           <button
             type="submit"
             class="btn btn-primary"
             [disabled]="!categoryForm.valid || !selectedImage"
           >
-            <i class="fas fa-save me-2"></i>Add Category
+            <i class="fas fa-save me-2"></i>إضافة القسم
           </button>
         </div>
       </form>
@@ -270,7 +270,7 @@
       <form [formGroup]="editCategoryForm" (ngSubmit)="updateCategory()">
         <div class="modal-header">
           <h5 class="modal-title" id="editCategoryModalLabel">
-            <i class="fas fa-edit me-2"></i>Edit Category
+            <i class="fas fa-edit me-2"></i>تعديل القسم
           </h5>
           <button
             type="button"
@@ -282,7 +282,7 @@
         <div class="modal-body">
           <!-- Current Image Display -->
           <div *ngIf="selectedCategory" class="mb-3">
-            <label class="form-label">Current Image</label>
+            <label class="form-label">الصورة الحالية</label>
             <div>
               <img
                 [src]="getImageUrl(selectedCategory.image)"
@@ -296,7 +296,7 @@
           <!-- Category Name -->
           <div class="mb-3">
             <label for="editCategoryName" class="form-label">
-              Category Name <span class="text-danger">*</span>
+              اسم القسم <span class="text-danger">*</span>
             </label>
             <input
               type="text"
@@ -304,7 +304,7 @@
               class="form-control"
               [class.is-invalid]="hasFieldError(editCategoryForm, 'name')"
               formControlName="name"
-              placeholder="Enter category name"
+              placeholder="أدخل اسم القسم"
             />
             <div
               *ngIf="hasFieldError(editCategoryForm, 'name')"
@@ -317,7 +317,7 @@
           <!-- Image Upload -->
           <div class="mb-3">
             <label for="editCategoryImage" class="form-label">
-              Update Image <small class="text-muted">(Optional)</small>
+              تحديث الصورة <small class="text-muted">(اختياري)</small>
             </label>
             <input
               type="file"
@@ -328,7 +328,7 @@
             />
             <div class="form-text">
               <i class="fas fa-info-circle me-1"></i>
-              Leave empty to keep the current image
+              اتركه فارغاً للاحتفاظ بالصورة الحالية
             </div>
             <div *ngIf="selectedEditImage" class="mt-2">
               <img
@@ -346,14 +346,14 @@
             class="btn btn-secondary"
             (click)="closeModals()"
           >
-            Cancel
+            إلغاء
           </button>
           <button
             type="submit"
             class="btn btn-primary"
             [disabled]="!editCategoryForm.valid"
           >
-            <i class="fas fa-save me-2"></i>Update Category
+            <i class="fas fa-save me-2"></i>تحديث القسم
           </button>
         </div>
       </form>
@@ -375,7 +375,7 @@
     <div class="modal-content">
       <div class="modal-header border-0">
         <h5 class="modal-title text-danger" id="deleteCategoryModalLabel">
-          <i class="fas fa-exclamation-triangle me-2"></i>Delete Category
+          <i class="fas fa-exclamation-triangle me-2"></i>حذف القسم
         </h5>
         <button
           type="button"
@@ -387,11 +387,10 @@
       <div class="modal-body">
         <div class="text-center mb-4">
           <i class="fas fa-exclamation-circle fa-3x text-danger mb-3"></i>
-          <h5>Are you sure?</h5>
+          <h5>هل أنت متأكد؟</h5>
           <p class="text-muted">
-            You are about to delete the category
-            <strong>"{{ selectedCategory?.name }}"</strong>. This action cannot
-            be undone.
+            أنت على وشك حذف القسم
+            <strong>"{{ selectedCategory?.name }}"</strong>. لا يمكن التراجع عن هذا الإجراء.
           </p>
           <div *ngIf="selectedCategory" class="mt-3">
             <img
@@ -405,10 +404,10 @@
       </div>
       <div class="modal-footer border-0">
         <button type="button" class="btn btn-secondary" (click)="closeModals()">
-          Cancel
+          إلغاء
         </button>
         <button type="button" class="btn btn-danger" (click)="deleteCategory()">
-          <i class="fas fa-trash me-2"></i>Delete Category
+          <i class="fas fa-trash me-2"></i>حذف القسم
         </button>
       </div>
     </div>

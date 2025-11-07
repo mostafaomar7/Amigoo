@@ -14,7 +14,7 @@ export interface OrderStats {
   standalone: true,
   imports: [CommonModule],
   templateUrl: './order-statistics.component.html',
-  // styleUrls: ['./order-statistics.component.css']
+  styleUrls: ['./order-statistics.component.css']
 })
 export class OrderStatisticsComponent implements OnChanges {
   @Input() orderStats: OrderStats | null = null;

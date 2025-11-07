@@ -67,9 +67,9 @@ export class SettingsComponent implements OnInit {
         console.error('Error loading settings:', error);
         this.isLoading = false;
         if (error.status === 404) {
-          this.notificationService.info('Info', 'Settings not found. You can create new settings by saving.');
+          this.notificationService.info('معلومات', 'لم يتم العثور على الإعدادات. يمكنك إنشاء إعدادات جديدة عن طريق الحفظ.');
         } else {
-          this.notificationService.error('Error', 'Failed to load settings');
+          this.notificationService.error('خطأ', 'فشل في تحميل الإعدادات');
         }
       }
     });
@@ -114,13 +114,13 @@ export class SettingsComponent implements OnInit {
 
       this.apiService.putCustom<Settings>('/settings', settingsData).subscribe({
         next: (response: any) => {
-          this.notificationService.success('Success', 'Settings updated successfully');
+          this.notificationService.success('نجاح', 'تم تحديث الإعدادات بنجاح');
           this.loadSettings();
           this.isSaving = false;
         },
         error: (error) => {
           console.error('Error updating settings:', error);
-          this.notificationService.error('Error', error.error?.message || 'Failed to update settings');
+          this.notificationService.error('خطأ', error.error?.message || 'فشل في تحديث الإعدادات');
           this.isSaving = false;
         }
       });
@@ -129,22 +129,22 @@ export class SettingsComponent implements OnInit {
       Object.keys(this.settingsForm.controls).forEach(key => {
         this.settingsForm.get(key)?.markAsTouched();
       });
-      this.notificationService.error('Validation Error', 'Please fill in all required fields correctly');
+      this.notificationService.error('خطأ في التحقق', 'يرجى ملء جميع الحقول المطلوبة بشكل صحيح');
     }
   }
 
   resetSettings(): void {
-    if (confirm('Are you sure you want to reset settings to defaults? This action cannot be undone.')) {
+    if (confirm('هل أنت متأكد من إعادة تعيين الإعدادات إلى الافتراضي؟ لا يمكن التراجع عن هذا الإجراء.')) {
       this.isResetting = true;
       this.apiService.postCustom<Settings>('/settings/reset', {}).subscribe({
         next: (response: any) => {
-          this.notificationService.success('Success', 'Settings reset to defaults successfully');
+          this.notificationService.success('نجاح', 'تم إعادة تعيين الإعدادات إلى الافتراضي بنجاح');
           this.loadSettings();
           this.isResetting = false;
         },
         error: (error) => {
           console.error('Error resetting settings:', error);
-          this.notificationService.error('Error', error.error?.message || 'Failed to reset settings');
+          this.notificationService.error('خطأ', error.error?.message || 'فشل في إعادة تعيين الإعدادات');
           this.isResetting = false;
         }
       });
@@ -155,27 +155,27 @@ export class SettingsComponent implements OnInit {
     const control = this.settingsForm.get(fieldName);
     if (control && control.invalid && (control.dirty || control.touched)) {
       if (control.errors?.['required']) {
-        return `${this.getFieldLabel(fieldName)} is required`;
+        return `${this.getFieldLabel(fieldName)} مطلوب`;
       }
       if (control.errors?.['email']) {
-        return 'Please enter a valid email address';
+        return 'يرجى إدخال عنوان بريد إلكتروني صحيح';
       }
       if (control.errors?.['pattern']) {
         if (fieldName === 'contact_phone' || fieldName === 'whatsapp') {
-          return 'Must be exactly 11 digits';
+          return 'يجب أن يكون 11 رقم بالضبط';
         }
       }
       if (control.errors?.['min']) {
-        return `${this.getFieldLabel(fieldName)} must be 0 or greater`;
+        return `${this.getFieldLabel(fieldName)} يجب أن يكون 0 أو أكبر`;
       }
       if (control.errors?.['maxlength']) {
-        return `${this.getFieldLabel(fieldName)} cannot exceed ${control.errors['maxlength'].requiredLength} characters`;
+        return `${this.getFieldLabel(fieldName)} لا يمكن أن يتجاوز ${control.errors['maxlength'].requiredLength} حرف`;
       }
       if (control.errors?.['invalidUrl']) {
-        return 'Please enter a valid URL (must start with http:// or https://)';
+        return 'يرجى إدخال رابط صحيح (يجب أن يبدأ بـ http:// أو https://)';
       }
       if (control.errors?.['invalidWhatsApp']) {
-        return 'WhatsApp must be exactly 11 digits';
+        return 'يجب أن يكون رقم WhatsApp 11 رقم بالضبط';
       }
     }
     return '';
@@ -188,10 +188,10 @@ export class SettingsComponent implements OnInit {
 
   private getFieldLabel(fieldName: string): string {
     const labels: { [key: string]: string } = {
-      contact_email: 'Contact Email',
-      contact_phone: 'Contact Phone',
-      shipping_cost: 'Shipping Cost',
-      address: 'Address',
+      contact_email: 'البريد الإلكتروني للاتصال',
+      contact_phone: 'هاتف الاتصال',
+      shipping_cost: 'تكلفة الشحن',
+      address: 'العنوان',
       facebook: 'Facebook',
       instagram: 'Instagram',
       whatsapp: 'WhatsApp',

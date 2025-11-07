@@ -1,9 +1,9 @@
 <!-- Order Statistics Section -->
 <div class="order-statistics-section">
   <!-- Section Header -->
-  <div class="mb-4">
-    <h2 class="h3 mb-2 text-white">Order Statistics</h2>
-    <p class="text-white-50 mb-0">Overview of all order metrics</p>
+  <div>
+    <h2>إحصائيات الطلبات</h2>
+    <p>نظرة عامة على جميع مقاييس الطلبات</p>
   </div>
 
   <!-- Statistics Cards -->
@@ -19,165 +19,119 @@
     </div>
 
     <!-- Data State -->
-    <div *ngIf="stats !== null && stats !== 'loading'" class="row g-3 g-md-4">
-    <!-- Total Orders Card -->
-    <div class="col-12 col-sm-6 col-lg-3">
-      <div class="stat-card stat-card-primary h-100">
+    <div *ngIf="stats !== null && stats !== 'loading'" class="stats-grid">
+      <!-- Total Orders Card -->
+      <div class="stat-card stat-card-primary">
         <div class="stat-card-body">
           <div class="stat-icon-wrapper">
-            <i class="fas fa-shopping-bag fa-2x"></i>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+            </svg>
           </div>
           <div class="stat-content">
-            <p class="stat-label">Total Orders</p>
+            <p class="stat-label">إجمالي الطلبات</p>
             <h3 class="stat-value">{{ stats.totalOrders | number }}</h3>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- Pending Orders Card -->
-    <div class="col-12 col-sm-6 col-lg-3">
-      <div class="stat-card stat-card-warning h-100">
+      <!-- Pending Orders Card -->
+      <div class="stat-card stat-card-warning">
         <div class="stat-card-body">
           <div class="stat-icon-wrapper">
-            <i class="fas fa-clock fa-2x"></i>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/>
+              <polyline points="12 6 12 12 16 14"/>
+            </svg>
           </div>
           <div class="stat-content">
-            <p class="stat-label">Pending Orders</p>
+            <p class="stat-label">الطلبات المعلقة</p>
             <h3 class="stat-value">
               {{ stats.pendingOrders | number }}
-              <span class="badge bg-warning text-dark ms-2">Pending</span>
+              <span class="stat-badge stat-badge-warning">معلق</span>
             </h3>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- Completed Orders Card -->
-    <div class="col-12 col-sm-6 col-lg-3">
-      <div class="stat-card stat-card-success h-100">
+      <!-- Completed Orders Card -->
+      <div class="stat-card stat-card-success">
         <div class="stat-card-body">
           <div class="stat-icon-wrapper">
-            <i class="fas fa-check-circle fa-2x"></i>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+              <polyline points="22 4 12 14.01 9 11.01"/>
+            </svg>
           </div>
           <div class="stat-content">
-            <p class="stat-label">Completed Orders</p>
+            <p class="stat-label">الطلبات المكتملة</p>
             <h3 class="stat-value">
               {{ stats.completedOrders | number }}
-              <span class="badge bg-success ms-2">Completed</span>
+              <span class="stat-badge stat-badge-success">مكتمل</span>
             </h3>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- Cancelled Orders Card -->
-    <div class="col-12 col-sm-6 col-lg-3">
-      <div class="stat-card stat-card-danger h-100">
+      <!-- Cancelled Orders Card -->
+      <div class="stat-card stat-card-danger">
         <div class="stat-card-body">
           <div class="stat-icon-wrapper">
-            <i class="fas fa-times-circle fa-2x"></i>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="15" y1="9" x2="9" y2="15"/>
+              <line x1="9" y1="9" x2="15" y2="15"/>
+            </svg>
           </div>
           <div class="stat-content">
-            <p class="stat-label">Cancelled Orders</p>
+            <p class="stat-label">الطلبات الملغاة</p>
             <h3 class="stat-value">
               {{ stats.cancelledOrders | number }}
-              <span class="badge bg-danger ms-2">Cancelled</span>
+              <span class="stat-badge stat-badge-danger">ملغي</span>
             </h3>
           </div>
         </div>
       </div>
-    </div>
 
-    <!-- Total Revenue Card (Full width on mobile, 2 columns on desktop) -->
-    <div class="col-12 col-lg-6">
-      <div class="stat-card stat-card-revenue h-100">
+      <!-- Total Revenue Card -->
+      <div class="stat-card stat-card-revenue">
         <div class="stat-card-body">
           <div class="stat-icon-wrapper">
-            <i class="fas fa-dollar-sign fa-2x"></i>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <line x1="12" y1="1" x2="12" y2="23"/>
+              <path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+            </svg>
           </div>
           <div class="stat-content">
-            <p class="stat-label">Total Revenue</p>
+            <p class="stat-label">إجمالي الإيرادات</p>
             <h3 class="stat-value">{{ formatCurrency(stats.totalRevenue) }}</h3>
           </div>
         </div>
       </div>
     </div>
-    </div>
   </ng-container>
 
   <!-- Error Template -->
   <ng-template #errorTemplate>
-    <div class="alert alert-danger" role="alert">
-      <i class="fas fa-exclamation-triangle me-2"></i>
-      Unable to load order statistics. Please refresh the page or try again later.
+    <div class="error-state">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+        <path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"/>
+        <line x1="12" y1="9" x2="12" y2="13"/>
+        <line x1="12" y1="17" x2="12.01" y2="17"/>
+      </svg>
+      <p>تعذر تحميل إحصائيات الطلبات. يرجى تحديث الصفحة أو المحاولة مرة أخرى لاحقاً.</p>
     </div>
   </ng-template>
 
   <!-- Loading Skeleton Template -->
   <ng-template #loadingTemplate>
-    <div class="row g-3 g-md-4">
-      <!-- Skeleton for Total Orders -->
-      <div class="col-12 col-sm-6 col-lg-3">
-        <div class="stat-card stat-card-skeleton h-100">
-          <div class="stat-card-body">
-            <div class="skeleton-icon"></div>
-            <div class="skeleton-content">
-              <div class="skeleton-line skeleton-label"></div>
-              <div class="skeleton-line skeleton-value"></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Skeleton for Pending Orders -->
-      <div class="col-12 col-sm-6 col-lg-3">
-        <div class="stat-card stat-card-skeleton h-100">
-          <div class="stat-card-body">
-            <div class="skeleton-icon"></div>
-            <div class="skeleton-content">
-              <div class="skeleton-line skeleton-label"></div>
-              <div class="skeleton-line skeleton-value"></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Skeleton for Completed Orders -->
-      <div class="col-12 col-sm-6 col-lg-3">
-        <div class="stat-card stat-card-skeleton h-100">
-          <div class="stat-card-body">
-            <div class="skeleton-icon"></div>
-            <div class="skeleton-content">
-              <div class="skeleton-line skeleton-label"></div>
-              <div class="skeleton-line skeleton-value"></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Skeleton for Cancelled Orders -->
-      <div class="col-12 col-sm-6 col-lg-3">
-        <div class="stat-card stat-card-skeleton h-100">
-          <div class="stat-card-body">
-            <div class="skeleton-icon"></div>
-            <div class="skeleton-content">
-              <div class="skeleton-line skeleton-label"></div>
-              <div class="skeleton-line skeleton-value"></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Skeleton for Total Revenue -->
-      <div class="col-12 col-lg-6">
-        <div class="stat-card stat-card-skeleton h-100">
-          <div class="stat-card-body">
-            <div class="skeleton-icon"></div>
-            <div class="skeleton-content">
-              <div class="skeleton-line skeleton-label"></div>
-              <div class="skeleton-line skeleton-value"></div>
-            </div>
+    <div class="stats-grid">
+      <div *ngFor="let i of [1,2,3,4,5]" class="stat-card stat-card-skeleton">
+        <div class="stat-card-body">
+          <div class="skeleton-icon"></div>
+          <div class="skeleton-content">
+            <div class="skeleton-line skeleton-label"></div>
+            <div class="skeleton-line skeleton-value"></div>
           </div>
         </div>
       </div>

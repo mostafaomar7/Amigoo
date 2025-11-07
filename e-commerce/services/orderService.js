@@ -538,11 +538,21 @@ exports.deleteOrder = asyncHandler(async (req, res) => {
 
 // Get order statistics (admin only)
 exports.getOrderStats = asyncHandler(async (req, res) => {
-  const totalOrders = await Order.countDocuments();
+  // Count orders by status
   const pendingOrders = await Order.countDocuments({ status: 'pending' });
-  const processingOrders = await Order.countDocuments({ status: 'processing' });
-  const deliveredOrders = await Order.countDocuments({ status: 'delivered' });
+
+  // Count completed orders - include all non-pending, non-cancelled statuses
+  // This covers: 'completed', 'delivered', 'confirmed', 'shipped', etc.
+  const completedOrders = await Order.countDocuments({
+    status: {
+      $nin: ['pending', 'cancelled']
+    }
+  });
+
   const cancelledOrders = await Order.countDocuments({ status: 'cancelled' });
+
+  // Calculate total as sum of all status counts to ensure accuracy
+  const totalOrders = pendingOrders + completedOrders + cancelledOrders;
 
   const totalRevenue = await Order.aggregate([
     { $match: { status: { $ne: 'cancelled' } } },
@@ -555,10 +565,47 @@ exports.getOrderStats = asyncHandler(async (req, res) => {
     data: {
       totalOrders,
       pendingOrders,
-      processingOrders,
-      deliveredOrders,
+      completedOrders,
       cancelledOrders,
       totalRevenue: (totalRevenue[0] && totalRevenue[0].total) || 0,
+    },
+  });
+});
+
+// Get all order statuses breakdown (for debugging)
+exports.getOrderStatusesBreakdown = asyncHandler(async (req, res) => {
+  // Get breakdown of all statuses in database
+  const statusBreakdown = await Order.aggregate([
+    {
+      $group: {
+        _id: '$status',
+        count: { $sum: 1 }
+      }
+    },
+    {
+      $sort: { count: -1 }
+    }
+  ]);
+
+  // Get total count
+  const totalCount = await Order.countDocuments();
+
+  // Format the response
+  const statuses = statusBreakdown.map(item => ({
+    status: item._id || 'null/undefined',
+    count: item.count
+  }));
+
+  res.status(200).json({
+    success: true,
+    message: 'Order statuses breakdown retrieved successfully',
+    data: {
+      totalOrders: totalCount,
+      statuses: statuses,
+      summary: statusBreakdown.reduce((acc, item) => {
+        acc[item._id || 'null'] = item.count;
+        return acc;
+      }, {})
     },
   });
 });

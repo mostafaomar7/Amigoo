@@ -18,7 +18,6 @@ export class CartService {
   constructor() {}
   addProductToCart(product: any) {
     this.cart.push(product);
-    console.log('السلة تحتوي الآن على:', this.cart);
   }
   getCartItemss() {
     return this.cart;

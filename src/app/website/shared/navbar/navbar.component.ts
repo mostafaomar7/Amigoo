@@ -282,7 +282,6 @@ export class NavbarComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   navigateToCategory(categoryId: string): void {
-    console.log('Navbar: Navigating to shop with category:', categoryId);
     this.router.navigate(['/shop'], { queryParams: { category: categoryId } });
     this.cdr.markForCheck();
   }
@@ -304,7 +303,6 @@ export class NavbarComponent implements OnInit, OnDestroy, AfterViewInit {
     // Use setTimeout to ensure DOM is ready
     setTimeout(() => {
       if (!this.categoriesContainer || !this.categoriesContainer.nativeElement) {
-        console.log('Categories container not found');
         return;
       }
 

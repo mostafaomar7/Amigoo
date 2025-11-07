@@ -104,7 +104,7 @@ export class CategoriesComponent implements OnInit, OnDestroy {
         this.isLoading = false;
         this.totalPages = 0;
         this.totalItems = 0;
-        this.notificationService.error('Error', 'Failed to load categories');
+        this.notificationService.error('خطأ', 'فشل في تحميل الأقسام');
       }
     });
   }
@@ -175,13 +175,13 @@ export class CategoriesComponent implements OnInit, OnDestroy {
 
       this.apiService.postFormData<Category>('/categories', formData).subscribe({
         next: (response) => {
-          this.notificationService.success('Success', 'Category added successfully');
+          this.notificationService.success('نجاح', 'تمت إضافة القسم بنجاح');
           this.closeModals();
           this.loadCategories();
         },
         error: (error) => {
           console.error('Error adding category:', error);
-          this.notificationService.error('Error', error.error?.message || 'Failed to add category');
+          this.notificationService.error('خطأ', error.error?.message || 'فشل في إضافة القسم');
         }
       });
     }
@@ -197,13 +197,13 @@ export class CategoriesComponent implements OnInit, OnDestroy {
 
       this.apiService.putFormData<Category>('/categories', this.selectedCategory._id, formData).subscribe({
         next: (response) => {
-          this.notificationService.success('Success', 'Category updated successfully');
+          this.notificationService.success('نجاح', 'تم تحديث القسم بنجاح');
           this.closeModals();
           this.loadCategories();
         },
         error: (error) => {
           console.error('Error updating category:', error);
-          this.notificationService.error('Error', error.error?.message || 'Failed to update category');
+          this.notificationService.error('خطأ', error.error?.message || 'فشل في تحديث القسم');
         }
       });
     }
@@ -213,13 +213,13 @@ export class CategoriesComponent implements OnInit, OnDestroy {
     if (this.selectedCategory) {
       this.apiService.delete('/categories', this.selectedCategory._id).subscribe({
         next: (response) => {
-          this.notificationService.success('Success', 'Category deleted successfully');
+          this.notificationService.success('نجاح', 'تم حذف القسم بنجاح');
           this.closeModals();
           this.loadCategories();
         },
         error: (error) => {
           console.error('Error deleting category:', error);
-          this.notificationService.error('Error', error.error?.message || 'Failed to delete category');
+          this.notificationService.error('خطأ', error.error?.message || 'فشل في حذف القسم');
         }
       });
     }
@@ -282,11 +282,11 @@ export class CategoriesComponent implements OnInit, OnDestroy {
     const control = formGroup.get(fieldName);
     if (control && control.invalid && (control.dirty || control.touched)) {
       if (control.errors?.['required']) {
-        return `${this.getFieldLabel(fieldName)} is required`;
+        return `${this.getFieldLabel(fieldName)} مطلوب`;
       }
       if (control.errors?.['minlength']) {
         const minLength = control.errors['minlength'].requiredLength;
-        return `${this.getFieldLabel(fieldName)} must be at least ${minLength} characters`;
+        return `${this.getFieldLabel(fieldName)} يجب أن يكون على الأقل ${minLength} أحرف`;
       }
     }
     return '';
@@ -305,7 +305,7 @@ export class CategoriesComponent implements OnInit, OnDestroy {
    */
   private getFieldLabel(fieldName: string): string {
     const labels: { [key: string]: string } = {
-      name: 'Category Name'
+      name: 'اسم القسم'
     };
     return labels[fieldName] || fieldName;
   }

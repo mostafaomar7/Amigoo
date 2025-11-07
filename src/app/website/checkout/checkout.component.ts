@@ -166,7 +166,6 @@ export class CheckoutComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: (response) => {
-          console.log('Shipping info response:', response);
           // Handle different response structures
           if (response.success && response.data) {
             this.baseShippingCost = response.data.shipping_cost || 0;

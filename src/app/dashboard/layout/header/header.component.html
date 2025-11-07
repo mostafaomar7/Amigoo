@@ -12,9 +12,9 @@
       </button>
 
       <div class="d-flex align-items-center">
-        <h5 class="mb-0 d-none d-md-block me-3">Dashboard</h5>
+        <h5 class="mb-0 d-none d-md-block me-3">لوحة التحكم</h5>
         <span class="text-muted small d-none d-md-block">
-          Welcome back, {{ currentUser?.name || 'Admin' }}
+          أهلاً بعودتك، {{ currentUser?.name || 'المدير' }}
         </span>
       </div>
     </div>
@@ -62,12 +62,12 @@
           </li>
           <li>
             <a class="dropdown-item" routerLink="/admin/settings" (click)="showProfileMenu = false">
-              <i class="fas fa-cog me-2"></i> Settings
+              <i class="fas fa-cog me-2"></i> الإعدادات
             </a>
           </li>
           <li>
             <a class="dropdown-item" routerLink="/admin/profile" (click)="showProfileMenu = false">
-              <i class="fas fa-user me-2"></i> Profile
+              <i class="fas fa-user me-2"></i> الملف الشخصي
             </a>
           </li>
           <li><hr class="dropdown-divider"></li>
@@ -76,7 +76,7 @@
               class="dropdown-item text-danger"
               type="button"
               (click)="onLogout()">
-              <i class="fas fa-sign-out-alt me-2"></i> Logout
+              <i class="fas fa-sign-out-alt me-2"></i> تسجيل الخروج
             </button>
           </li>
         </ul>

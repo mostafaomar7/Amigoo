@@ -1,5 +1,6 @@
-import { Component, Input, Output, EventEmitter } from '@angular/core';
+import { Component, Input } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-dashboard-overview',
@@ -16,26 +17,23 @@ export class DashboardOverviewComponent {
     totalRevenue: 0,
     unreadMessages: 0
   };
-  @Input() recentActivity: any[] = [];
   @Input() isLoading = false;
-  @Output() addProduct = new EventEmitter<void>();
-  @Output() viewOrders = new EventEmitter<void>();
-  @Output() manageCategories = new EventEmitter<void>();
-  @Output() viewMessages = new EventEmitter<void>();
+
+  constructor(private router: Router) {}
 
   onAddProduct(): void {
-    this.addProduct.emit();
+    this.router.navigate(['/admin/products']);
   }
 
   onViewOrders(): void {
-    this.viewOrders.emit();
+    this.router.navigate(['/admin/orders']);
   }
 
   onManageCategories(): void {
-    this.manageCategories.emit();
+    this.router.navigate(['/admin/categories']);
   }
 
   onViewMessages(): void {
-    this.viewMessages.emit();
+    this.router.navigate(['/admin/contact-forms']);
   }
 }

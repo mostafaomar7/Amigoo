@@ -59,7 +59,7 @@ export class ApiService {
 
   constructor(private http: HttpClient) {}
 
-  getPaginated<T>(endpoint: string, params?: PaginationParams): Observable<PaginatedResponse<T>> {
+  getPaginated<T>(endpoint: string, params?: PaginationParams, skipGlobalLoading?: boolean): Observable<PaginatedResponse<T>> {
     let httpParams = new HttpParams();
     if (params) {
       if (params.page) httpParams = httpParams.set('page', params.page.toString());
@@ -70,14 +70,18 @@ export class ApiService {
       if (params.status) httpParams = httpParams.set('status', params.status);
       if (params.category_id) {
         httpParams = httpParams.set('category_id', params.category_id);
-        console.log('API Service: Adding category_id to request:', params.category_id);
       }
     }
     const fullUrl = `${this.apiUrl}${endpoint}?${httpParams.toString()}`;
-    console.log('API Service: Full request URL:', fullUrl);
-    console.log('API Service: Final HTTP params:', httpParams.toString());
+
+    // Add header to skip global loading if requested
+    let headers = this.getHeaders();
+    if (skipGlobalLoading) {
+      headers = headers.set('X-Skip-Global-Loading', 'true');
+    }
+
     return this.http.get<PaginatedResponse<T>>(`${this.apiUrl}${endpoint}`, {
-      headers: this.getHeaders(),
+      headers: headers,
       params: httpParams
     });
   }

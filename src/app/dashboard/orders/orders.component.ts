@@ -136,7 +136,7 @@ export class OrdersComponent implements OnInit, OnDestroy {
         this.isLoading = false;
         this.totalPages = 0;
         this.totalItems = 0;
-        this.notificationService.error('Error', 'Failed to load orders');
+        this.notificationService.error('خطأ', 'فشل في تحميل الطلبات');
       }
     });
   }
@@ -183,7 +183,7 @@ export class OrdersComponent implements OnInit, OnDestroy {
         this.selectedOrder = order;
         this.showDetailsModal = true;
         document.body.classList.add('modal-open');
-        this.notificationService.error('Warning', 'Could not load full order details. Some data may be incomplete.');
+        this.notificationService.error('تحذير', 'تعذر تحميل تفاصيل الطلب الكاملة. قد تكون بعض البيانات غير مكتملة.');
       }
     });
   }
@@ -205,13 +205,13 @@ export class OrdersComponent implements OnInit, OnDestroy {
 
       this.apiService.putCustom<any>(`/Order/${this.selectedOrder._id}/status`, statusData).subscribe({
         next: (response: any) => {
-          this.notificationService.success('Success', 'Order status updated successfully');
+          this.notificationService.success('نجاح', 'تم تحديث حالة الطلب بنجاح');
           this.closeModals();
           this.loadOrders();
         },
         error: (error) => {
           console.error('Error updating order status:', error);
-          this.notificationService.error('Error', error.error?.message || 'Failed to update order status');
+          this.notificationService.error('خطأ', error.error?.message || 'فشل في تحديث حالة الطلب');
         }
       });
     }

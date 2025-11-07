@@ -27,21 +27,9 @@
       </app-dashboard-header>
 
       <!-- Dashboard Content -->
-      <div class="content-area thin-scrollbar" style="position: relative;">
-        <!-- Overview Component -->
-        <app-dashboard-overview
-          *ngIf="showDashboard"
-          [stats]="stats"
-          [recentActivity]="recentActivity"
-          [isLoading]="isLoading"
-          (addProduct)="addProduct()"
-          (viewOrders)="viewOrders()"
-          (manageCategories)="manageCategories()"
-          (viewMessages)="viewMessages()">
-        </app-dashboard-overview>
-
+      <div class="content-area thin-scrollbar">
         <!-- Order Statistics Component -->
-        <div *ngIf="showDashboard && orderStats" class="container-fluid py-4">
+        <div *ngIf="showDashboard && orderStats">
           <app-order-statistics [orderStats]="orderStats" [isLoading]="isLoading"></app-order-statistics>
         </div>
 

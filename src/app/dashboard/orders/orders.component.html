@@ -2,8 +2,8 @@
 <div class="container-fluid py-4">
   <!-- Header -->
   <div class="mb-4">
-    <h1 class="h2 mb-1 text-white">Orders Management</h1>
-    <p class="text-white mb-0">Manage your customer orders</p>
+    <h1 class="h2 mb-1 text-white">إدارة الطلبات</h1>
+    <p class="text-white mb-0">إدارة طلبات العملاء</p>
   </div>
 
   <!-- Search and Filter -->
@@ -20,7 +20,7 @@
         class="form-control"
         [(ngModel)]="searchTerm"
         (input)="onSearchInput()"
-        placeholder="Search orders by number, customer, email..."
+        placeholder="البحث في الطلبات برقم الطلب، العميل، البريد الإلكتروني..."
         [ngModelOptions]="{standalone: true}"
       />
     </div>
@@ -34,10 +34,10 @@
         (change)="onStatusFilter()"
         [ngModelOptions]="{standalone: true}"
       >
-        <option value="">All Status</option>
-        <option value="pending">Pending</option>
-        <option value="completed">Completed</option>
-        <option value="cancelled">Cancelled</option>
+        <option value="">جميع الحالات</option>
+        <option value="pending">معلق</option>
+        <option value="completed">مكتمل</option>
+        <option value="cancelled">ملغي</option>
       </select>
     </div>
   </div>
@@ -57,12 +57,12 @@
         <table class="table table-hover align-middle orders-table">
           <thead class="table-light">
             <tr>
-              <th scope="col">Order Number</th>
-              <th scope="col">Customer</th>
-              <th scope="col">Total</th>
-              <th scope="col">Status</th>
-              <th scope="col">Date</th>
-              <th scope="col" class="text-end">Actions</th>
+              <th scope="col">رقم الطلب</th>
+              <th scope="col">العميل</th>
+              <th scope="col">الإجمالي</th>
+              <th scope="col">الحالة</th>
+              <th scope="col">التاريخ</th>
+              <th scope="col" class="text-end">الإجراءات</th>
             </tr>
           </thead>
           <tbody>
@@ -88,9 +88,9 @@
                     [value]="order.status"
                     (change)="updateOrderStatusDirectly(order, $any($event.target).value)"
                   >
-                    <option value="pending">Pending</option>
-                    <option value="completed">Completed</option>
-                    <option value="cancelled">Cancelled</option>
+                    <option value="pending">معلق</option>
+                    <option value="completed">مكتمل</option>
+                    <option value="cancelled">ملغي</option>
                   </select>
                   <i class="fas fa-chevron-down status-dropdown-icon"></i>
                 </div>
@@ -112,7 +112,7 @@
                     type="button"
                     class="btn btn-sm btn-action btn-info"
                     (click)="showOrderDetailsModal(order)"
-                    title="View Details"
+                    title="عرض التفاصيل"
                   >
                     <i class="fas fa-eye"></i>
                   </button>
@@ -130,12 +130,12 @@
         class="text-center py-5"
       >
         <i class="fas fa-shopping-cart fa-3x text-muted mb-3"></i>
-        <h5 class="text-muted">No orders found</h5>
+        <h5 class="text-muted">لم يتم العثور على طلبات</h5>
         <p class="text-muted" *ngIf="statusFilter">
-          No orders with status "{{ getStatusLabel(statusFilter) }}" found.
+          لم يتم العثور على طلبات بحالة "{{ getStatusLabel(statusFilter) }}".
         </p>
         <p class="text-muted" *ngIf="!statusFilter">
-          No orders have been placed yet.
+          لم يتم تقديم أي طلبات بعد.
         </p>
       </div>
     </div>
@@ -186,11 +186,11 @@
     </nav>
     <div class="text-center text-muted">
       <small>
-        Showing <strong>{{ (currentPage - 1) * itemsPerPage + 1 }}</strong> to
-        <strong>{{ Math.min(currentPage * itemsPerPage, totalItems) }}</strong> of
+        عرض <strong>{{ (currentPage - 1) * itemsPerPage + 1 }}</strong> إلى
+        <strong>{{ Math.min(currentPage * itemsPerPage, totalItems) }}</strong> من
         <strong>{{ totalItems }}</strong>
-        {{ totalItems === 1 ? 'order' : 'orders' }}
-        <span *ngIf="totalPages > 1"> | Page <strong>{{ currentPage }}</strong> of <strong>{{ totalPages }}</strong></span>
+        {{ totalItems === 1 ? 'طلب' : 'طلبات' }}
+        <span *ngIf="totalPages > 1"> | صفحة <strong>{{ currentPage }}</strong> من <strong>{{ totalPages }}</strong></span>
       </small>
     </div>
   </div>
@@ -210,7 +210,7 @@
     <div class="modal-content">
       <div class="modal-header">
         <h5 class="modal-title" id="orderDetailsModalLabel">
-          <i class="fas fa-info-circle me-2"></i>Order Details #{{ selectedOrder?.orderNumber }}
+          <i class="fas fa-info-circle me-2"></i>تفاصيل الطلب #{{ selectedOrder?.orderNumber }}
         </h5>
         <button
           type="button"
@@ -223,77 +223,77 @@
         <!-- Order Info -->
         <div class="row mb-4">
           <div class="col-md-6">
-            <h6 class="text-muted mb-3 border-bottom pb-2 fw-semibold">Order Information</h6>
+            <h6 class="text-muted mb-3 border-bottom pb-2 fw-semibold">معلومات الطلب</h6>
             <div class="mb-2">
-              <strong>Order Number:</strong> #{{ selectedOrder.orderNumber }}
+              <strong>رقم الطلب:</strong> #{{ selectedOrder.orderNumber }}
             </div>
             <div class="mb-2">
-              <strong>Status:</strong>
+              <strong>الحالة:</strong>
               <span class="badge ms-2" [ngClass]="getStatusClass(selectedOrder.status)">
                 {{ getStatusLabel(selectedOrder.status) }}
               </span>
             </div>
             <div class="mb-2">
-              <strong>Date:</strong>
+              <strong>التاريخ:</strong>
               {{ selectedOrder.createdAt | date : "dd-MM-yyyy h:mm a" }}
             </div>
             <div class="mb-2" *ngIf="selectedOrder.orderNotes">
-              <strong>Order Notes:</strong>
+              <strong>ملاحظات الطلب:</strong>
               <div class="mt-1 p-2 bg-light rounded">
                 <em>{{ selectedOrder.orderNotes }}</em>
               </div>
             </div>
           </div>
           <div class="col-md-6">
-            <h6 class="text-muted mb-3 border-bottom pb-2 fw-semibold">Customer Information</h6>
+            <h6 class="text-muted mb-3 border-bottom pb-2 fw-semibold">معلومات العميل</h6>
             <div class="mb-2" *ngIf="selectedOrder.userId">
-              <strong>User Account:</strong>
+              <strong>حساب المستخدم:</strong>
               <div class="ms-2">
                 <small class="d-block">{{ selectedOrder.userId.name }}</small>
                 <small class="text-muted">{{ selectedOrder.userId.email }}</small>
               </div>
             </div>
             <div class="mb-2">
-              <strong>Name:</strong> {{ selectedOrder.fullName }}
+              <strong>الاسم:</strong> {{ selectedOrder.fullName }}
             </div>
             <div class="mb-2">
-              <strong>Email:</strong> {{ selectedOrder.email }}
+              <strong>البريد الإلكتروني:</strong> {{ selectedOrder.email }}
             </div>
             <div class="mb-2">
-              <strong>Phone:</strong> {{ selectedOrder.phone }}
+              <strong>الهاتف:</strong> {{ selectedOrder.phone }}
             </div>
           </div>
         </div>
 
         <!-- Shipping Address -->
         <div class="mb-4">
-          <h6 class="text-muted mb-3 border-bottom pb-2 fw-semibold">Shipping Address</h6>
+          <h6 class="text-muted mb-3 border-bottom pb-2 fw-semibold">عنوان الشحن</h6>
           <div class="mb-2">
-            <strong>Street:</strong> {{ selectedOrder.streetAddress }}
+            <strong>الشارع:</strong> {{ selectedOrder.streetAddress }}
           </div>
           <div class="mb-2">
-            <strong>State:</strong> {{ selectedOrder.state }}
+            <strong>المحافظة:</strong> {{ selectedOrder.state }}
           </div>
           <div class="mb-2">
-            <strong>Country:</strong> {{ selectedOrder.country }}
+            <strong>الدولة:</strong> {{ selectedOrder.country }}
           </div>
 
         </div>
 
         <!-- Order Items -->
         <div class="mb-4">
-          <h6 class="text-muted mb-3 border-bottom pb-2 fw-semibold">Order Items</h6>
+          <h6 class="text-muted mb-3 border-bottom pb-2 fw-semibold">عناصر الطلب</h6>
           <div class="table-responsive">
             <table class="table table-bordered table-hover">
               <thead class="table-light">
                 <tr>
-                  <th style="width: 50px;">Image</th>
-                  <th>Product</th>
-                  <th>Category</th>
-                  <th>Size</th>
-                  <th>Quantity</th>
-                  <th>Price</th>
-                  <th>Total</th>
+                  <th style="width: 50px;">الصورة</th>
+                  <th>المنتج</th>
+                  <th>القسم</th>
+                  <th>المقاس</th>
+                  <th>الكمية</th>
+                  <th>السعر</th>
+                  <th>الإجمالي</th>
                 </tr>
               </thead>
               <tbody>
@@ -312,10 +312,10 @@
                     </div>
                   </td>
                   <td class="align-middle">
-                    <strong>{{ item.productId?.title || 'Unknown Product' }}</strong>
+                    <strong>{{ item.productId?.title || 'منتج غير معروف' }}</strong>
                   </td>
                   <td class="align-middle">
-                    <small class="text-muted">{{ item.productId?.category?.name || 'N/A' }}</small>
+                    <small class="text-muted">{{ item.productId?.category?.name || 'غير متاح' }}</small>
                   </td>
                   <td class="align-middle">
                     <span class="badge bg-secondary">{{ item.sizeName.toUpperCase() }}</span>
@@ -326,7 +326,7 @@
                 </tr>
                 <tr *ngIf="!selectedOrder.items || selectedOrder.items.length === 0">
                   <td colspan="7" class="text-center text-muted">
-                    No items found in this order
+                    لم يتم العثور على عناصر في هذا الطلب
                   </td>
                 </tr>
               </tbody>
@@ -341,15 +341,15 @@
               <table class="table table-sm mb-0">
                 <tbody>
                   <tr>
-                    <td><strong>Subtotal:</strong></td>
+                    <td><strong>المجموع الفرعي:</strong></td>
                     <td class="text-end">{{ selectedOrder.totalAmount }} EGP</td>
                   </tr>
                   <tr>
-                    <td><strong>Shipping:</strong></td>
+                    <td><strong>الشحن:</strong></td>
                     <td class="text-end">{{ selectedOrder.shippingCost }} EGP</td>
                   </tr>
                   <tr class="table-light">
-                    <td><strong>Total:</strong></td>
+                    <td><strong>الإجمالي:</strong></td>
                     <td class="text-end"><strong>{{ selectedOrder.finalAmount }} EGP</strong></td>
                   </tr>
                 </tbody>
@@ -364,7 +364,7 @@
           class="btn btn-secondary"
           (click)="closeModals()"
         >
-          Close
+          إغلاق
         </button>
 
       </div>

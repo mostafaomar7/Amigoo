@@ -84,9 +84,9 @@ export class TopFilterBarComponent implements OnInit, OnDestroy {
   }
 
   getSelectedCategoryLabel(): string {
-    if (!this.selectedCategory) return 'جميع الفئات';
+    if (!this.selectedCategory) return 'جميع الأقسام';
     const category = this.categories.find(cat => cat._id === this.selectedCategory);
-    return category ? category.name : 'جميع الفئات';
+    return category ? category.name : 'جميع الأقسام';
   }
 
   toggleFilterPanel(): void {

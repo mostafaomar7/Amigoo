@@ -27,7 +27,8 @@ export class CategoryService {
 
   // 🔵 جلب جميع الفئات
   getCategories(): Observable<CategoryResponse> {
-    return this.http.get<CategoryResponse>(this.apiUrl);
+    // Pass a large limit to get all categories
+    return this.http.get<CategoryResponse>(`${this.apiUrl}?limit=1000`);
   }
   deleteCategory(id: string): Observable<void> {
     return this.http.delete<void>(`${environment.apiUrl}/categories/${id}`);

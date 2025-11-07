@@ -25,7 +25,7 @@
           [routerLinkActiveOptions]="{exact: true}"
           (click)="onNavLinkClick()">
           <i class="fas fa-tachometer-alt"></i>
-          <span class="nav-label">Dashboard</span>
+          <span class="nav-label">لوحة التحكم</span>
         </a>
       </li>
 
@@ -37,7 +37,7 @@
           routerLinkActive="active"
           (click)="onNavLinkClick()">
           <i class="fas fa-tags"></i>
-          <span class="nav-label">Categories</span>
+          <span class="nav-label">الأقسام</span>
         </a>
       </li>
 
@@ -49,7 +49,7 @@
           routerLinkActive="active"
           (click)="onNavLinkClick()">
           <i class="fas fa-box"></i>
-          <span class="nav-label">Products</span>
+          <span class="nav-label">المنتجات</span>
         </a>
       </li>
 
@@ -61,7 +61,7 @@
           routerLinkActive="active"
           (click)="onNavLinkClick()">
           <i class="fas fa-list-alt"></i>
-          <span class="nav-label">Sizes</span>
+          <span class="nav-label">المقاسات</span>
         </a>
       </li>
 
@@ -73,7 +73,7 @@
           routerLinkActive="active"
           (click)="onNavLinkClick()">
           <i class="fas fa-shopping-cart"></i>
-          <span class="nav-label">Orders</span>
+          <span class="nav-label">الطلبات</span>
           <span class="badge bg-danger ms-auto" *ngIf="pendingOrders > 0 && !sidebarCollapsed">
             {{ pendingOrders }}
           </span>
@@ -88,7 +88,7 @@
           routerLinkActive="active"
           (click)="onNavLinkClick()">
           <i class="fas fa-envelope"></i>
-          <span class="nav-label">Contact</span>
+          <span class="nav-label">التواصل</span>
         </a>
       </li>
 
@@ -100,7 +100,7 @@
           routerLinkActive="active"
           (click)="onNavLinkClick()">
           <i class="fas fa-cog"></i>
-          <span class="nav-label">Settings</span>
+          <span class="nav-label">الإعدادات</span>
         </a>
       </li>
     </ul>
@@ -112,7 +112,7 @@
       (click)="onLogout()"
       type="button">
       <i class="fas fa-sign-out-alt"></i>
-      <span class="nav-label" *ngIf="!sidebarCollapsed">Logout</span>
+      <span class="nav-label" *ngIf="!sidebarCollapsed">تسجيل الخروج</span>
     </button>
   </div>
 </aside>

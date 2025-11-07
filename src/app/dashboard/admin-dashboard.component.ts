@@ -9,7 +9,6 @@ import { Subscription, interval } from 'rxjs';
 import { DashboardNotificationToastComponent } from './components/notification-toast/notification-toast.component';
 import { DashboardSidebarComponent } from './layout/sidebar/sidebar.component';
 import { DashboardHeaderComponent } from './layout/header/header.component';
-import { DashboardOverviewComponent } from './layout/overview/overview.component';
 import { OrderStatisticsComponent } from './order-statistics/order-statistics.component';
 
 @Component({
@@ -22,7 +21,6 @@ import { OrderStatisticsComponent } from './order-statistics/order-statistics.co
     DashboardNotificationToastComponent,
     DashboardSidebarComponent,
     DashboardHeaderComponent,
-    DashboardOverviewComponent,
     OrderStatisticsComponent
   ],
   templateUrl: './admin-dashboard.component.html',
@@ -65,7 +63,6 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
     this.updateDashboardVisibility();
     this.startRealTimeUpdates();
 
-    // Listen to route changes to update dashboard visibility
     this.router.events.pipe(
       filter(event => event instanceof NavigationEnd)
     ).subscribe(() => {
@@ -74,18 +71,12 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
   }
 
   ngOnDestroy(): void {
-    // Clean up interval subscription
     if (this.dataRefreshInterval) {
       this.dataRefreshInterval.unsubscribe();
     }
   }
 
-  /**
-   * Start real-time updates for dashboard data
-   * Updates data every 30 seconds without page refresh
-   */
   private startRealTimeUpdates(): void {
-    // Only update when dashboard is visible
     this.dataRefreshInterval = interval(this.REFRESH_INTERVAL).subscribe(() => {
       if (this.showDashboard && !this.isLoading) {
         this.loadDashboardData();
@@ -95,14 +86,12 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
 
   private updateDashboardVisibility(): void {
     const url = this.router.url;
-    // Show dashboard overview only when on /admin exactly or /admin/, hide it when on child routes
     this.showDashboard = url === '/admin' || url === '/admin/';
   }
 
   loadDashboardData(): void {
     this.isLoading = true;
 
-    // Fetch all dashboard data from API - no static/hardcoded data
     let statsLoaded = false;
     let activityLoaded = false;
     let orderStatsLoaded = false;
@@ -113,13 +102,8 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
       }
     };
 
-    // Load stats from API (includes order statistics to avoid duplicate calls)
     this.dashboardService.getDashboardStats().subscribe({
       next: (stats) => {
-        // All data comes from API endpoints according to API documentation
-        // Stats endpoint: GET /Order/stats
-        // Products count: GET /product (results field)
-        // Messages count: GET /submit (filter by isReplied: false)
         this.stats = {
           totalProducts: stats.totalProducts || 0,
           totalOrders: stats.totalOrders || 0,
@@ -127,16 +111,14 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
           totalRevenue: stats.totalRevenue || 0,
           unreadMessages: stats.unreadMessages || 0
         };
-        // Use order statistics from the same API call to avoid duplication
         this.orderStats = stats.orderStatistics || null;
         statsLoaded = true;
         orderStatsLoaded = true;
         checkLoadingComplete();
       },
       error: (error) => {
-        console.error('Error loading dashboard stats from API:', error);
-        this.notificationService.error('Error', 'Failed to load dashboard statistics');
-        // Set defaults to 0 if API fails (no static data)
+        console.error('Error loading dashboard stats:', error);
+        this.notificationService.error('خطأ', 'فشل تحميل إحصائيات لوحة التحكم');
         this.stats = {
           totalProducts: 0,
           totalOrders: 0,
@@ -151,21 +133,15 @@ export class AdminDashboardComponent implements OnInit, OnDestroy {
       }
     });
 
-    // Load recent activity from API
     this.dashboardService.getRecentActivity().subscribe({
       next: (activity) => {
-        // Recent activity comes from API:
-        // - Recent orders: GET /Order?limit=5&sort=-createdAt
-        // - Recent products: GET /product?limit=5&sort=-createdAt
-        // - Recent messages: GET /submit?limit=5&sort=-createdAt
         this.recentActivity = activity || [];
         activityLoaded = true;
         checkLoadingComplete();
       },
       error: (error) => {
-        console.error('Error loading recent activity from API:', error);
-        this.notificationService.error('Error', 'Failed to load recent activity');
-        // Empty array if API fails (no static data)
+        console.error('Error loading recent activity:', error);
+        this.notificationService.error('خطأ', 'فشل تحميل النشاط الأخير');
         this.recentActivity = [];
         activityLoaded = true;
         checkLoadingComplete();
