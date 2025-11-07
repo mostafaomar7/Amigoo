@@ -146,7 +146,7 @@ export class OpencartService {
   /**
    * Directly add product to cart (internal method)
    */
-  private addToCartDirectly(product: any): boolean {
+  private addToCartDirectly(product: any, silent: boolean = false): boolean {
     // Check if product already exists in cart (same product + size combination)
     const existingItem = this.findDuplicateInCart(product);
 
@@ -159,10 +159,12 @@ export class OpencartService {
       this.cartproduct[existingIndex].quantity = newQuantity;
       localStorage.setItem("cart", JSON.stringify(this.cartproduct));
 
-      this.notificationService.success(
-        'تم تحديث الكمية',
-        `تم تحديث كمية ${product.title || 'المنتج'} في السلة. الكمية الحالية: ${newQuantity}`
-      );
+      if (!silent) {
+        this.notificationService.success(
+          'تم تحديث الكمية',
+          `تم تحديث كمية ${product.title || 'المنتج'} في السلة. الكمية الحالية: ${newQuantity}`
+        );
+      }
       document.dispatchEvent(new CustomEvent('cartUpdated'));
       return true;
     }
@@ -171,9 +173,33 @@ export class OpencartService {
     this.cartproduct.push(product);
     localStorage.setItem("cart", JSON.stringify(this.cartproduct));
 
-    this.notificationService.success('تمت الإضافة إلى السلة', `تمت إضافة ${product.title || 'المنتج'} إلى السلة`);
+    if (!silent) {
+      this.notificationService.success('تمت الإضافة إلى السلة', `تمت إضافة ${product.title || 'المنتج'} إلى السلة`);
+    }
     document.dispatchEvent(new CustomEvent('cartUpdated'));
     return true;
+  }
+
+  /**
+   * Add product to cart silently (without notifications)
+   */
+  addToCartSilent(product: any): boolean {
+    // Validate product before adding
+    const validation = this.validateProductForCart(product);
+
+    if (!validation.valid) {
+      // Even in silent mode, show validation errors
+      this.notificationService.warning('خطأ في الإضافة', validation.message || 'لا يمكن إضافة المنتج إلى السلة');
+      return false;
+    }
+
+    // Ensure product has valid quantity
+    if (!product.quantity || product.quantity < 1) {
+      product.quantity = 1;
+    }
+
+    // Product should already have all required selections when called from modal
+    return this.addToCartDirectly(product, true);
   }
 
   /**

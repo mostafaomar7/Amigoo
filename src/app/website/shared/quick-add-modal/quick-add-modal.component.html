@@ -52,7 +52,6 @@
                 class="color-bullet"
                 [style.background-color]="getColorValue(getColorName(color))">
               </span>
-              <span class="color-name">{{ getColorName(color) }}</span>
             </div>
           </div>
         </div>
@@ -73,9 +72,6 @@
               [disabled]="sizeData.no === 0 && sizeData.quantity === 0"
               (click)="selectedSize = sizeData.size">
               {{ sizeData.size }}
-              <small *ngIf="sizeData.no !== undefined" class="stock-info">
-                ({{ sizeData.no }} متاح)
-              </small>
             </button>
           </div>
         </div>
@@ -92,7 +88,7 @@
               class="qty-btn"
               (click)="decreaseQuantity()"
               [disabled]="quantity <= 1">
-              <i class="fas fa-minus"></i>
+              <span class="qty-icon">−</span>
             </button>
             <input
               type="number"
@@ -106,12 +102,9 @@
               class="qty-btn"
               (click)="increaseQuantity()"
               [disabled]="quantity >= (getSelectedSizeStock() || 999)">
-              <i class="fas fa-plus"></i>
+              <span class="qty-icon">+</span>
             </button>
           </div>
-          <small class="stock-info-text" *ngIf="selectedSize && getSelectedSizeStock() > 0">
-            متاح: {{ getSelectedSizeStock() }} قطعة
-          </small>
         </div>
       </div>
       <div class="modal-footer">

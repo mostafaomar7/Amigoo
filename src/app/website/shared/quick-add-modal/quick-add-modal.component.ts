@@ -85,12 +85,6 @@ export class QuickAddModalComponent implements OnInit, OnDestroy {
 
     this.showModal = true;
 
-    // Show notification when modal opens
-    this.notificationService.info(
-      'اختر المواصفات',
-      `يرجى اختيار المواصفات للمنتج ${this.product.title || ''}`
-    );
-
     this.cdr.markForCheck();
   }
 
@@ -165,7 +159,6 @@ export class QuickAddModalComponent implements OnInit, OnDestroy {
 
     if (this.onConfirmCallback) {
       this.onConfirmCallback(this.selectedColor, this.selectedSize, this.quantity);
-      // Note: The opencart service will show the success notification
     }
     this.closeModal();
   }
