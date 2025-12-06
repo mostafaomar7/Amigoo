@@ -1,6 +1,6 @@
 {
     "/api": {
-    "target": "https://amigoapi.mosalam.com",
+    "target": "https://api.amigostore.online",
     "secure": false
     }
 }

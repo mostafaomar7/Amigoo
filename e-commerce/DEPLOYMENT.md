@@ -92,7 +92,7 @@ docker run -d \
 - [ ] SSL/HTTPS configured (handled by Traefik in docker-compose)
 
 ## API Endpoints
-- Base URL: `https://amigoapi.mosalam.com/api/v1`
+- Base URL: `https://api.amigostore.online/api/v1`
 - Categories: `/api/v1/categories`
 - Products: `/api/v1/product`
 - Users: `/api/v1/user`
@@ -122,4 +122,3 @@ docker run -d \
 ### Image Upload Issues
 - Check `uploads/` folder exists
 - Verify folder permissions: `chmod -R 755 uploads/`
-

@@ -13,11 +13,11 @@ services:
       traefik.enable: "true"
       traefik.http.routers.amigoapi-http.entrypoints: "http"
       traefik.http.routers.amigoapi-http.middlewares: "https-redirect"
-      traefik.http.routers.amigoapi-http.rule: "Host(`amigoapi.mosalam.com`)"
+      traefik.http.routers.amigoapi-http.rule: "Host(`api.amigostore.online`)"
       traefik.http.routers.amigoapi-http.service: "amigoapi"
 
       traefik.http.routers.amigoapi-https.entrypoints: "https"
-      traefik.http.routers.amigoapi-https.rule: "Host(`amigoapi.mosalam.com`)"
+      traefik.http.routers.amigoapi-https.rule: "Host(`api.amigostore.online`)"
       traefik.http.routers.amigoapi-https.service: "amigoapi"
       traefik.http.routers.amigoapi-https.tls: "true"
       traefik.http.routers.amigoapi-https.tls.certresolver: "le"
