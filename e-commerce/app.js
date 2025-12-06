@@ -16,9 +16,19 @@ const sizeRoutes = require('./routes/sizeRoutes');
 const settingsRoutes = require('./routes/settingsRoutes');
 
 const corsOptions = {
-  origin: ["https://amigo.mosalam.com", "https://amigostore.online", "http://localhost:3000","http://localhost:4200","http://192.168.0.107:4200"],
-  methods: ["GET", "POST", "PUT", "DELETE"],
+  origin: [
+    "https://amigo.mosalam.com",
+    "https://amigostore.online",
+    "https://amigostore.online/",
+    "http://localhost:3000",
+    "http://localhost:4200",
+    "http://192.168.0.107:4200"
+  ],
+  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+  allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
+  exposedHeaders: ["Content-Type", "Authorization"],
   credentials: true,
+  optionsSuccessStatus: 200
 };
 
 dbConnection();
