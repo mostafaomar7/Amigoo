@@ -1,6 +1,6 @@
 {
     "/api": {
-    "target": "https://api.amigostore.online",
-    "secure": false
+        "target": "https://api.amigostore.online",
+        "secure": false
     }
 }

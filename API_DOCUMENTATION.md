@@ -23,7 +23,7 @@
 **Image Uploads:** Use `multipart/form-data` for endpoints that accept images
 
 **CORS:** Enabled for:
-- `https://amigo.mosalam.com`
+- `https://amigostore.online`
 - `http://localhost:3000`
 - `http://localhost:4200`
 

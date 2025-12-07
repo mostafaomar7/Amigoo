@@ -16,17 +16,8 @@ const sizeRoutes = require('./routes/sizeRoutes');
 const settingsRoutes = require('./routes/settingsRoutes');
 
 const corsOptions = {
-  origin: [
-    "https://amigo.mosalam.com",
-    "https://amigostore.online",
-    "https://amigostore.online/",
-    "http://localhost:3000",
-    "http://localhost:4200",
-    "http://192.168.0.107:4200"
-  ],
-  methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-  allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
-  exposedHeaders: ["Content-Type", "Authorization"],
+  origin: ["https://amigostore.online", "http://localhost:3000", "http://localhost:4200", "http://192.168.0.107:4200"],
+  methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true,
   optionsSuccessStatus: 200
 };
@@ -37,7 +28,7 @@ const app = express();
 app.use(cors(corsOptions));
 
 app.use(express.json());
-app.use('/uploads' , express.static(path.join(__dirname,"uploads")));
+app.use('/uploads', express.static(path.join(__dirname, "uploads")));
 
 
 if (process.env.NODE_ENV === 'development') {
