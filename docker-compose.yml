@@ -2,9 +2,11 @@ version: '3.8'
 
 services:
   backend:
+    build:
+      context: ./ops/node-security/backend
     container_name: backend
     restart: always
-    image: amigo-backend
+    image: local/node-security/backend:22.23.4-20261024
     networks:
       - proxy
     ports:
@@ -26,7 +28,9 @@ services:
       traefik.http.services.amigoapi.loadbalancer.server.port: "8000"
 
   frontend:
-    image: amigo-frontend
+    build:
+      context: ./ops/node-security/amigoo-frontend-1
+    image: local/node-security/amigoo-frontend-1:22.23.4-20261024
     restart: always
     networks:
       - proxy
